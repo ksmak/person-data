@@ -13,6 +13,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum QueryStateType {
+  WAITING
+  SUCCESS
+  ERROR
+}
+
 model User {
   id           Int            @id @default(autoincrement())
   isActive     Boolean        @default(true)
@@ -24,4 +30,54 @@ model User {
   expiredPwd   DateTime?
   createdAt    DateTime?      @default(now())
   updatedAt    DateTime?      @updatedAt
+  queries      Query[]
+  subs         Subscription?  @relation(fields: [subsId], references: [id], onDelete: SetNull)
+  subsId       Int?
+}
+
+model Person {
+  id           Int            @id @default(autoincrement())
+  firstName    String?
+  lastName     String?
+  middleName   String?
+  iin          String?
+  phone        String?   
+  photo        String?
+  createdAt    DateTime?      @default(now())
+  updatedAt    DateTime?      @updatedAt
+  addresses    Address[]
+}
+
+model Address {
+  id           Int            @id @default(autoincrement())
+  person       Person         @relation(fields: [personId], references: [id], onDelete: Cascade)
+  personId     Int
+  region       String?
+  district     String?
+  locality     String?
+  street       String?
+  building     String?
+  apartment    Int?
+}
+
+model Query {
+  id           Int            @id @default(autoincrement())
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       Int
+  body         String
+  count        Int
+  state        QueryStateType @default(WAITING)
+}
+
+model Subscription {
+  id               Int            @id @default(autoincrement())
+  title            String
+  maxQueriesDay    Int
+  maxQueriesMonth  Int
+  maxQueriesTotal  Int
+  usageTimeLimit   Int
+  accessImportData Boolean
+  accessUsers      Boolean
+  accessMonitoring Boolean
+  user             User[]
 }
