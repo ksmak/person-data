@@ -1,43 +1,64 @@
 'use client';
 
 import Link from 'next/link';
-import { updateUser, State } from '@/app/lib/actions';
-import { useActionState } from 'react';
-import { Button } from '@/app/ui/button';
+import { createUser, updateUser, State } from '@/app/lib/actions';
+import { useActionState, useState } from 'react';
 import { User } from '@prisma/client';
+import { ModalDeleteUser } from '@/app/ui/users/modal';
+import { Button } from '../button';
 
-export default function Form({
+export default function UserForm({
   user
 }: {
-  user: User
+  user: User | null
 }) {
-  const updateUserWithId = updateUser.bind(null, user.id)
+  let userAction;
+  if (user) {
+    userAction = updateUser.bind(null, user.id);
+  } else {
+    userAction = createUser;
+  }
   const initialState: State = { message: null, errors: {} };
-  const [state, formAction] = useActionState(updateUserWithId, initialState);
+  const [state, formAction] = useActionState(userAction, initialState);
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => setOpen(!open);
 
   return (
     <form action={formAction}>
+      <div className="mb-3 flex justify-end gap-4">
+        {user?.id
+          ? <Button onClick={(e) => { e.preventDefault(); handleOpen() }} className='bg-red-600  w-32 justify-center'>Удалить</Button>
+          : null}
+        <Button type="submit" className='w-32 justify-center'>Сохранить</Button>
+        <Link
+          href="/users"
+          className="flex h-8 w-32 justify-center items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
+        >
+          Закрыть
+        </Link>
+      </div>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
         {/* isActive */}
         <div className="mb-4">
-          <label htmlFor="isActive" className="mb-2 block text-sm font-medium">
-            Активность
+          <label htmlFor="isActive" className="pl-2 mb-2 block text-sm font-medium">
+            Активный
           </label>
-          <div className="relative mt-2 rounded-md">
+          <div className="relative mt-2 pl-1 rounded-md place-self-start">
             <div className="relative">
               <input
+                className="peer block w-5 h-5 rounded-md border border-gray-200 py-4 pl-10 outline-2 placeholder:text-gray-500  checked:bg-blue-600"
                 id="isActive"
                 name="isActive"
                 type="checkbox"
-                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-                defaultChecked={user.isActive}
+                defaultChecked={user ? user.isActive : true}
               />
             </div>
           </div>
         </div>
         {/* login */}
         <div className="mb-4">
-          <label htmlFor="login" className="mb-2 block text-sm font-medium">
+          <label htmlFor="login" className="pl-2 mb-2 block text-sm font-medium">
             Логин
           </label>
           <div className="relative mt-2 rounded-md">
@@ -47,7 +68,7 @@ export default function Form({
                 id="login"
                 name="login"
                 type="text"
-                defaultValue={user.login}
+                defaultValue={user?.login ? user.login : ""}
                 aria-describedby="login-error"
               />
             </div>
@@ -63,7 +84,7 @@ export default function Form({
         </div>
         {/* password */}
         <div className="mb-4">
-          <label htmlFor="password" className="mb-2 block text-sm font-medium">
+          <label htmlFor="password" className="pl-2 mb-2 block text-sm font-medium">
             Пароль
           </label>
           <div className="relative mt-2 rounded-md">
@@ -73,7 +94,7 @@ export default function Form({
                 id="password"
                 name="password"
                 type="password"
-                defaultValue=""
+                defaultValue={user?.password ? user.password : ""}
                 aria-describedby="password-error"
               />
             </div>
@@ -89,7 +110,7 @@ export default function Form({
         </div>
         {/* lastName */}
         <div className="mb-4">
-          <label htmlFor="lastName" className="mb-2 block text-sm font-medium">
+          <label htmlFor="lastName" className="pl-2 mb-2 block text-sm font-medium">
             Фамилия
           </label>
           <div className="relative mt-2 rounded-md">
@@ -99,7 +120,7 @@ export default function Form({
                 id="lastName"
                 name="lastName"
                 type="text"
-                defaultValue={user.lastName ? user.lastName : ""}
+                defaultValue={user?.lastName ? user.lastName : ""}
                 aria-describedby="login-error"
               />
             </div>
@@ -115,7 +136,7 @@ export default function Form({
         </div>
         {/* firstName */}
         <div className="mb-4">
-          <label htmlFor="firstName" className="mb-2 block text-sm font-medium">
+          <label htmlFor="firstName" className="pl-2 mb-2 block text-sm font-medium">
             Имя
           </label>
           <div className="relative mt-2 rounded-md">
@@ -125,7 +146,7 @@ export default function Form({
                 id="firstName"
                 name="firstName"
                 type="text"
-                defaultValue={user.firstName ? user.firstName : ""}
+                defaultValue={user?.firstName ? user.firstName : ""}
                 aria-describedby="firstName-error"
               />
             </div>
@@ -141,7 +162,7 @@ export default function Form({
         </div>
         {/* middleName */}
         <div className="mb-4">
-          <label htmlFor="middleName" className="mb-2 block text-sm font-medium">
+          <label htmlFor="middleName" className="pl-2 mb-2 block text-sm font-medium">
             Отчество
           </label>
           <div className="relative mt-2 rounded-md">
@@ -151,7 +172,7 @@ export default function Form({
                 id="middleName"
                 name="middleName"
                 type="text"
-                defaultValue={user.middleName ? user.middleName : ""}
+                defaultValue={user?.middleName ? user.middleName : ""}
                 aria-describedby="middleName-error"
               />
             </div>
@@ -166,15 +187,7 @@ export default function Form({
           </div>
         </div>
       </div>
-      <div className="mt-6 flex justify-end gap-4">
-        <Link
-          href="/users"
-          className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
-        >
-          Отмена
-        </Link>
-        <Button type="submit">Сохранить</Button>
-      </div>
+      {user?.id && <ModalDeleteUser id={user.id} open={open} handleOpen={handleOpen} />}
     </form>
   );
 }

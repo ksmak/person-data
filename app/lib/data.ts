@@ -5,6 +5,8 @@ const ITEMS_PER_PAGE = 2;
 export async function fetchFilteredUsers(
     query: string,
     currentPage: number,
+    orderBy: string,
+    sort: string,
 ) {
 
     const users = await prisma.user.findMany({
@@ -32,6 +34,9 @@ export async function fetchFilteredUsers(
                 },
             ],
         },
+        orderBy: {
+            [`${orderBy}`]: `${sort}`
+        }
     });
 
     return users;

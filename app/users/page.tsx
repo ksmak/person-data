@@ -1,12 +1,11 @@
 import Pagination from '@/app/ui/users/pagination';
 import Search from '@/app/ui/search';
-import Table from '@/app/ui/users/table';
+import WrapTable from '@/app/ui/users/wrap_table';
 import { CreateUser } from '@/app/ui/users/buttons';
 import { UsersTableSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
 import { fetchUsersPages } from '@/app/lib/data';
 import { Metadata } from 'next';
-import { ModalDeleteUser } from '../ui/users/modal';
 
 export const metadata: Metadata = {
     title: 'Users',
@@ -16,16 +15,16 @@ export default async function Page(props: {
     searchParams?: Promise<{
         query?: string;
         page?: string;
-        confirmDelete?: string;
-        id?: string;
+        orderBy?: string;
+        sort?: string;
     }>;
 }) {
     const searchParams = await props.searchParams;
     const query = searchParams?.query || '';
     const currentPage = Number(searchParams?.page) || 1;
     const totalPages = await fetchUsersPages(query);
-    const confirmDelete = searchParams?.confirmDelete || '';
-    const id = searchParams?.id || '';
+    const orderBy = searchParams?.orderBy || 'id';
+    const sort = searchParams?.sort || 'asc';
 
     return (
         <div className="w-full">
@@ -37,12 +36,11 @@ export default async function Page(props: {
                 <CreateUser />
             </div>
             <Suspense key={query + currentPage} fallback={<UsersTableSkeleton />}>
-                <Table query={query} currentPage={currentPage} />
+                <WrapTable query={query} currentPage={currentPage} orderBy={orderBy} sort={sort} />
             </Suspense>
             <div className="mt-5 flex w-full justify-center">
                 <Pagination totalPages={totalPages} />
             </div>
-            {confirmDelete && <ModalDeleteUser id={id} />}
         </div>
     );
 }

@@ -1,19 +1,29 @@
+'use client';
+
 import moment from "moment";
-import { UpdateUser, ConfirmDeleteUser } from '@/app/ui/users/buttons';
-import { fetchFilteredUsers } from '@/app/lib/data';
 import { User } from '@prisma/client';
-import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { HiOutlineChevronDown, HiOutlineChevronUp } from "react-icons/hi";
 
-
-
-export default async function UsersTable({
-  query,
-  currentPage,
+export default function UsersTable({
+  users
 }: {
-  query: string;
-  currentPage: number;
+  users: User[]
 }) {
-  const users = await fetchFilteredUsers(query, currentPage);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const { replace } = useRouter();
+  const orderBy = searchParams.get('orderBy');
+  const sort = searchParams.get('sort');
+
+  const handleOrder = (fieldName: string) => {
+    const params = new URLSearchParams(searchParams);
+    const sort = params.get('sort');
+    params.set('orderBy', fieldName);
+    params.set('sort', sort === null ? 'asc' : sort === 'asc' ? 'desc' : 'asc');
+    replace(`${pathname}?${params.toString()}`);
+  }
 
   return (
     <div className="mt-6 flow-root">
@@ -22,26 +32,77 @@ export default async function UsersTable({
           <table className="hidden min-w-full text-gray-900 md:table">
             <thead className="rounded-lg text-left text-sm font-normal">
               <tr>
-                <th scope="col" className="px-3 py-5 font-normal">
-                  Статус
+                <th
+                  scope="col"
+                  className="px-3 py-5 font-normal hover:cursor-pointer"
+                  onClick={() => handleOrder('isActive')}
+                >
+                  <div className="flex gap-3 items-center">
+                    <span>Статус</span>
+                    {orderBy === 'isActive'
+                      ? sort === 'asc' ? <HiOutlineChevronUp /> : <HiOutlineChevronDown />
+                      : null}
+                  </div>
                 </th>
-                <th scope="col" className="px-4 py-5 font-medium sm:pl-6">
-                  Фамилия
+                <th
+                  scope="col"
+                  className="px-4 py-5 font-medium hover:cursor-pointer"
+                  onClick={() => handleOrder('lastName')}
+                >
+                  <div className="flex gap-3 items-center">
+                    <span>Фамилия</span>
+                    {orderBy === 'lastName'
+                      ? sort === 'asc' ? <HiOutlineChevronUp /> : <HiOutlineChevronDown />
+                      : null}
+                  </div>
                 </th>
-                <th scope="col" className="px-4 py-5 font-medium sm:pl-6">
-                  Имя
+                <th
+                  scope="col"
+                  className="px-4 py-5 font-medium hover:cursor-pointer"
+                  onClick={() => handleOrder('firstName')}
+                >
+                  <div className="flex gap-3 items-center">
+                    <span>Имя</span>
+                    {orderBy === 'firstName'
+                      ? sort === 'asc' ? <HiOutlineChevronUp /> : <HiOutlineChevronDown />
+                      : null}
+                  </div>
                 </th>
-                <th scope="col" className="px-4 py-5 font-medium sm:pl-6">
-                  Отчество
+                <th
+                  scope="col"
+                  className="px-4 py-5 font-medium hover:cursor-pointer"
+                  onClick={() => handleOrder('middleName')}
+                >
+                  <div className="flex gap-3 items-center">
+                    <span>Отчество</span>
+                    {orderBy === 'middleName'
+                      ? sort === 'asc' ? <HiOutlineChevronUp /> : <HiOutlineChevronDown />
+                      : null}
+                  </div>
                 </th>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Логин
+                <th
+                  scope="col"
+                  className="px-3 py-5 font-medium hover:cursor-pointer"
+                  onClick={() => handleOrder('login')}
+                >
+                  <div className="flex gap-3 items-center">
+                    <span>Логин</span>
+                    {orderBy === 'login'
+                      ? sort === 'asc' ? <HiOutlineChevronUp /> : <HiOutlineChevronDown />
+                      : null}
+                  </div>
                 </th>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Срок действия пароля
-                </th>
-                <th scope="col" className="relative py-3 pl-6 pr-3">
-                  <span className="sr-only">Редактировать</span>
+                <th
+                  scope="col"
+                  className="px-3 py-5 font-medium hover:cursor-pointer"
+                  onClick={() => handleOrder('expiredPwd')}
+                >
+                  <div className="flex gap-3 items-center">
+                    <span>Срок действия пароля</span>
+                    {orderBy === 'expiredPwd'
+                      ? sort === 'asc' ? <HiOutlineChevronUp /> : <HiOutlineChevronDown />
+                      : null}
+                  </div>
                 </th>
               </tr>
             </thead>
@@ -49,7 +110,8 @@ export default async function UsersTable({
               {users?.map((user: User) => (
                 <tr
                   key={user.id}
-                  className="w-full border-b py-3 text-sm last-of-type:border-none [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg"
+                  className="w-full border-b py-3 text-sm last-of-type:border-none [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg hover:cursor-pointer hover:bg-gray-50"
+                  onClick={() => router.push(`/users/${user.id}/edit`)}
                 >
                   <td className="whitespace-nowrap px-3 py-3">
                     {user.isActive
@@ -71,12 +133,6 @@ export default async function UsersTable({
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
                     {user.expiredPwd && moment(user.expiredPwd).format('DD.MM.YYYY')}
-                  </td>
-                  <td className="whitespace-nowrap py-3 pl-6 pr-3">
-                    <div className="flex justify-end gap-3">
-                      <UpdateUser id={user.id} />
-                      <ConfirmDeleteUser id={user.id} />
-                    </div>
                   </td>
                 </tr>
               ))}

@@ -1,4 +1,4 @@
-import Form from '@/app/ui/users/create-form';
+import Form from '@/app/ui/users/form';
 import Breadcrumbs from '@/app/ui/users/breadcrumbs';
 
 export default async function Page() {
@@ -14,7 +14,7 @@ export default async function Page() {
                     },
                 ]}
             />
-            <Form />
+            <Form  user={null}/>
         </main>
     );
 }
