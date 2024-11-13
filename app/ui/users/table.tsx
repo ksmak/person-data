@@ -2,10 +2,11 @@ import moment from "moment";
 import { UpdateUser, ConfirmDeleteUser } from '@/app/ui/users/buttons';
 import { fetchFilteredUsers } from '@/app/lib/data';
 import { User } from '@prisma/client';
+import Link from "next/link";
 
 
 
-export default async function InvoicesTable({
+export default async function UsersTable({
   query,
   currentPage,
 }: {

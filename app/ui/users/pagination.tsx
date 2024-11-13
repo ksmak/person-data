@@ -74,7 +74,7 @@ function PaginationNumber({
   isActive: boolean;
 }) {
   const className = clsx(
-    'flex h-6 w-6 items-center justify-center text-sm border',
+    'flex h-8 w-8 items-center justify-center text-sm border',
     {
       'rounded-l-md': position === 'first' || position === 'single',
       'rounded-r-md': position === 'last' || position === 'single',
@@ -103,7 +103,7 @@ function PaginationArrow({
   isDisabled?: boolean;
 }) {
   const className = clsx(
-    'flex h-6 w-6 items-center justify-center rounded-md border',
+    'flex h-8 w-8 items-center justify-center rounded-md border',
     {
       'pointer-events-none text-gray-300': isDisabled,
       'hover:bg-gray-100': !isDisabled,
