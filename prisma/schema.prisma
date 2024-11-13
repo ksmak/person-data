@@ -20,57 +20,58 @@ enum QueryStateType {
 }
 
 model User {
-  id           Int            @id @default(autoincrement())
-  isActive     Boolean        @default(true)
-  login        String         @unique
-  password     String
-  firstName    String?
-  lastName     String?
-  middleName   String?
-  expiredPwd   DateTime?
-  createdAt    DateTime?      @default(now())
-  updatedAt    DateTime?      @updatedAt
-  queries      Query[]
-  subs         Subscription?  @relation(fields: [subsId], references: [id], onDelete: SetNull)
-  subsId       Int?
+  id         String        @id @default(cuid())
+  isActive   Boolean       @default(true)
+  login      String        @unique
+  password   String
+  firstName  String?
+  lastName   String?
+  middleName String?
+  expiredPwd DateTime?
+  createdAt  DateTime?     @default(now())
+  updatedAt  DateTime?     @updatedAt
+  queries    Query[]
+  subs       Subscription? @relation(fields: [subsId], references: [id], onDelete: SetNull)
+  subsId     String?
 }
 
 model Person {
-  id           Int            @id @default(autoincrement())
-  firstName    String?
-  lastName     String?
-  middleName   String?
-  iin          String?
-  phone        String?   
-  photo        String?
-  createdAt    DateTime?      @default(now())
-  updatedAt    DateTime?      @updatedAt
-  addresses    Address[]
+  id         String    @id @default(cuid())
+  firstName  String?
+  lastName   String?
+  middleName String?
+  iin        String?
+  phone      String?
+  photo      String?
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @updatedAt
+  addresses  Address[]
 }
 
 model Address {
-  id           Int            @id @default(autoincrement())
-  person       Person         @relation(fields: [personId], references: [id], onDelete: Cascade)
-  personId     Int
-  region       String?
-  district     String?
-  locality     String?
-  street       String?
-  building     String?
-  apartment    Int?
+  id        String  @id @default(cuid())
+  person    Person  @relation(fields: [personId], references: [id], onDelete: Cascade)
+  personId  String
+  region    String?
+  district  String?
+  locality  String?
+  street    String?
+  building  String?
+  apartment Int?
 }
 
 model Query {
-  id           Int            @id @default(autoincrement())
-  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId       Int
-  body         String
-  count        Int
-  state        QueryStateType @default(WAITING)
+  id        String         @id @default(cuid())
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  body      String
+  count     Int
+  state     QueryStateType @default(WAITING)
+  createdAt DateTime?      @default(now())
 }
 
 model Subscription {
-  id               Int            @id @default(autoincrement())
+  id               String  @id @default(cuid())
   title            String
   maxQueriesDay    Int
   maxQueriesMonth  Int

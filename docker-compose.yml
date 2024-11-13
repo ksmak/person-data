@@ -6,11 +6,10 @@ volumes:
 
 
 services:
-  db:
-    container_name: db
+  pgdb:
+    container_name: pgdb
     image: postgres:15
     volumes:
-    
       - pgdata:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: "root"
@@ -26,7 +25,7 @@ services:
     volumes:
       - pgadmin-data:/var/lib/pgadmin
     depends_on:
-      - db
+      - pgdb
     ports:
       - 5050:80
     environment:
@@ -36,7 +35,7 @@ services:
 
   web:
     container_name: web
-    build: 
+    build:
       context: .
       dockerfile: DockerFile
     command: npm run dev
@@ -46,6 +45,6 @@ services:
     ports:
       - 3000:3000
     depends_on:
-      - db
+      - pgdb
     env_file:
       - ./.env
