@@ -1,17 +1,20 @@
 'use client';
 
-import { HiOutlineSearch, HiOutlineChartBar, HiOutlineUsers, HiOutlineKey } from "react-icons/hi";
+import { HiOutlineSearch, HiOutlineChartBar, HiOutlineUser, HiOutlineKey, HiOutlineDatabase } from "react-icons/hi";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 
-// Map of links to display in the side navigation.
-// Depending on the size of the application, this would be stored in a database.
 const links = [
   {
     name: 'Поиск информации',
-    href: '/search',
+    href: '/queries',
     icon: HiOutlineSearch,
+  },
+  {
+    name: 'Загрузка данных',
+    href: '/import',
+    icon: HiOutlineDatabase,
   },
   {
     name: 'Мониторинг запросов',
@@ -21,7 +24,7 @@ const links = [
   {
     name: 'Пользователи',
     href: '/users',
-    icon: HiOutlineUsers,
+    icon: HiOutlineUser,
   },
   {
     name: 'Подписки',

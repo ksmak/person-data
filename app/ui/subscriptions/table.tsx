@@ -34,11 +34,11 @@ export default function SubscriptionsTable({
                 <th
                   scope="col"
                   className="px-3 py-5 font-normal hover:cursor-pointer"
-                  onClick={() => handleOrder('isActive')}
+                  onClick={() => handleOrder('title')}
                 >
                   <div className="flex gap-3 items-center">
                     <span>Наименование</span>
-                    {orderBy === 'isActive'
+                    {orderBy === 'title'
                       ? sort === 'asc' ? <HiOutlineChevronUp /> : <HiOutlineChevronDown />
                       : null}
                   </div>

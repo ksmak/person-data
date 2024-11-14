@@ -20,10 +20,12 @@ export default function SearchPanel({ id }: { id: string }) {
     const handleOpen = () => { setOpen(false) };
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
         const createQueryWithId = createQuery.bind(null, id);
         const formData = new FormData(event.currentTarget);
-        if (checkingEmptyQuery(formData)) return;
+        if (checkingEmptyQuery(formData)) {
+            event.preventDefault();
+            return;
+        }
         await createQueryWithId(undefined, formData);
         handleOpen();
     }

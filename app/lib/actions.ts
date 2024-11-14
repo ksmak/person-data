@@ -329,4 +329,6 @@ export async function createQuery(id: string, prevState: string | undefined, for
     } catch (error) {
         throw error;
     }
+    revalidatePath('/queries');
+    redirect('/queries');
 }

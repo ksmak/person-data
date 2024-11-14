@@ -1,14 +1,14 @@
 'use client';
 
 import moment from "moment";
-import { User } from '@prisma/client';
+import { Query } from '@prisma/client';
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { HiOutlineChevronDown, HiOutlineChevronUp } from "react-icons/hi";
 
-export default function UsersTable({
-  users
+export default function QueriesTable({
+  queries
 }: {
-  users: User[]
+  queries: Query[]
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -34,12 +34,32 @@ export default function UsersTable({
               <tr>
                 <th
                   scope="col"
-                  className="px-3 py-5 font-normal hover:cursor-pointer"
-                  onClick={() => handleOrder('isActive')}
+                  className="px-3 py-5 font-medium hover:cursor-pointer"
+                  onClick={() => handleOrder('createdAt')}
+                >
+                  <div className="flex gap-3 items-center">
+                    <span>Создан</span>
+                    {orderBy === 'createdAt'
+                      ? sort === 'asc' ? <HiOutlineChevronUp /> : <HiOutlineChevronDown />
+                      : null}
+                  </div>
+                </th>
+                <th
+                  scope="col"
+                  className="w-96 px-4 py-5 font-medium hover:cursor-pointer"
+                >
+                  <div className="flex gap-3 items-center">
+                    <span>Условия запроса</span>
+                  </div>
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-5 font-medium hover:cursor-pointer"
+                  onClick={() => handleOrder('state')}
                 >
                   <div className="flex gap-3 items-center">
                     <span>Статус</span>
-                    {orderBy === 'isActive'
+                    {orderBy === 'state'
                       ? sort === 'asc' ? <HiOutlineChevronUp /> : <HiOutlineChevronDown />
                       : null}
                   </div>
@@ -47,59 +67,11 @@ export default function UsersTable({
                 <th
                   scope="col"
                   className="px-4 py-5 font-medium hover:cursor-pointer"
-                  onClick={() => handleOrder('lastName')}
+                  onClick={() => handleOrder('count')}
                 >
                   <div className="flex gap-3 items-center">
-                    <span>Фамилия</span>
-                    {orderBy === 'lastName'
-                      ? sort === 'asc' ? <HiOutlineChevronUp /> : <HiOutlineChevronDown />
-                      : null}
-                  </div>
-                </th>
-                <th
-                  scope="col"
-                  className="px-4 py-5 font-medium hover:cursor-pointer"
-                  onClick={() => handleOrder('firstName')}
-                >
-                  <div className="flex gap-3 items-center">
-                    <span>Имя</span>
-                    {orderBy === 'firstName'
-                      ? sort === 'asc' ? <HiOutlineChevronUp /> : <HiOutlineChevronDown />
-                      : null}
-                  </div>
-                </th>
-                <th
-                  scope="col"
-                  className="px-4 py-5 font-medium hover:cursor-pointer"
-                  onClick={() => handleOrder('middleName')}
-                >
-                  <div className="flex gap-3 items-center">
-                    <span>Отчество</span>
-                    {orderBy === 'middleName'
-                      ? sort === 'asc' ? <HiOutlineChevronUp /> : <HiOutlineChevronDown />
-                      : null}
-                  </div>
-                </th>
-                <th
-                  scope="col"
-                  className="px-3 py-5 font-medium hover:cursor-pointer"
-                  onClick={() => handleOrder('login')}
-                >
-                  <div className="flex gap-3 items-center">
-                    <span>Логин</span>
-                    {orderBy === 'login'
-                      ? sort === 'asc' ? <HiOutlineChevronUp /> : <HiOutlineChevronDown />
-                      : null}
-                  </div>
-                </th>
-                <th
-                  scope="col"
-                  className="px-3 py-5 font-medium hover:cursor-pointer"
-                  onClick={() => handleOrder('expiredPwd')}
-                >
-                  <div className="flex gap-3 items-center">
-                    <span>Срок действия пароля</span>
-                    {orderBy === 'expiredPwd'
+                    <span>Кол-во полож. ответов</span>
+                    {orderBy === 'count'
                       ? sort === 'asc' ? <HiOutlineChevronUp /> : <HiOutlineChevronDown />
                       : null}
                   </div>
@@ -107,34 +79,28 @@ export default function UsersTable({
               </tr>
             </thead>
             <tbody className="bg-white">
-              {users?.map((user: User) => (
+              {queries?.map((query: Query) => (
                 <tr
-                  key={user.id}
+                  key={query.id}
                   className="w-full border-b py-3 text-sm last-of-type:border-none [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg hover:cursor-pointer hover:bg-gray-50"
-                  onClick={() => router.push(`/users/${user.id}/edit`)}
+                  onClick={() => router.push(`/queries/${query.id}`)}
                 >
                   <td className="whitespace-nowrap px-3 py-3">
-                    <div className="w-10">
-                      {user.isActive
-                        ? <div className="w-20 text-green-600 border border-green-600 p-0 text-center text-xs">Активный</div>
-                        : <div className="w-20 text-red-600 border border-red-600 p-0 text-center text-xs">Не активный</div>
-                      }
-                    </div>
+                    {query.createdAt && moment(query.createdAt).format('DD.MM.YYYY H:M:S')}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
-                    {user.lastName}
+                    <div className="w-96 h-20 text-wrap overflow-y-auto">{query.body}</div>
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
-                    {user.firstName}
+                    {query.state === 'WAITING'
+                      ? <div className="text-orange-600 border border-orange-600 p-0 text-center text-xs w-32">в процессе</div>
+                      : query.state === "SUCCESS"
+                        ? <div className="text-green-600 border border-green-600 p-0 text-center text-xs w-32">выполнен</div>
+                        : <div className="text-red-600 border border-red-600 p-0 text-center text-xs w-32">ошибка</div>
+                    }
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
-                    {user.middleName}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-3">
-                    {user.login}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-3">
-                    {user.expiredPwd && moment(user.expiredPwd).format('DD.MM.YYYY')}
+                    {query.count}
                   </td>
                 </tr>
               ))}
