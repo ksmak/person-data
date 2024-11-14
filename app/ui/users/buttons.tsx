@@ -1,6 +1,5 @@
 import { HiOutlinePlusSm, HiOutlinePencil } from "react-icons/hi";
 import Link from 'next/link';
-import { deleteUser } from '@/app/lib/actions';
 
 export function CreateUser() {
   return (
@@ -22,17 +21,5 @@ export function UpdateUser({ id }: { id: string }) {
     >
       <HiOutlinePencil className="w-5" />
     </Link>
-  );
-}
-
-export function DeleteUser({ id }: { id: string }) {
-  const deleteUserWithId = deleteUser.bind(null, id);
-
-  return (
-    <form action={deleteUserWithId}>
-      <button className="inline-flex w-full justify-center gap-2 items-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto">
-        Удалить
-      </button>
-    </form>
   );
 }

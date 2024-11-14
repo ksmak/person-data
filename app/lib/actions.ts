@@ -296,3 +296,37 @@ export async function deleteSubscription(id: string) {
     revalidatePath('/subscriptions');
     redirect('/subscriptions');
 }
+
+export async function createQuery(id: string, prevState: string | undefined, formData: FormData) {
+
+    let body: any = [];
+    for (const pair of formData.entries()) {
+        if (pair[1]) {
+            const condition = {
+                [`${pair[0]}`]: {
+                    startsWith: `${pair[1]}`,
+                    mode: 'insensitive',
+                }
+            }
+            body.push(condition);
+        }
+    }
+
+    try {
+        const persons = prisma.person.findMany({
+            where: {
+                OR: [...body],
+            }
+        })
+
+        await prisma.query.create({
+            data: {
+                userId: id,
+                body: JSON.stringify(body),
+                count: (await persons).length,
+            }
+        })
+    } catch (error) {
+        throw error;
+    }
+}

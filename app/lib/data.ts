@@ -1,6 +1,6 @@
 import prisma from "./db";
 
-const ITEMS_PER_PAGE = 2;
+const ITEMS_PER_PAGE = 20;
 
 export async function fetchSubscriptions() {
     return await prisma.subscription.findMany();
@@ -98,14 +98,10 @@ export async function fetchFilteredSubscriptions(
         skip: (currentPage - 1) * ITEMS_PER_PAGE,
         take: ITEMS_PER_PAGE,
         where: {
-            OR: [
-                {
-                    title: {
-                        startsWith: `${query}`,
-                        mode: 'insensitive',
-                    },
-                },
-            ],
+            title: {
+                startsWith: `${query}`,
+                mode: 'insensitive',
+            },
         },
         orderBy: {
             [`${orderBy}`]: `${sort}`
@@ -118,14 +114,10 @@ export async function fetchFilteredSubscriptions(
 export async function fetchSubscriptionsPages(query: string) {
     const subsCount = await prisma.subscription.count({
         where: {
-            OR: [
-                {
-                    title: {
-                        startsWith: `${query}`,
-                        mode: 'insensitive',
-                    },
-                },
-            ],
+            title: {
+                startsWith: `${query}`,
+                mode: 'insensitive',
+            },
         },
     })
 

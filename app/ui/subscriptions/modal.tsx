@@ -1,5 +1,6 @@
 'use client';
 
+import { deleteSubscription } from "@/app/lib/actions";
 import { DeleteSubscription } from "@/app/ui/subscriptions/buttons";
 import {
     Dialog,
@@ -14,6 +15,12 @@ export function ModalDeleteUser({ id, open, handleOpen
     open: boolean,
     handleOpen: () => void,
 }) {
+    const handleDelete = async () => {
+        const deleteSubscriptionWithId = deleteSubscription.bind(null, id);
+        await deleteSubscriptionWithId();
+        handleOpen();
+    }
+
     return (
         <Dialog open={open} handler={handleOpen}>
             <DialogHeader>Удаление</DialogHeader>
@@ -27,7 +34,12 @@ export function ModalDeleteUser({ id, open, handleOpen
                 >
                     <span>Отмена</span>
                 </button>
-                <DeleteSubscription id={id} />
+                <button
+                    className="inline-flex w-full justify-center gap-2 items-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
+                    onClick={handleDelete}
+                >
+                    Удалить
+                </button>
             </DialogFooter>
         </Dialog>
     )

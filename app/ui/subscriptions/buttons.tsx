@@ -24,15 +24,3 @@ export function UpdateSubscription({ id }: { id: string }) {
     </Link>
   );
 }
-
-export function DeleteSubscription({ id }: { id: string }) {
-  const deleteSubscriptionWithId = deleteSubscription.bind(null, id);
-
-  return (
-    <form action={deleteSubscriptionWithId}>
-      <button className="inline-flex w-full justify-center gap-2 items-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto">
-        Удалить
-      </button>
-    </form>
-  );
-}

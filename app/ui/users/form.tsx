@@ -206,11 +206,10 @@ export default function UserForm({
           </label>
           <div className='flex items-center flex-wrap gap-5'>
             {subs.map((sub: Subscription) => (
-              <div className="relative mt-2 pl-1 rounded-md place-self-start">
+              <div className="relative mt-2 pl-1 rounded-md place-self-start" key={sub.id}>
                 <div className="relative">
                   <Radio
                     name='subsId'
-                    key={sub.id}
                     color='blue'
                     label={
                       <SubscriptionCard sub={sub} />

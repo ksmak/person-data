@@ -1,6 +1,6 @@
 'use client';
 
-import { DeleteUser } from "@/app/ui/users/buttons";
+import { deleteUser } from "@/app/lib/actions";
 import {
     Dialog,
     DialogHeader,
@@ -14,6 +14,12 @@ export function ModalDeleteUser({ id, open, handleOpen
     open: boolean,
     handleOpen: () => void,
 }) {
+    const handleDelete = async () => {
+        const deleteUserWithId = deleteUser.bind(null, id);
+        await deleteUserWithId();
+        handleOpen();
+    }
+
     return (
         <Dialog open={open} handler={handleOpen}>
             <DialogHeader>Удаление</DialogHeader>
@@ -27,7 +33,12 @@ export function ModalDeleteUser({ id, open, handleOpen
                 >
                     <span>Отмена</span>
                 </button>
-                <DeleteUser id={id} />
+                <button
+                    className="inline-flex w-full justify-center gap-2 items-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
+                    onClick={handleDelete}
+                >
+                    Удалить
+                </button>
             </DialogFooter>
         </Dialog>
     )
