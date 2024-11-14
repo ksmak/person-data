@@ -1,4 +1,5 @@
 import { ImportForm } from "../ui/import/form";
+import { ImportPanel } from "../ui/import/panel";
 
 export default async function Page() {
     return (

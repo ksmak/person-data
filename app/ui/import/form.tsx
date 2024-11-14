@@ -1,19 +1,59 @@
+'use client';
+
+import { ChangeEvent, FormEvent, useRef, useState } from "react";
+import { HiOutlineDownload, HiCloudUpload } from "react-icons/hi";
+import Papa from 'papaparse';
+import Panel from "./panel";
+import { Person } from "@/app/lib/definitions";
+
 export function ImportForm() {
+    const [uploading, setUploading] = useState(false);
+    const [data, setData] = useState<Person[]>([]);
+
+    const streamPeopleCSV = (csvFile: File): void => {
+        let persons: Person[] = [];
+        const parset = Papa.parse<Person>(csvFile, {
+            header: true,
+            dynamicTyping: true,
+            step: (results) => {
+                console.log("Row data:", results.data);
+                persons.push(results.data);
+            }
+        });
+
+        setData(persons);
+    };
+
+    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files.length) {
+            const file = event.target.files[0];
+            streamPeopleCSV(file);
+        }
+    }
+
+    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+    }
+
     return (
-        <form>
-            <label htmlFor="uploadFile1"
-                className="flex bg-gray-800 hover:bg-gray-700 text-white text-base px-5 py-3 outline-none rounded w-max cursor-pointer mx-auto font-[sans-serif]">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 mr-2 fill-white inline" viewBox="0 0 32 32">
-                    <path
-                        d="M23.75 11.044a7.99 7.99 0 0 0-15.5-.009A8 8 0 0 0 9 27h3a1 1 0 0 0 0-2H9a6 6 0 0 1-.035-12 1.038 1.038 0 0 0 1.1-.854 5.991 5.991 0 0 1 11.862 0A1.08 1.08 0 0 0 23 13a6 6 0 0 1 0 12h-3a1 1 0 0 0 0 2h3a8 8 0 0 0 .75-15.956z"
-                        data-original="#000000" />
-                    <path
-                        d="M20.293 19.707a1 1 0 0 0 1.414-1.414l-5-5a1 1 0 0 0-1.414 0l-5 5a1 1 0 0 0 1.414 1.414L15 16.414V29a1 1 0 0 0 2 0V16.414z"
-                        data-original="#000000" />
-                </svg>
-                Выбрать файл
-                <input type="file" id='uploadFile1' class="hidden" />
-            </label>
+        <form onSubmit={handleSubmit} className="w-full flex flex-col items-start">
+            <div className="flex gap-4 items-center">
+                <label htmlFor="uploadFile1"
+                    className="w-48 flex gap-4 justify-center bg-gradient-to-t font-bold text-xs uppercase from-blue-600 to-blue-500 items-center hover:shadow-lg hover:shadow-blue-300 text-white px-4 py-2 outline-none rounded-lg cursor-pointer mx-auto font-[sans-serif]">
+                    Выбрать файл
+                    <HiCloudUpload className="h-6 w-6" />
+                    <input type="file" id='uploadFile1' className="hidden" onChange={handleChange} />
+                </label>
+            </div>
+            <div className="mt-5 flex w-full justify-center rounded-lg bg-gray-50 p-2 md:pt-0">
+                {data && <Panel data={data} />}
+            </div>
+            <div className="mt-5 flex gap-4 items-center">
+                {data && <button
+                    className="w-48 flex gap-4 justify-center bg-gradient-to-t font-bold text-xs uppercase from-blue-600 to-blue-500 items-center hover:shadow-lg hover:shadow-blue-300 text-white px-4 py-2 outline-none rounded-lg cursor-pointer mx-auto font-[sans-serif]"
+                    type="submit"
+                >Начать загрузку <HiOutlineDownload className="h-6 w-6" /></button>}
+            </div>
         </form>
     )
 } 

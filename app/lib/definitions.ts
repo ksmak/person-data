@@ -1,14 +1,13 @@
-export type User = {
-    id: number,
-    isActive: boolean,
-    login: string,
-    password: string,
-    firstName: string,
-    lastName: string,
-    middleName: string,
-}
-
-export type CustomerField = {
-    id: string;
-    name: string;
+export type Person = {
+  lastName?: string;
+  firstName?: string;
+  middleName?: string;
+  iin?: string;
+  phone?: string;
+  region?: string;
+  district?: string;
+  locality?: string;
+  street?: string;
+  building?: string;
+  apartment?: number;
 };
