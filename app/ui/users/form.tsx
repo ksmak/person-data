@@ -2,30 +2,42 @@
 
 import Link from 'next/link';
 import { createUser, updateUser, State } from '@/app/lib/actions';
-import { useActionState, useState } from 'react';
-import { User } from '@prisma/client';
+import { FormEvent, useState } from 'react';
+import { Subscription, User } from '@prisma/client';
 import { ModalDeleteUser } from '@/app/ui/users/modal';
 import { Button } from '../button';
+import { Radio } from "@material-tailwind/react";
+import { SubscriptionCard } from '../card';
 
 export default function UserForm({
-  user
+  user,
+  subs,
 }: {
-  user: User | null
+  user: User | null,
+  subs: Subscription[],
 }) {
-  let userAction;
-  if (user) {
-    userAction = updateUser.bind(null, user.id);
-  } else {
-    userAction = createUser;
-  }
-  const initialState: State = { message: null, errors: {} };
-  const [state, formAction] = useActionState(userAction, initialState);
+  const [state, setState] = useState<State>({ message: null, errors: {} });
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(!open);
 
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    let action;
+    if (user) {
+      action = updateUser.bind(null, user.id);
+    } else {
+      action = createUser;
+    }
+
+    const formData = new FormData(event.currentTarget);
+    const initialState: State = { message: null, errors: {} };
+    setState(await action(initialState, formData));
+  }
+
   return (
-    <form action={formAction}>
+    <form onSubmit={onSubmit}>
       <div className="mb-3 flex justify-end gap-4">
         {user?.id
           ? <Button onClick={(e) => { e.preventDefault(); handleOpen() }} className='bg-red-600  w-32 justify-center'>Удалить</Button>
@@ -39,6 +51,7 @@ export default function UserForm({
         </Link>
       </div>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
+        <p className="mt-2 text-sm text-red-500 text-center mb-2">{state.message}</p>
         {/* isActive */}
         <div className="mb-4">
           <label htmlFor="isActive" className="pl-2 mb-2 block text-sm font-medium">
@@ -121,7 +134,7 @@ export default function UserForm({
                 name="lastName"
                 type="text"
                 defaultValue={user?.lastName ? user.lastName : ""}
-                aria-describedby="login-error"
+                aria-describedby="lastName-error"
               />
             </div>
             <div id="lastName-error" aria-live="polite" aria-atomic="true">
@@ -184,6 +197,30 @@ export default function UserForm({
                   </p>
                 ))}
             </div>
+          </div>
+        </div>
+        {/* subscription */}
+        <div className="mb-4">
+          <label htmlFor="isActive" className="pl-2 mb-2 block text-sm font-medium">
+            Подписка
+          </label>
+          <div className='flex items-center flex-wrap gap-5'>
+            {subs.map((sub: Subscription) => (
+              <div className="relative mt-2 pl-1 rounded-md place-self-start">
+                <div className="relative">
+                  <Radio
+                    name='subsId'
+                    key={sub.id}
+                    color='blue'
+                    label={
+                      <SubscriptionCard sub={sub} />
+                    }
+                    defaultValue={sub.id}
+                    defaultChecked={user?.subsId === sub.id}
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

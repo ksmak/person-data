@@ -1,7 +1,10 @@
 import Form from '@/app/ui/users/form';
 import Breadcrumbs from '@/app/ui/users/breadcrumbs';
+import { fetchSubscriptions } from '@/app/lib/data';
 
 export default async function Page() {
+    const subs = await fetchSubscriptions();
+
     return (
         <main>
             <Breadcrumbs
@@ -14,7 +17,7 @@ export default async function Page() {
                     },
                 ]}
             />
-            <Form  user={null}/>
+            <Form user={null} subs={subs} />
         </main>
     );
 }
