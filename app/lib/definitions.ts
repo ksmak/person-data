@@ -1,5 +1,5 @@
 export type Person = {
-  fullName?: string,
+  fullName?: string;
   lastName?: string;
   firstName?: string;
   middleName?: string;
@@ -11,4 +11,9 @@ export type Person = {
   street?: string;
   building?: string;
   apartment?: number;
+};
+
+export type PersonField = {
+  name: string;
+  title: string;
 };
