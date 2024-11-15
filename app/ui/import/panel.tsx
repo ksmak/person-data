@@ -1,14 +1,12 @@
 import { Person } from "@/app/lib/definitions";
 
 export default function ImportPanel({
-    data
-}: { data: Person }) {
+    persons
+}: { persons: Person[] }) {
 
     return (
-        {
-            data.map((person: Person) => (
-            
-        ))
-        }
+        // {persons.map((person: Person) => (
+        <div>1</div>
+        // ))}
     )
 }

@@ -1,3 +1,6 @@
+import { Person } from "./definitions";
+import Papa, { ParseError, ParseResult } from 'papaparse';
+
 export const formatCurrency = (amount: number) => {
   return (amount / 100).toLocaleString('en-US', {
     style: 'currency',
@@ -55,3 +58,32 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
     totalPages,
   ];
 };
+
+export async function uploadCsv(csvFile: File, formData: FormData | undefined = undefined) {
+  let persons: Person[] = [];
+  let cols: string[] = [];
+
+  return new Promise(resolve => {
+    Papa.parse<any>(csvFile, {
+      header: true,
+      dynamicTyping: true,
+      step: (results) => {
+        if (formData) {
+          cols = results.meta.fields ? results.meta.fields : [];
+          let person: Person = {};
+          results.meta.fields?.forEach(element => {
+            const field = formData.get(`${element}`);
+            const val = results.data[`${element}` as keyof typeof results.data];
+            if (field && val) {
+              person[`${field}` as keyof typeof person] = val;
+            }
+          });
+          persons.push(person);
+        }
+      },
+      complete: () => {
+        resolve({ persons: persons, cols: cols });
+      }
+    });
+  });
+}

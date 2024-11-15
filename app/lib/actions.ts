@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import prisma from './db';
+import { uploadCsv } from './utils';
 
 const EXPIRED_PASSWORD_DAYS = 30;
 
@@ -331,4 +332,8 @@ export async function createQuery(id: string, prevState: string | undefined, for
     }
     revalidatePath('/queries');
     redirect('/queries');
+}
+
+export async function importData(prevState: string | undefined, formData: FormData) {
+    //
 }

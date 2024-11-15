@@ -1,4 +1,5 @@
 export type Person = {
+  fullName?: string,
   lastName?: string;
   firstName?: string;
   middleName?: string;
