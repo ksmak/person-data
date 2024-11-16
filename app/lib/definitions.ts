@@ -16,4 +16,11 @@ export type Person = {
 export type PersonField = {
   name: string;
   title: string;
+  value?: string;
 };
+
+export type ParsedData = {
+  persons: Person[],
+  cols: string[],
+  logs: string[],
+}

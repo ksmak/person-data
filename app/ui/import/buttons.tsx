@@ -1,18 +1,19 @@
 'use client';
 
-import { uploadFile } from "@/app/lib/actions";
+import { ImportState, uploadFile } from "@/app/lib/actions";
 import { Spinner } from "@material-tailwind/react";
-import { ChangeEvent, FormEvent, useRef } from "react";
+import { ChangeEvent, FormEvent, useRef, useState } from "react";
+import { useFormStatus } from "react-dom";
 import { HiOutlineUpload } from "react-icons/hi";
 
 export function UploadFileButton({
-    uploading,
-    fileName,
+    fileName
 }: {
-    uploading: boolean,
     fileName: string | undefined
 }) {
+    const [state, setState] = useState<ImportState>({});
     const refForm = useRef<HTMLFormElement>(null);
+    const status = useFormStatus()
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files.length) {
@@ -23,17 +24,21 @@ export function UploadFileButton({
     };
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
         const formData = new FormData(event.currentTarget);
-        await uploadFile(formData);
+        const initialState = { message: '', file: '' }
+        setState(await uploadFile(initialState, formData));
     }
 
+    const file = state.file ? state.file : fileName;
+
     return (
-        <div className="flex gap-4 items-center">
-            <form onSubmit={handleSubmit} ref={refForm}>
+        <form onSubmit={handleSubmit} ref={refForm}>
+            <div className="flex gap-5 items-center justify-self-start">
                 <label htmlFor="uploadFile1"
                     className="w-48 flex gap-4 justify-center bg-gradient-to-t font-bold text-xs uppercase from-blue-600 to-blue-500 items-center hover:shadow-lg hover:shadow-blue-300 text-white px-4 py-2 outline-none rounded-lg cursor-pointer mx-auto font-[sans-serif]">
-                    {uploading ? "Загрузка..." : "Выбрать файл"}
-                    {uploading ? <Spinner className="h-6 w-6" /> : <HiOutlineUpload className="h-6 w-6" />}
+                    {status.pending ? "Загрузка..." : "Выбрать файл"}
+                    {status.pending ? <Spinner className="h-6 w-6" /> : <HiOutlineUpload className="h-6 w-6" />}
                     <input
                         className="hidden"
                         id="uploadFile1"
@@ -42,8 +47,11 @@ export function UploadFileButton({
                         onChange={handleChange}
                     />
                 </label>
-                {fileName && <span>Выбран файл: {fileName}</span>}
-            </form>
-        </div>
+                {file && <span>Выбран файл: {file}</span>}
+            </div>
+            <div className="text-red-600 p-2 text-sm">
+                {state.message}
+            </div>
+        </form>
     );
 }

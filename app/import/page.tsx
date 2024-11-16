@@ -1,5 +1,4 @@
-import { ImportForm } from "../ui/import/form";
-import { ImportPanel } from "../ui/import/panel";
+import { ImportForm } from "@/app//ui/import/forms";
 
 export default async function Page() {
     return (
@@ -7,9 +6,7 @@ export default async function Page() {
             <div className="flex w-full items-center justify-between">
                 <h1 className="text-2xl">Загрузка данных</h1>
             </div>
-            <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
-                <ImportForm />
-            </div>
+            <ImportForm />
         </div>
     )
 }

@@ -32,7 +32,7 @@ export function ConfigTable({
                     </tr>
                 </thead>
                 <tbody className="bg-white">
-                    {cols?.map((col: string, index: number) => (
+                    {Array.isArray(cols) && cols.map((col: string, index: number) => (
                         <tr
                             key={index}
                             className="w-full border-b py-3 text-sm last-of-type:border-none [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg hover:cursor-pointer hover:bg-gray-50"
@@ -44,6 +44,7 @@ export function ConfigTable({
                                 <select
                                     id={col}
                                     name={col}
+                                    form="previewForm"
                                     defaultValue=""
                                     className="peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-2 text-sm outline-2 placeholder:text-gray-500"
                                 >

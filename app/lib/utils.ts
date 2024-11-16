@@ -1,30 +1,5 @@
-import { Person } from "./definitions";
-import Papa, { ParseError, ParseResult } from 'papaparse';
-
-export const formatCurrency = (amount: number) => {
-  return (amount / 100).toLocaleString('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  });
-};
-
-export const formatDateToLocal = (
-  dateStr: string | null,
-  locale: string = 'en-US',
-) => {
-  if (!dateStr) {
-    return "";
-  }
-
-  const date = new Date(dateStr);
-  const options: Intl.DateTimeFormatOptions = {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  };
-  const formatter = new Intl.DateTimeFormat(locale, options);
-  return formatter.format(date);
-};
+import { ParsedData, Person, PersonField } from "./definitions";
+import Papa from 'papaparse';
 
 export const generatePagination = (currentPage: number, totalPages: number) => {
   // If the total number of pages is 7 or less,
@@ -59,30 +34,49 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
   ];
 };
 
-export async function uploadCsv(csvFile: File, formData: FormData | undefined = undefined) {
+
+export async function uploadCsv(
+  csvFile: string,
+  config: PersonField[] | undefined = undefined,
+  limitRows: number = 100,
+  skipRows: number = 0,
+): Promise<ParsedData> {
   let persons: Person[] = [];
   let cols: string[] = [];
+  let logs: string[] = [];
 
   return new Promise(resolve => {
+    logs.push(`Результаты предварительной обработки файла:`);
+    let count = 0;
     Papa.parse<any>(csvFile, {
+      worker: true,
       header: true,
       dynamicTyping: true,
-      step: (results) => {
-        if (formData) {
+      step: (results, parser) => {
+        count++;
+        if (skipRows < count) {
           cols = results.meta.fields ? results.meta.fields : [];
-          let person: Person = {};
-          results.meta.fields?.forEach(element => {
-            const field = formData.get(`${element}`);
-            const val = results.data[`${element}` as keyof typeof results.data];
-            if (field && val) {
-              person[`${field}` as keyof typeof person] = val;
-            }
-          });
-          persons.push(person);
+          if (config) {
+            let person: Person = {};
+            config.forEach((conf: PersonField) => {
+              const val = results.data[`${conf.name}` as keyof typeof results.data];
+              if (val) {
+                person[`${conf.value}` as keyof typeof person] = val;
+              }
+            });
+            persons.push(person);
+            logs.push(`Запись: ${JSON.stringify(person)}`);
+          } else {
+            logs.push(`Строка: ${JSON.stringify(results.data)}`);
+          }
+        }
+        if (limitRows === count) {
+          parser.abort();
+          resolve({ persons: persons, cols: cols, logs: logs });
         }
       },
-      complete: () => {
-        resolve({ persons: persons, cols: cols });
+      complete: (results) => {
+        resolve({ persons: persons, cols: cols, logs: logs });
       }
     });
   });
