@@ -1,26 +1,35 @@
-const { Queue, Worker, QueueEvents } = require("bullmq");
+const { Worker, QueueEvents } = require("bullmq");
 const Redis = require("ioredis");
+const { PrismaClient } = require("@prisma/client");
+const { loadData } = require("./jobs.ts");
 
 const redisConnection = new Redis("redis://redis:6379", {
   enableReadyCheck: false,
   maxRetriesPerRequest: null,
 });
 
+const prisma = new PrismaClient();
+
 module.exports = redisConnection;
 
 const worker = new Worker(
-  "foo",
+  "queries",
   async (job) => {
-    // Will print { foo: 'bar'} for the first job
-    // and { qux: 'baz' } for the second.
-    console.log(job.data);
+    console.log(job.name);
+    // switch (job.name) {
+    //   case "loadData": {
+    //     console.log("run");
+    //     loadData(job.data);
+    //     break;
+    //   }
+    // }
   },
   {
     connection: redisConnection,
   }
 );
 
-const queueEvents = new QueueEvents("foo", {
+const queueEvents = new QueueEvents("queries", {
   connection: redisConnection,
 });
 
@@ -39,6 +48,3 @@ queueEvents.on("completed", ({ jobId, returnvalue }) => {
 queueEvents.on("failed", ({ jobId, failedReason }) => {
   console.log(`${jobId} has failed with reason ${failedReason}`);
 });
-
-// await myQueue.add("myJobName", { foo: "bar" });
-// await myQueue.add("myJobName", { qux: "baz" });

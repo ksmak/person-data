@@ -36,13 +36,16 @@ services:
     build:
       context: .
       dockerfile: DockerFile
-    command: npm run dev
+    command: >
+      bash -c "npm run dev
+      && node app/lib/worker.ts"
     volumes:
       - .:/app
     ports:
       - 3000:3000
     depends_on:
       - pgdb
+      - redis
     env_file:
       - ./.env
   

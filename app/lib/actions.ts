@@ -13,10 +13,8 @@ import {
 import fs from "fs/promises";
 import fss from "node:fs";
 import { ParsedData, Person, PersonField } from "./definitions";
-import { error } from "console";
-import { Prisma, PrismaPromise } from "@prisma/client";
-import { Queue } from "bullmq";
-import Redis from "ioredis";
+import { Prisma } from "@prisma/client";
+import queue, { queueEvents } from "./queue";
 
 const EXPIRED_PASSWORD_DAYS = 30;
 
@@ -431,7 +429,7 @@ export async function previewData(
 
   console.log(config);
 
-  const parseData: ParsedData = await uploadCsv(file, config);
+  const parseData: ParsedData = await uploadCsv(file, config, 100);
 
   return {
     file: params.fileName,
@@ -445,120 +443,28 @@ export async function loadData(
   params: { fileName: string | undefined; cols: string[]; persons: Person[] },
   prevState: ImportState
 ) {
-  let tx: Prisma.Prisma__PersonClient<Person>[] = [];
-  let logs: string[] = [];
-  let persons: Person[] = [];
-
-  for (const person of params.persons) {
-    if (person.iin) {
-      const findPersonByIin = await prisma.person.findUnique({
-        where: {
-          iin: Number(person.iin),
-        },
-      });
-      if (findPersonByIin) {
-        try {
-          tx.push(
-            prisma.person.update({
-              data: {
-                firstName: formatString(person.firstName),
-                lastName: formatString(person.lastName),
-                middleName: formatString(person.middleName),
-                phone: formatPhone(person.phone),
-                region: formatString(person.region),
-                district: formatString(person.district),
-                building: formatString(person.building),
-                apartment: formatString(person.apartment),
-              },
-              where: {
-                id: findPersonByIin.id,
-              },
-            })
-          );
-          // persons.push(p);
-        } catch (e) {
-          logs.push(`Ошибка! ${e}`);
-        }
-        continue;
-      }
-    }
-    if (person.firstName && person.lastName) {
-      const findPersonByFIO = await prisma.person.findFirst({
-        where: {
-          firstName: formatString(person.firstName),
-          lastName: formatString(person.lastName),
-          middleName: formatString(person.middleName),
-        },
-      });
-      if (findPersonByFIO) {
-        try {
-          tx.push(
-            prisma.person.update({
-              data: {
-                iin: formatInt(person.iin),
-                phone: formatPhone(person.phone),
-                region: formatString(person.region),
-                district: formatString(person.district),
-                building: formatString(person.building),
-                apartment: formatString(person.apartment),
-              },
-              where: {
-                id: findPersonByFIO.id,
-              },
-            })
-          );
-          // persons.push(p);
-        } catch (e) {
-          logs.push(`Ошибка! ${e}`);
-        }
-        continue;
-      }
-    }
-    try {
-      tx.push(
-        prisma.person.create({
-          data: {
-            firstName: formatString(person.firstName),
-            lastName: formatString(person.lastName),
-            middleName: formatString(person.middleName),
-            iin: formatInt(person.iin),
-            phone: formatPhone(person.phone),
-            region: formatString(person.region),
-            district: formatString(person.district),
-            building: formatString(person.building),
-            apartment: formatString(person.apartment),
-          },
-        })
-      );
-      // persons.push(p);
-    } catch (e) {
-      logs.push(`Ошибка! ${e}`);
-    }
-  }
-  await prisma.$transaction(tx);
-  if (logs.length > 0) {
-    return {
-      error: "В ходе загрузки данных возникли некоторые ошибки.",
-      logs: logs,
-    };
-  }
-  return {
-    logs: logs,
-    persons: persons,
-  };
-}
-
-export async function initQueen() {
-  const redisConnection = new Redis("redis://redis:6379", {
-    enableReadyCheck: false,
-    maxRetriesPerRequest: null,
+  const job = await queue.add("loadData", {
+    persons: params.persons,
   });
-  const myQueue = new Queue("foo", {
-    connection: redisConnection,
-  });
+
+  const result = await job.waitUntilFinished(queueEvents);
+
+  console.log(result);
+
+  return result;
 }
 
 export async function addJob() {
-  await myQueue.add("myJobName", { foo: "bar" });
-  await myQueue.add("myJobName", { qux: "baz" });
+  console.log("start");
+  const job = await queue.add("loadData", {
+    persons: {
+      firstName: "AAA",
+    },
+  });
+
+  const result = await job.waitUntilFinished(queueEvents);
+
+  console.log(result);
+
+  return result;
 }
