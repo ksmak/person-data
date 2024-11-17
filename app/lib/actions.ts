@@ -4,11 +4,19 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import prisma from "./db";
-import { uploadCsv } from "@/app/lib/utils";
+import {
+  formatString,
+  formatPhone,
+  uploadCsv,
+  formatInt,
+} from "@/app/lib/utils";
 import fs from "fs/promises";
 import fss from "node:fs";
 import { ParsedData, Person, PersonField } from "./definitions";
 import { error } from "console";
+import { Prisma, PrismaPromise } from "@prisma/client";
+import { Queue } from "bullmq";
+import Redis from "ioredis";
 
 const EXPIRED_PASSWORD_DAYS = 30;
 
@@ -373,36 +381,41 @@ export async function createQuery(
 export async function uploadFile(prevState: ImportState, formData: FormData) {
   const dataFile = formData.get("file") as File;
 
-  const extension = dataFile.name.split('.').at(-1);
-  if (extension !== 'csv') {
+  const extension = dataFile.name.split(".").at(-1);
+  if (extension !== "csv" && extension !== "txt") {
     return {
       file: dataFile.name,
-      error: "Ошибка формата файла! Для загрузки данных необходимы файлы с расширением csv",
-    }
-  };
+      error:
+        "Ошибка формата файла! Для загрузки данных необходимы файлы с расширением csv, txt",
+    };
+  }
 
   const buffer = await dataFile.arrayBuffer();
   const dataBuffer = Buffer.from(buffer);
   await fs.writeFile(`uploads/${dataFile.name}`, dataBuffer);
 
-  const file = fss.readFileSync(`uploads/${dataFile.name}`, 'utf8');
+  const file = fss.readFileSync(`uploads/${dataFile.name}`, "utf8");
 
-  const parseData: ParsedData = await uploadCsv(file);
+  const parseData: ParsedData = await uploadCsv(file, undefined, 30);
 
   return {
     file: dataFile.name,
     cols: parseData.cols,
     logs: parseData.logs,
-  }
+  };
 }
 
-export async function previewData(params: { fileName: string | undefined, cols: string[] }, prevState: ImportState, formData: FormData) {
+export async function previewData(
+  params: { fileName: string | undefined; cols: string[] },
+  prevState: ImportState,
+  formData: FormData
+) {
   if (!params.fileName) {
     return {
-      error: "Ошибка! Файл не выбран!"
-    }
+      error: "Ошибка! Файл не выбран!",
+    };
   }
-  const file = fss.readFileSync(`uploads/${params.fileName}`, 'utf8');
+  const file = fss.readFileSync(`uploads/${params.fileName}`, "utf8");
 
   let config: PersonField[] = [];
   params.cols.forEach((item: string) => {
@@ -414,7 +427,7 @@ export async function previewData(params: { fileName: string | undefined, cols: 
         value: field,
       } as PersonField);
     }
-  })
+  });
 
   console.log(config);
 
@@ -425,22 +438,127 @@ export async function previewData(params: { fileName: string | undefined, cols: 
     cols: parseData.cols,
     persons: parseData.persons,
     logs: parseData.logs,
-  }
+  };
 }
 
-export async function loadData(params: { fileName: string | undefined, cols: string[], persons: Person[] }, prevState: ImportState) {
-  try {
-    await prisma.person.createMany({
-      data: params.persons,
-      skipDuplicates: true,
-    });
-    return {
-      file: params.fileName,
-      cols: params.cols,
-      persons: params.persons,
-      logs: ['Данные успешно загружены.'],
+export async function loadData(
+  params: { fileName: string | undefined; cols: string[]; persons: Person[] },
+  prevState: ImportState
+) {
+  let tx: Prisma.Prisma__PersonClient<Person>[] = [];
+  let logs: string[] = [];
+  let persons: Person[] = [];
+
+  for (const person of params.persons) {
+    if (person.iin) {
+      const findPersonByIin = await prisma.person.findUnique({
+        where: {
+          iin: Number(person.iin),
+        },
+      });
+      if (findPersonByIin) {
+        try {
+          tx.push(
+            prisma.person.update({
+              data: {
+                firstName: formatString(person.firstName),
+                lastName: formatString(person.lastName),
+                middleName: formatString(person.middleName),
+                phone: formatPhone(person.phone),
+                region: formatString(person.region),
+                district: formatString(person.district),
+                building: formatString(person.building),
+                apartment: formatString(person.apartment),
+              },
+              where: {
+                id: findPersonByIin.id,
+              },
+            })
+          );
+          // persons.push(p);
+        } catch (e) {
+          logs.push(`Ошибка! ${e}`);
+        }
+        continue;
+      }
     }
-  } catch (error) {
-    throw error;
+    if (person.firstName && person.lastName) {
+      const findPersonByFIO = await prisma.person.findFirst({
+        where: {
+          firstName: formatString(person.firstName),
+          lastName: formatString(person.lastName),
+          middleName: formatString(person.middleName),
+        },
+      });
+      if (findPersonByFIO) {
+        try {
+          tx.push(
+            prisma.person.update({
+              data: {
+                iin: formatInt(person.iin),
+                phone: formatPhone(person.phone),
+                region: formatString(person.region),
+                district: formatString(person.district),
+                building: formatString(person.building),
+                apartment: formatString(person.apartment),
+              },
+              where: {
+                id: findPersonByFIO.id,
+              },
+            })
+          );
+          // persons.push(p);
+        } catch (e) {
+          logs.push(`Ошибка! ${e}`);
+        }
+        continue;
+      }
+    }
+    try {
+      tx.push(
+        prisma.person.create({
+          data: {
+            firstName: formatString(person.firstName),
+            lastName: formatString(person.lastName),
+            middleName: formatString(person.middleName),
+            iin: formatInt(person.iin),
+            phone: formatPhone(person.phone),
+            region: formatString(person.region),
+            district: formatString(person.district),
+            building: formatString(person.building),
+            apartment: formatString(person.apartment),
+          },
+        })
+      );
+      // persons.push(p);
+    } catch (e) {
+      logs.push(`Ошибка! ${e}`);
+    }
   }
+  await prisma.$transaction(tx);
+  if (logs.length > 0) {
+    return {
+      error: "В ходе загрузки данных возникли некоторые ошибки.",
+      logs: logs,
+    };
+  }
+  return {
+    logs: logs,
+    persons: persons,
+  };
+}
+
+export async function initQueen() {
+  const redisConnection = new Redis("redis://redis:6379", {
+    enableReadyCheck: false,
+    maxRetriesPerRequest: null,
+  });
+  const myQueue = new Queue("foo", {
+    connection: redisConnection,
+  });
+}
+
+export async function addJob() {
+  await myQueue.add("myJobName", { foo: "bar" });
+  await myQueue.add("myJobName", { qux: "baz" });
 }

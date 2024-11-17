@@ -1,16 +1,15 @@
 export type Person = {
-  fullName?: string;
-  lastName?: string;
-  firstName?: string;
-  middleName?: string;
-  iin?: string;
-  phone?: string;
-  region?: string;
-  district?: string;
-  locality?: string;
-  street?: string;
-  building?: string;
-  apartment?: number;
+  lastName?: string | null;
+  firstName?: string | null;
+  middleName?: string | null;
+  iin?: bigint | null;
+  phone?: bigint | null;
+  region?: string | null;
+  district?: string | null;
+  locality?: string | null;
+  street?: string | null;
+  building?: string | null;
+  apartment?: string | null;
 };
 
 export type PersonField = {
@@ -20,7 +19,7 @@ export type PersonField = {
 };
 
 export type ParsedData = {
-  persons: Person[],
-  cols: string[],
-  logs: string[],
-}
+  persons: Person[];
+  cols: string[];
+  logs: string[];
+};

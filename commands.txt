@@ -1,0 +1,6 @@
+-- stop postgresql service
+sudo service postgresql stop
+
+-- reset prisma models
+npx prisma db push --force-reset
+npx prisma generate 

@@ -48,12 +48,11 @@ model Person {
   locality   String?
   street     String?
   building   String?
-  apartment  Int?
+  apartment  String?
   createdAt  DateTime? @default(now())
   updatedAt  DateTime? @updatedAt
 
   @@unique([iin])
-  @@unique([firstName, lastName, middleName])
   @@unique([phone])
 }
 

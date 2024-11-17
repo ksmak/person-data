@@ -10,10 +10,10 @@ export default function UsersTable({
 }: {
   users: User[]
 }) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
   const pathname = usePathname();
+  const router = useRouter();
   const { replace } = useRouter();
+  const searchParams = useSearchParams();
   const orderBy = searchParams.get('orderBy');
   const sort = searchParams.get('sort');
 

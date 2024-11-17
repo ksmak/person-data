@@ -1,5 +1,5 @@
 import { ParsedData, Person, PersonField } from "./definitions";
-import Papa from 'papaparse';
+import Papa from "papaparse";
 
 export const generatePagination = (currentPage: number, totalPages: number) => {
   // If the total number of pages is 7 or less,
@@ -11,13 +11,13 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
   // If the current page is among the first 3 pages,
   // show the first 3, an ellipsis, and the last 2 pages.
   if (currentPage <= 3) {
-    return [1, 2, 3, '...', totalPages - 1, totalPages];
+    return [1, 2, 3, "...", totalPages - 1, totalPages];
   }
 
   // If the current page is among the last 3 pages,
   // show the first 2, an ellipsis, and the last 3 pages.
   if (currentPage >= totalPages - 2) {
-    return [1, 2, '...', totalPages - 2, totalPages - 1, totalPages];
+    return [1, 2, "...", totalPages - 2, totalPages - 1, totalPages];
   }
 
   // If the current page is somewhere in the middle,
@@ -25,27 +25,26 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
   // another ellipsis, and the last page.
   return [
     1,
-    '...',
+    "...",
     currentPage - 1,
     currentPage,
     currentPage + 1,
-    '...',
+    "...",
     totalPages,
   ];
 };
 
-
 export async function uploadCsv(
   csvFile: string,
   config: PersonField[] | undefined = undefined,
-  limitRows: number = 100,
-  skipRows: number = 0,
+  limitRows: number = -1,
+  skipRows: number = 0
 ): Promise<ParsedData> {
   let persons: Person[] = [];
   let cols: string[] = [];
   let logs: string[] = [];
 
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     logs.push(`Результаты предварительной обработки файла:`);
     let count = 0;
     Papa.parse<any>(csvFile, {
@@ -59,7 +58,8 @@ export async function uploadCsv(
           if (config) {
             let person: Person = {};
             config.forEach((conf: PersonField) => {
-              const val = results.data[`${conf.name}` as keyof typeof results.data];
+              const val =
+                results.data[`${conf.name}` as keyof typeof results.data];
               if (val) {
                 person[`${conf.value}` as keyof typeof person] = val;
               }
@@ -77,7 +77,27 @@ export async function uploadCsv(
       },
       complete: (results) => {
         resolve({ persons: persons, cols: cols, logs: logs });
-      }
+      },
     });
   });
+}
+
+export function formatString(s: string | null | undefined) {
+  return s ? s.trim().toUpperCase() : null;
+}
+
+export function formatInt(s: number | string | bigint | null | undefined) {
+  if (!s) return null;
+  if (typeof s === "string") return parseInt(s);
+  return s;
+}
+
+export function formatPhone(s: number | string | bigint | null | undefined) {
+  if (!s) return null;
+  const converStr = String(s);
+  if (converStr.startsWith("8")) {
+    const replaceStr = "7" + converStr.slice(1);
+    return parseInt(replaceStr);
+  }
+  return parseInt(converStr);
 }
