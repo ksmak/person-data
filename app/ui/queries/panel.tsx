@@ -2,16 +2,15 @@
 
 import { createQuery } from "@/app/lib/actions";
 import {
-    Button,
     Dialog,
     DialogHeader,
     DialogBody,
     DialogFooter,
-    Typography,
     Alert
 } from "@material-tailwind/react";
 import { FormEvent, useState } from "react";
 import { HiOutlineSearch } from "react-icons/hi";
+import { Button } from "../button";
 
 export default function SearchPanel({ id }: { id: string }) {
     const [open, setOpen] = useState(false);
@@ -108,30 +107,27 @@ export default function SearchPanel({ id }: { id: string }) {
         <>
             <Button
                 className="flex items-center gap-3"
-                variant="gradient"
-                color="blue"
-                size="md"
                 onClick={(e) => { e.preventDefault(); setOpen(true); }}
             >
                 Новый запрос
                 <HiOutlineSearch className="w-4 h-4" />
             </Button>
             <Dialog open={open} handler={handleOpen}>
-                <DialogHeader>
-                    <Typography variant="h5" color="blue-gray">
+                <Alert
+                    className="absolute top-5 rounded-none border-l-4 border-primary bg-select font-medium text-primarytxt"
+                    open={!!message}
+                    onClose={() => setMessage('')}
+                >
+                    {message}
+                </Alert>
+                <DialogHeader className="m-0 p-0">
+                    <div className="w-full mt-20 mb-0 text-2xl text-center text-primarytxt">
                         Новый запрос
-                    </Typography>
+                    </div>
                 </DialogHeader>
-                <DialogBody className="overflow-y-scroll h-[42rem]">
-                    <Alert
-                        className="rounded-none border-l-4 border-[#2ec946] bg-[#2ec946]/10 font-medium text-[#2ec946]"
-                        open={!!message}
-                        onClose={() => setMessage('')}
-                    >
-                        {message}
-                    </Alert>
+                <DialogBody className="overflow-y-scroll h-[40rem]">
                     <form onSubmit={handleSubmit} id="createQueryForm">
-                        <div className="rounded-md bg-gray-50 p-4 md:p-6">
+                        <div className="rounded-2xl bg-secondary p-4 md:p-6">
                             {fields.map((fld: Field, index: number) => (
                                 <div className="mb-4" key={index}>
                                     <label htmlFor="lastName" className="pl-2 mb-2 block text-sm font-medium">
@@ -140,7 +136,7 @@ export default function SearchPanel({ id }: { id: string }) {
                                     <div className="relative mt-2 rounded-md">
                                         <div className="relative">
                                             <input
-                                                className="peer block w-full rounded-md border border-gray-200 py-2 pl-2 text-sm outline-2 placeholder:text-gray-500"
+                                                className="font-medium block w-full rounded-md border border-gray-200 py-2 pl-2 text-sm outline-2"
                                                 name={fld.name}
                                                 type="text"
                                                 defaultValue=""
@@ -153,19 +149,18 @@ export default function SearchPanel({ id }: { id: string }) {
                     </form>
                 </DialogBody>
                 <DialogFooter>
-                    <button
+                    <Button
                         form="createQueryForm"
                         type="submit"
-                        className="ml-4 flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
                     >
                         Начать поиск
-                    </button>
-                    <button
-                        className="ml-4 flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
+                    </Button>
+                    <Button
+                        className="ml-5"
                         onClick={handleOpen}
                     >
                         <span>Отмена</span>
-                    </button>
+                    </Button>
                 </DialogFooter>
             </Dialog>
         </>

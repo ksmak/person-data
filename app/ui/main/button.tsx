@@ -2,7 +2,7 @@
 
 import { addShedullerJob, removeShedullerJob } from "@/app/lib/actions";
 import { FormEvent, useState } from "react"
-import { Button } from "@material-tailwind/react";
+import { Button } from "@/app/ui/button";
 
 export function AddShedullerJobButton() {
     const [state, setState] = useState<string>('');
@@ -15,7 +15,7 @@ export function AddShedullerJobButton() {
     return (
         <div>
             <form onSubmit={handlerSubmit}>
-                <Button type="submit" variant="gradient" color="blue" size="md" > Запустить планировщик </Button>
+                <Button type="submit"> Запустить планировщик </Button>
                 {state}
             </form>
         </div>
@@ -33,7 +33,7 @@ export function RemoveShedullerJobButton() {
     return (
         <div>
             <form onSubmit={handlerSubmit}>
-                <Button type="submit" variant="gradient" color="blue" size="md" > Остановить планировщик </Button>
+                <Button type="submit"> Остановить планировщик </Button>
                 {state}
             </form>
         </div>

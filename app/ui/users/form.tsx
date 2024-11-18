@@ -6,7 +6,7 @@ import { FormEvent, useState } from 'react';
 import { Subscription, User } from '@prisma/client';
 import { ModalDeleteUser } from '@/app/ui/users/modal';
 import { Button } from '../button';
-import { Radio } from "@material-tailwind/react";
+import { Checkbox, Radio } from "@material-tailwind/react";
 import { SubscriptionCard } from '../card';
 
 export default function UserForm({
@@ -43,29 +43,28 @@ export default function UserForm({
           ? <Button onClick={(e) => { e.preventDefault(); handleOpen() }} className='bg-red-600  w-32 justify-center'>Удалить</Button>
           : null}
         <Button type="submit" className='w-32 justify-center'>Сохранить</Button>
-        <Link
-          href="/users"
-          className="flex h-8 w-32 justify-center items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
-        >
-          Закрыть
-        </Link>
+        <Button>
+          <Link
+            href="/users"
+          >
+            Закрыть
+          </Link>
+        </Button>
       </div>
-      <div className="rounded-md bg-gray-50 p-4 md:p-6">
+      <div className="rounded-md bg-secondary p-4 md:p-6">
         <p className="mt-2 text-sm text-red-500 text-center mb-2">{state.message}</p>
         {/* isActive */}
         <div className="mb-4">
-          <label htmlFor="isActive" className="pl-2 mb-2 block text-sm font-medium">
-            Активный
-          </label>
-          <div className="relative mt-2 pl-1 rounded-md place-self-start">
-            <div className="relative">
-              <input
-                className="peer block w-5 h-5 rounded-md border border-gray-200 py-4 pl-10 outline-2 placeholder:text-gray-500  checked:bg-blue-600"
-                id="isActive"
-                name="isActive"
-                type="checkbox"
-                defaultChecked={user ? user.isActive : true}
-              />
+          <div className="flex gap-4 items-center place-self-start">
+            <Checkbox
+              className="peer block w-5 h-5 bg-primary checked:bg-primary checked:border-none"
+              id="isActive"
+              name="isActive"
+              type="checkbox"
+              defaultChecked={user ? user.isActive : true}
+            />
+            <div className="text-sm font-medium">
+              Активный
             </div>
           </div>
         </div>
@@ -210,7 +209,7 @@ export default function UserForm({
                 <div className="relative">
                   <Radio
                     name='subsId'
-                    color='blue'
+                    color='green'
                     label={
                       <SubscriptionCard sub={sub} />
                     }

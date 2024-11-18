@@ -6,6 +6,7 @@ import { FormEvent, useState } from 'react';
 import { Subscription } from '@prisma/client';
 import { ModalDeleteUser } from '@/app/ui/subscriptions/modal';
 import { Button } from '../button';
+import { Checkbox } from '@material-tailwind/react';
 
 export default function SubscriptionForm({
   sub
@@ -39,14 +40,15 @@ export default function SubscriptionForm({
           ? <Button onClick={(e) => { e.preventDefault(); handleOpen() }} className='bg-red-600  w-32 justify-center'>Удалить</Button>
           : null}
         <Button type="submit" className='w-32 justify-center'>Сохранить</Button>
-        <Link
-          href="/subscriptions"
-          className="flex h-8 w-32 justify-center items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
-        >
-          Закрыть
-        </Link>
+        <Button>
+          <Link
+            href="/subscriptions"
+          >
+            Закрыть
+          </Link>
+        </Button>
       </div>
-      <div className="rounded-md bg-gray-50 p-4 md:p-6">
+      <div className="rounded-md bg-secondary p-4 md:p-6">
         <p className="mt-2 text-sm text-red-500 text-center mb-2">{state.message}</p>
         {/* title */}
         <div className="mb-4">
@@ -180,57 +182,51 @@ export default function SubscriptionForm({
         </div>
         {/* accessImportData */}
         <div className="mb-4">
-          <label htmlFor="accessImportData" className="pl-2 mb-2 block text-sm font-medium">
-            Доступ к подсистеме "Загрузка данных"
-          </label>
-          <div className="relative mt-2 pl-1 rounded-md place-self-start">
-            <div className="relative">
-              <input
-                className="peer block w-5 h-5 rounded-md border border-gray-200 py-4 pl-10 outline-2 placeholder:text-gray-500  checked:bg-blue-600"
-                id="accessImportData"
-                name="accessImportData"
-                type="checkbox"
-                defaultChecked={sub ? sub.accessImportData : false}
-              />
+          <div className="flex gap-4 items-center place-self-start">
+            <Checkbox
+              className="peer w-5 h-5 bg-primary checked:bg-primary checked:border-none"
+              id="accessImportData"
+              name="accessImportData"
+              type="checkbox"
+              defaultChecked={sub ? sub.accessImportData : false}
+            />
+            <div className="text-sm font-medium">
+              Доступ к подсистеме "Загрузка данных"
             </div>
           </div>
         </div>
         {/* accessMonitoring */}
         <div className="mb-4">
-          <label htmlFor="accessMonitoring" className="pl-2 mb-2 block text-sm font-medium">
-            Доступ к подсистеме "Мониторинг запросов"
-          </label>
-          <div className="relative mt-2 pl-1 rounded-md place-self-start">
-            <div className="relative">
-              <input
-                className="peer block w-5 h-5 rounded-md border border-gray-200 py-4 pl-10 outline-2 placeholder:text-gray-500  checked:bg-blue-600"
-                id="accessMonitoring"
-                name="accessMonitoring"
-                type="checkbox"
-                defaultChecked={sub ? sub.accessMonitoring : false}
-              />
+          <div className="flex gap-4 items-center place-self-start">
+            <Checkbox
+              className="bg-primary checked:bg-primary checked:border-none"
+              id="accessMonitoring"
+              name="accessMonitoring"
+              type="checkbox"
+              defaultChecked={sub ? sub.accessMonitoring : false}
+            />
+            <div className="text-sm font-medium">
+              Доступ к подсистеме "Мониторинг запросов"
             </div>
           </div>
         </div>
         {/* accessUsers */}
         <div className="mb-4">
-          <label htmlFor="accessUsers" className="pl-2 mb-2 block text-sm font-medium">
-            Доступ к подсистеме "Пользователи"
-          </label>
-          <div className="relative mt-2 pl-1 rounded-md place-self-start">
-            <div className="relative">
-              <input
-                className="peer block w-5 h-5 rounded-md border border-gray-200 py-4 pl-10 outline-2 placeholder:text-gray-500  checked:bg-blue-600"
-                id="accessUsers"
-                name="accessUsers"
-                type="checkbox"
-                defaultChecked={sub ? sub.accessUsers : false}
-              />
+          <div className="flex gap-4 items-center place-self-start">
+            <Checkbox
+              className="peeh-5 bg-primary checked:bg-primary checked:border-none"
+              id="accessUsers"
+              name="accessUsers"
+              type="checkbox"
+              defaultChecked={sub ? sub.accessUsers : false}
+            />
+            <div className="text-sm font-medium">
+              Доступ к подсистеме "Пользователи"
             </div>
           </div>
         </div>
       </div>
       {sub?.id && <ModalDeleteUser id={sub.id} open={open} handleOpen={handleOpen} />}
-    </form>
+    </form >
   );
 }
