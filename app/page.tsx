@@ -1,13 +1,9 @@
-import { addJob } from "./lib/actions";
-
+import { AddShedullerJobButton, RemoveShedullerJobButton } from '@/app/ui/main/button';
 export default function Home() {
-
   return (
-    <div>
-      Main Page
-      <form action={addJob}>
-        <button type="submit">Add Job</button>
-      </form>
+    <div className='flex flex-col gap-5'>
+      <AddShedullerJobButton />
+      <RemoveShedullerJobButton />
     </div>
   );
 }

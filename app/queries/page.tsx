@@ -17,7 +17,7 @@ export default async function Page(props: {
         sort?: string;
     }>;
 }) {
-    const userId = 'cm3g468p40002f17vmmqfa0s6';
+    const userId = 'cm3mq094u0002zajjs6hs3txz';
     const searchParams = await props.searchParams;
     const currentPage = Number(searchParams?.page) || 1;
     const totalPages = await fetchQueriesPages(userId);

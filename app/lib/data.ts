@@ -165,3 +165,13 @@ export async function fetchQueriesPages(userId: string) {
 
   return totalPages;
 }
+
+export async function fetchQueryById(id: string) {
+  const query = prisma.query.findUnique({
+    where: {
+      id: id,
+    },
+  });
+
+  return query;
+}

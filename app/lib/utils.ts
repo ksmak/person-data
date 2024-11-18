@@ -1,5 +1,43 @@
-import { ParsedData, Person, PersonField } from "./definitions";
+import { ParsedData, Person, PersonField, personFields } from "./definitions";
 import Papa from "papaparse";
+
+export const formatDateToLocal = (
+  dateStr: string,
+  locale: string = 'en-US',
+) => {
+  const date = new Date(dateStr);
+  const options: Intl.DateTimeFormatOptions = {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  };
+  const formatter = new Intl.DateTimeFormat(locale, options);
+  return formatter.format(date);
+};
+
+export const formatQueryCondition = (
+  query: any
+) => {
+  let result: string[] = [];
+  try {
+    const arrFields = JSON.parse(query);
+    arrFields.map((item: any) => {
+      Object.keys(item).map((key: string) => {
+        for (const fld of personFields) {
+          if (fld.name === key) {
+            if (Object.keys(item[key])[0] === 'startsWith') {
+              result.push(`${fld.title} начинается с "${item[key]['startsWith']}"`);
+            }
+          }
+        }
+      });
+    })
+  } catch (e) {
+    console.log(e);
+  }
+
+  return result;
+}
 
 export const generatePagination = (currentPage: number, totalPages: number) => {
   // If the total number of pages is 7 or less,

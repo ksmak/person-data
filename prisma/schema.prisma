@@ -40,8 +40,8 @@ model Person {
   firstName  String?
   lastName   String?
   middleName String?
-  iin        BigInt?
-  phone      BigInt?
+  iin        String?
+  phone      String?
   photo      String?
   region     String?
   district   String?
@@ -53,7 +53,6 @@ model Person {
   updatedAt  DateTime? @updatedAt
 
   @@unique([iin])
-  @@unique([phone])
 }
 
 model Query {
@@ -61,7 +60,8 @@ model Query {
   user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
   body      String
-  count     Int
+  result    String?
+  count     Int?
   state     QueryStateType @default(WAITING)
   createdAt DateTime?      @default(now())
 }

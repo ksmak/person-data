@@ -36,9 +36,7 @@ services:
     build:
       context: .
       dockerfile: DockerFile
-    command: >
-      bash -c "npm run dev
-      && node app/lib/worker.ts"
+    command: npm run dev
     volumes:
       - .:/app
     ports:
@@ -48,7 +46,7 @@ services:
       - redis
     env_file:
       - ./.env
-  
+
   redis:
     container_name: redis
     image: redis:alpine

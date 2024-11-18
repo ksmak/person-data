@@ -4,6 +4,7 @@ import moment from "moment";
 import { Query } from '@prisma/client';
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { HiOutlineChevronDown, HiOutlineChevronUp } from "react-icons/hi";
+import { formatDateToLocal, formatQueryCondition } from "@/app/lib/utils";
 
 export default function QueriesTable({
   queries
@@ -49,7 +50,7 @@ export default function QueriesTable({
                   className="w-96 px-4 py-5 font-medium hover:cursor-pointer"
                 >
                   <div className="flex gap-3 items-center">
-                    <span>Условия запроса</span>
+                    <span>Запрос</span>
                   </div>
                 </th>
                 <th
@@ -70,7 +71,7 @@ export default function QueriesTable({
                   onClick={() => handleOrder('count')}
                 >
                   <div className="flex gap-3 items-center">
-                    <span>Кол-во полож. ответов</span>
+                    <span>Кол-во совпадений</span>
                     {orderBy === 'count'
                       ? sort === 'asc' ? <HiOutlineChevronUp /> : <HiOutlineChevronDown />
                       : null}
@@ -86,10 +87,10 @@ export default function QueriesTable({
                   onClick={() => router.push(`/queries/${query.id}`)}
                 >
                   <td className="whitespace-nowrap px-3 py-3">
-                    {query.createdAt && moment(query.createdAt).format('DD.MM.YYYY H:M:S')}
+                    {query.createdAt ? formatDateToLocal(query.createdAt.toString()) : ""}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
-                    <div className="w-96 h-20 text-wrap overflow-y-auto">{query.body}</div>
+                    <div className="w-96 h-20 text-wrap overflow-y-auto">{formatQueryCondition(query.body)}</div>
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
                     {query.state === 'WAITING'

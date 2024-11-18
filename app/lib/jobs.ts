@@ -20,7 +20,7 @@ function formatPhone(s) {
   return parseInt(converStr);
 }
 
-async function loadData() {
+async function loadData(data) {
   let tx = [];
   let logs = [];
   let persons = [];
@@ -123,3 +123,9 @@ async function loadData() {
     persons: persons,
   };
 }
+
+module.exports = {
+  loadData
+}
+
+exports.loadData = loadData;

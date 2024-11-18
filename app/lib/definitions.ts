@@ -2,8 +2,8 @@ export type Person = {
   lastName?: string | null;
   firstName?: string | null;
   middleName?: string | null;
-  iin?: bigint | null;
-  phone?: bigint | null;
+  iin?: string | null;
+  phone?: string | null;
   region?: string | null;
   district?: string | null;
   locality?: string | null;
@@ -23,3 +23,18 @@ export type ParsedData = {
   cols: string[];
   logs: string[];
 };
+
+export const personFields: PersonField[] = [
+  { name: "fullName", title: "ФИО" },
+  { name: "lastName", title: "Фамилия" },
+  { name: "firstName", title: "Имя" },
+  { name: "middleName", title: "Отчество" },
+  { name: "iin", title: "ИИН" },
+  { name: "phone", title: "Номер телефона" },
+  { name: "region", title: "Область" },
+  { name: "district", title: "Район" },
+  { name: "locality", title: "Населенный пункт" },
+  { name: "street", title: "Улица" },
+  { name: "building", title: "Дом" },
+  { name: "apartment", title: "Квартира" },
+];

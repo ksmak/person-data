@@ -4,16 +4,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import prisma from "./db";
-import {
-  formatString,
-  formatPhone,
-  uploadCsv,
-  formatInt,
-} from "@/app/lib/utils";
-import fs from "fs/promises";
-import fss from "node:fs";
 import { ParsedData, Person, PersonField } from "./definitions";
-import { Prisma } from "@prisma/client";
 import queue, { queueEvents } from "./queue";
 
 const EXPIRED_PASSWORD_DAYS = 30;
@@ -356,17 +347,11 @@ export async function createQuery(
   }
 
   try {
-    const persons = prisma.person.findMany({
-      where: {
-        OR: [...body],
-      },
-    });
-
     await prisma.query.create({
       data: {
         userId: id,
         body: JSON.stringify(body),
-        count: (await persons).length,
+        count: 0,
       },
     });
   } catch (error) {
@@ -376,75 +361,9 @@ export async function createQuery(
   redirect("/queries");
 }
 
-export async function uploadFile(prevState: ImportState, formData: FormData) {
-  const dataFile = formData.get("file") as File;
-
-  const extension = dataFile.name.split(".").at(-1);
-  if (extension !== "csv" && extension !== "txt") {
-    return {
-      file: dataFile.name,
-      error:
-        "Ошибка формата файла! Для загрузки данных необходимы файлы с расширением csv, txt",
-    };
-  }
-
-  const buffer = await dataFile.arrayBuffer();
-  const dataBuffer = Buffer.from(buffer);
-  await fs.writeFile(`uploads/${dataFile.name}`, dataBuffer);
-
-  const file = fss.readFileSync(`uploads/${dataFile.name}`, "utf8");
-
-  const parseData: ParsedData = await uploadCsv(file, undefined, 30);
-
-  return {
-    file: dataFile.name,
-    cols: parseData.cols,
-    logs: parseData.logs,
-  };
-}
-
-export async function previewData(
-  params: { fileName: string | undefined; cols: string[] },
-  prevState: ImportState,
-  formData: FormData
-) {
-  if (!params.fileName) {
-    return {
-      error: "Ошибка! Файл не выбран!",
-    };
-  }
-  const file = fss.readFileSync(`uploads/${params.fileName}`, "utf8");
-
-  let config: PersonField[] = [];
-  params.cols.forEach((item: string) => {
-    const field = formData.get(item);
-    if (field) {
-      config.push({
-        name: item,
-        title: item,
-        value: field,
-      } as PersonField);
-    }
-  });
-
-  console.log(config);
-
-  const parseData: ParsedData = await uploadCsv(file, config, 100);
-
-  return {
-    file: params.fileName,
-    cols: parseData.cols,
-    persons: parseData.persons,
-    logs: parseData.logs,
-  };
-}
-
-export async function loadData(
-  params: { fileName: string | undefined; cols: string[]; persons: Person[] },
-  prevState: ImportState
-) {
-  const job = await queue.add("loadData", {
-    persons: params.persons,
+export async function loadData(persons: Person[], prevState: ImportState) {
+  const job = await queue.add("load-data", {
+    persons: persons,
   });
 
   const result = await job.waitUntilFinished(queueEvents);
@@ -454,17 +373,25 @@ export async function loadData(
   return result;
 }
 
-export async function addJob() {
-  console.log("start");
-  const job = await queue.add("loadData", {
-    persons: {
-      firstName: "AAA",
+export async function addShedullerJob(prevState: string) {
+  await queue.upsertJobScheduler(
+    'repeat-every-30s',
+    {
+      every: 30000,
     },
-  });
+    {
+      name: 'process-queries',
+    },
+  );
 
-  const result = await job.waitUntilFinished(queueEvents);
+  return 'Планировщик запущен';
+}
 
-  console.log(result);
+export async function removeShedullerJob(prevState: string) {
+  console.log('run remove sheduller')
+  await queue.removeJobScheduler('repeat-every-30s');
 
-  return result;
+  await queue.obliterate();
+
+  return 'Планировщик остановлен';
 }

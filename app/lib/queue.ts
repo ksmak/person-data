@@ -1,18 +1,18 @@
 import { Queue, QueueEvents } from "bullmq";
-import Redis from "ioredis";
-
-const redisConnection = new Redis("redis://redis:6379", {
-  enableReadyCheck: false,
-  maxRetriesPerRequest: null,
-});
 
 export const queueEvents = new QueueEvents("queries", {
-  connection: redisConnection,
+  connection: {
+    host: "redis",
+    port: 6379
+  }
 });
 
 const queueSingleton = () => {
   return new Queue("queries", {
-    connection: redisConnection,
+    connection: {
+      host: "redis",
+      port: 6379
+    }
   });
 };
 
