@@ -25,7 +25,6 @@ export type ParsedData = {
 };
 
 export const personFields: PersonField[] = [
-  { name: "fullName", title: "ФИО" },
   { name: "lastName", title: "Фамилия" },
   { name: "firstName", title: "Имя" },
   { name: "middleName", title: "Отчество" },
@@ -42,6 +41,14 @@ export const personFields: PersonField[] = [
 export type TableHead = {
   title: string;
   name: string;
-  fieldType: 'string' | 'boolean' | 'date' | 'datetime' | 'active' | 'nested' | 'queryBody' | 'queryState';
+  fieldType:
+    | "string"
+    | "boolean"
+    | "date"
+    | "datetime"
+    | "active"
+    | "nested"
+    | "queryBody"
+    | "queryState";
   nestedName?: string;
-}
+};

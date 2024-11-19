@@ -1,23 +1,20 @@
-import { ParsedData, Person, PersonField, personFields } from "./definitions";
-import Papa from "papaparse";
+import { personFields } from "./definitions";
 
 export const formatDateToLocal = (
   dateStr: string,
-  locale: string = 'en-US',
+  locale: string = "en-US"
 ) => {
   const date = new Date(dateStr);
   const options: Intl.DateTimeFormatOptions = {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
+    day: "numeric",
+    month: "short",
+    year: "numeric",
   };
   const formatter = new Intl.DateTimeFormat(locale, options);
   return formatter.format(date);
 };
 
-export const formatQueryCondition = (
-  query: any
-) => {
+export const formatQueryCondition = (query: any) => {
   let result: string[] = [];
   try {
     const arrFields = JSON.parse(query);
@@ -25,19 +22,21 @@ export const formatQueryCondition = (
       Object.keys(item).map((key: string) => {
         for (const fld of personFields) {
           if (fld.name === key) {
-            if (Object.keys(item[key])[0] === 'startsWith') {
-              result.push(`${fld.title} начинается с "${item[key]['startsWith']}"`);
+            if (Object.keys(item[key])[0] === "startsWith") {
+              result.push(
+                `${fld.title} начинается с "${item[key]["startsWith"]}"`
+              );
             }
           }
         }
       });
-    })
+    });
   } catch (e) {
     console.log(e);
   }
 
   return result;
-}
+};
 
 export const generatePagination = (currentPage: number, totalPages: number) => {
   // If the total number of pages is 7 or less,
@@ -72,70 +71,36 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
   ];
 };
 
-export async function uploadCsv(
-  csvFile: string,
-  config: PersonField[] | undefined = undefined,
-  limitRows: number = -1,
-  skipRows: number = 0
-): Promise<ParsedData> {
-  let persons: Person[] = [];
-  let cols: string[] = [];
-  let logs: string[] = [];
-
-  return new Promise((resolve) => {
-    logs.push(`Результаты предварительной обработки файла:`);
-    let count = 0;
-    Papa.parse<any>(csvFile, {
-      worker: true,
-      header: true,
-      dynamicTyping: true,
-      step: (results, parser) => {
-        count++;
-        if (skipRows < count) {
-          cols = results.meta.fields ? results.meta.fields : [];
-          if (config) {
-            let person: Person = {};
-            config.forEach((conf: PersonField) => {
-              const val =
-                results.data[`${conf.name}` as keyof typeof results.data];
-              if (val) {
-                person[`${conf.value}` as keyof typeof person] = val;
-              }
-            });
-            persons.push(person);
-            logs.push(`Запись: ${JSON.stringify(person)}`);
-          } else {
-            logs.push(`Строка: ${JSON.stringify(results.data)}`);
-          }
-        }
-        if (limitRows === count) {
-          parser.abort();
-          resolve({ persons: persons, cols: cols, logs: logs });
-        }
-      },
-      complete: (results) => {
-        resolve({ persons: persons, cols: cols, logs: logs });
-      },
-    });
-  });
-}
-
-export function formatString(s: string | null | undefined) {
-  return s ? s.trim().toUpperCase() : null;
-}
-
-export function formatInt(s: number | string | bigint | null | undefined) {
-  if (!s) return null;
-  if (typeof s === "string") return parseInt(s);
-  return s;
-}
-
-export function formatPhone(s: number | string | bigint | null | undefined) {
-  if (!s) return null;
-  const converStr = String(s);
-  if (converStr.startsWith("8")) {
-    const replaceStr = "7" + converStr.slice(1);
-    return parseInt(replaceStr);
+export function formatStr(s: any) {
+  let str: string = String(s).trim().toUpperCase();
+  if (str === "NULL") return null;
+  const removingSymbols = [
+    " ",
+    "!",
+    "@",
+    "#",
+    "%",
+    "^",
+    "&",
+    "*",
+    "-",
+    "+",
+    "<",
+    ">",
+    "=",
+    "/",
+  ];
+  for (let i = 0; i > removingSymbols.length; i++) {
+    str = str.replaceAll(removingSymbols[i], "");
   }
-  return parseInt(converStr);
+  return str;
+}
+
+export function formatPhone(s: any) {
+  const converStr = formatStr(s);
+  if (s === null) return null;
+  if (String(converStr).startsWith("8")) {
+    return "7" + String(converStr).slice(1);
+  }
+  return converStr;
 }

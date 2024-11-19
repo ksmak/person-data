@@ -25,14 +25,13 @@ function formatPhone(s) {
 const worker = new Worker(
   "queries",
   async (job) => {
-    if (job.name === 'load-data') {
+    if (job.name === "load-data") {
       let logs = [];
       let persons = [];
       let error = false;
 
       logs.push(`Начат процесс загрузки данных...`);
       for (const person of job.data.persons) {
-
         if (person.iin) {
           const findPersonByIin = await prisma.person.findUnique({
             where: {
@@ -90,11 +89,13 @@ const worker = new Worker(
               logs.push(`Обновление: ${JSON.stringify(p)}`);
             } catch (e) {
               error = true;
-              logs.push(`Ошибка при обновлении! (${person.lastName} ${person.firstName} ${person.middleName})! ${e}`);
+              logs.push(
+                `Ошибка при обновлении! (${person.lastName} ${person.firstName} ${person.middleName})! ${e}`
+              );
             }
             continue;
-          };
-        };
+          }
+        }
         try {
           const p = await prisma.person.create({
             data: {
@@ -107,8 +108,8 @@ const worker = new Worker(
               district: formatStr(person.district),
               building: formatStr(person.building),
               apartment: formatStr(person.apartment),
-            }
-          })
+            },
+          });
           logs.push(`Вставка: ${JSON.stringify(p)}`);
         } catch (e) {
           error = true;
@@ -126,14 +127,14 @@ const worker = new Worker(
           logs: logs,
           persons: persons,
         };
-      };
+      }
     }
-    if (job.name === 'process-queries') {
+    if (job.name === "process-queries") {
       const queries = await prisma.query.findMany({
         where: {
-          state: 'WAITING',
-        }
-      })
+          state: "WAITING",
+        },
+      });
       for (query of queries) {
         const persons = await prisma.person.findMany({
           where: {
@@ -146,16 +147,19 @@ const worker = new Worker(
           },
           data: {
             count: persons.length,
-            result: persons.length > 100 ? "Найдено больше 100 записей" : JSON.stringify(persons),
-            state: 'SUCCESS',
+            result:
+              persons.length > 100
+                ? "Найдено больше 100 записей"
+                : JSON.stringify(persons),
+            state: "SUCCESS",
           },
         });
-      };
-    };
+      }
+    }
   },
   {
     connection: redisConnection,
     removeOnComplete: { count: 0 },
-    removeOnFail: { count: 0 }
+    removeOnFail: { count: 0 },
   }
 );

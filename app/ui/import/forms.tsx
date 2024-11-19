@@ -4,11 +4,14 @@ import Papa from "papaparse";
 import { ChangeEvent, FormEvent, useRef, useState } from "react";
 import { Spinner, Stepper, Step, Button, Typography } from "@material-tailwind/react";
 import { HiOutlineUpload, HiOutlineDatabase, HiOutlineCog } from "react-icons/hi";
-import { ImportState, loadData, previewData, uploadFile } from "@/app/lib/actions";
-import { ConfigTable, PersonsTable } from "@/app/ui/import/tables";
+import { ImportState, loadData } from "@/app/lib/actions";
+import { ConfigTable } from "@/app/ui/import/tables";
 import { JournalPanel } from "@/app/ui/import/panels";
 import { Person, PersonField, personFields } from "@/app/lib/definitions";
-import prisma from "@/app/lib/db";
+import { Btn } from "@/app/ui/buttons";
+import { formatPhone, formatStr } from "@/app/lib/utils";
+
+const LIMIT_ROW_COUNT = 1000
 
 export function ImportForm() {
     const [activeStep, setActiveStep] = useState(0);
@@ -17,8 +20,6 @@ export function ImportForm() {
     const [uploading, setUploading] = useState(false);
     const [previewing, setPreviewing] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [uploadState, setUploadState] = useState<ImportState>({});
-    const [previewState, setPreviewState] = useState<ImportState>({});
     const [loadState, setLoadState] = useState<ImportState>({});
     const refForm = useRef<HTMLFormElement>(null);
     const [file, setFile] = useState<File | null>(null);
@@ -40,11 +41,9 @@ export function ImportForm() {
         setCols([]);
         setFile(null);
         if (event.target.files && event.target.files.length) {
-            // refForm.current?.requestSubmit();
             const file = event.target.files[0];
             const extension = file.name.split(".").at(-1);
             setFile(file);
-            //check
             if (extension !== "csv" && extension !== "txt") {
                 setUploadError("Ошибка формата файла! Для загрузки данных необходимы файлы с расширением csv, txt");
                 return;
@@ -52,8 +51,8 @@ export function ImportForm() {
             let data: any[] = []
             let cols: string[] = [];
             let count = 0;
-            const limitRows = 1000;
-            setUploadLogs(prev => prev.concat([`Начат процесс предварительной загрузки файла ${file.name}...`]));
+            const limitRows = LIMIT_ROW_COUNT;
+            setUploadLogs(prev => prev.concat(['[']));
             Papa.parse<any>(file, {
                 header: true,
                 dynamicTyping: true,
@@ -61,29 +60,21 @@ export function ImportForm() {
                     count++;
                     cols = results.meta.fields ? results.meta.fields : [];
                     data.push(results.data);
-                    setUploadLogs(prev => prev.concat([`Запись: ${JSON.stringify(results.data)}`]));
+                    setUploadLogs(prev => prev.concat(`${[JSON.stringify(results.data, null, 2)]},`));
                     //limit rows
                     if (limitRows === count) {
                         parser.abort();
                     }
                 },
                 complete: (results) => {
+                    setUploadLogs(prev => prev.concat([']']));
                     setCols(cols);
                     setData(data);
-                    setUploadLogs(prev => prev.concat([`Процесс загрузки файла завершен...`]));
                 },
             });
         }
         setUploading(false);
     };
-
-    const handleUploadFile = async (event: FormEvent<HTMLFormElement>) => {
-        // event.preventDefault();
-        // setUploading(true);
-        // const formData = new FormData(event.currentTarget);
-        // setUploadState(await uploadFile({}, formData));
-        // setUploading(false);
-    }
 
     const handlePreviewData = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -91,7 +82,6 @@ export function ImportForm() {
         setPreviewError('');
         setPreviewLogs([]);
         setPersons([]);
-        setPreviewLogs(prev => prev.concat([`Начат процесс обработки данных файла ${file?.name}...`]));
         const formData = new FormData(event.currentTarget);
         //get select cols
         let config: PersonField[] = [];
@@ -110,21 +100,16 @@ export function ImportForm() {
         data.map((item: any) => {
             let person: Person = {};
             config.forEach((conf: PersonField) => {
-                const val =
-                    item[`${conf.name}` as keyof typeof item];
+                const val = (conf.name === 'phone')
+                    ? formatPhone(item[`${conf.name}` as keyof typeof item])
+                    : formatStr(item[`${conf.name}` as keyof typeof item]);
                 if (val) {
                     person[`${conf.value}` as keyof typeof person] = val;
                 }
             });
             setPersons(prev => prev.concat([person]));
-            setPreviewLogs(prev => prev.concat([`Запись: ${JSON.stringify(person)}.`]));
+            setPreviewLogs(prev => prev.concat([JSON.stringify(person, null, 2)]));
         })
-        setPreviewLogs(prev => prev.concat([`Процесс обработки данных завершен.`]));
-        // const previewDataWithParams = previewData.bind(null, {
-        //     fileName: uploadState.file,
-        //     cols: uploadState.cols || []
-        // });
-        // setPreviewState(await previewDataWithParams({}, formData));
         setPreviewing(false);
     }
 
@@ -139,19 +124,19 @@ export function ImportForm() {
 
     return (
         <div className="w-full h-dvh">
-            <div className="w-full px-24 py-4">
+            <div className="w-full px-24 py-2">
                 <Stepper
                     activeStep={activeStep}
                     className=""
-                    lineClassName="bg-blue-200"
-                    activeLineClassName="bg-blue-600"
+                    lineClassName="bg-gray-100"
+                    activeLineClassName="bg-primary"
                     isLastStep={(value) => setIsLastStep(value)}
                     isFirstStep={(value) => setIsFirstStep(value)}
                 >
                     <Step
                         className=""
-                        activeClassName="ring-0 !bg-blue-600 text-white"
-                        completedClassName="ring-0 !bg-blue-600 text-white"
+                        activeClassName="ring-0 !bg-primary text-white"
+                        completedClassName="ring-0 !bg-primary text-white"
                         onClick={() => setActiveStep(0)}
                     >
                         <HiOutlineUpload className="h-5 w-5" />
@@ -172,8 +157,8 @@ export function ImportForm() {
                     </Step>
                     <Step
                         className=""
-                        activeClassName="ring-0 !bg-blue-600 text-white"
-                        completedClassName="ring-0 !bg-blue-600 text-white"
+                        activeClassName="ring-0 !bg-primary text-white"
+                        completedClassName="ring-0 !bg-primary text-white"
                         onClick={() => setActiveStep(1)}
                     >
                         <HiOutlineCog className="h-5 w-5" />
@@ -194,8 +179,8 @@ export function ImportForm() {
                     </Step>
                     <Step
                         className=""
-                        activeClassName="ring-0 !bg-blue-600 text-white"
-                        completedClassName="ring-0 !bg-blue-600 text-white"
+                        activeClassName="ring-0 !bg-primary text-white"
+                        completedClassName="ring-0 !bg-primary text-white"
                         onClick={() => setActiveStep(2)}
                     >
                         <HiOutlineDatabase className="h-5 w-5" />
@@ -218,13 +203,13 @@ export function ImportForm() {
             </div>
             {activeStep === 0 && <div className="w-full mt-[4rem]">
                 <div className="rounded-lg h-24 w-full flex flex-col gap-3 justify-center items-center">
-                    <form id="uploadForm" onSubmit={handleUploadFile} ref={refForm}>
+                    <form id="uploadForm" ref={refForm}>
                         <div className="w-full flex justify-start items-center gap-5">
                             <label htmlFor="uploadFile1"
-                                className="flex justify-start items-center gap-4 bg-gradient-to-t font-bold text-xs uppercase from-blue-600 to-blue-500 hover:shadow-lg hover:shadow-blue-300 text-white px-4 py-2 outline-none rounded-lg cursor-pointer font-[sans-serif]"
+                                className='flex items-center gap-3 rounded-lg p-2 text-xs  text-white uppercase bg-gradient-to-t from-emerald-500 to-emerald-400 hover:shadow-lg hover:shadow-emerald-200 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:bg-emerald-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50'
                             >
                                 {uploading ? "Загрузка файла..." : "Выбрать файл"}
-                                {uploading ? <Spinner className="h-6 w-6" /> : <HiOutlineUpload className="h-6 w-6" />}
+                                {uploading ? <Spinner className="h-5 w-5" /> : <HiOutlineUpload className="h-6 w-6" />}
                                 <input
                                     className="hidden"
                                     id="uploadFile1"
@@ -243,68 +228,66 @@ export function ImportForm() {
                 <div className="rounded h-full w-full">
                     <JournalPanel logs={uploadLogs} />
                 </div>
-            </div>}
-            {activeStep === 1 && <div className="w-full mt-[4rem]">
-                <div className="rounded-lg h-24 w-full flex flex-col gap-3 justify-center items-center">
-                    <form id="previewForm" onSubmit={handlePreviewData}>
-                        <div className="flex gap-4 items-center">
-                            {file && <Button
-                                type="submit"
-                                variant="gradient"
-                                color="blue"
-                                size="md"
-                                className="flex gap-4 items-center"
-                            >
-                                {previewing ? "Обработка данных..." : "Подготовить данные"}
-                                {previewing ? <Spinner className="h-6 w-6" /> : <HiOutlineCog className="h-6 w-6" />}
-                            </Button>}
-                            {persons && <span className="italic text-gray-600">Данные подготовлены</span>}
+            </div >}
+            {
+                activeStep === 1 && <div className="w-full mt-[4rem]">
+                    <div className="rounded-lg h-24 w-full flex flex-col gap-3 justify-center items-center">
+                        <form id="previewForm" onSubmit={handlePreviewData}>
+                            <div className="flex gap-4 items-center">
+                                {file && <Btn
+                                    type="submit"
+                                    className="flex gap-4 items-center"
+                                >
+                                    {previewing ? "Обработка данных..." : "Подготовить данные"}
+                                    {previewing ? <Spinner className="h-6 w-6" /> : <HiOutlineCog className="h-6 w-6" />}
+                                </Btn>}
+                                {persons && <span className="italic text-gray-600">Данные подготовлены</span>}
+                            </div>
+                        </form>
+                        <div className="text-red-600 text-sm">
+                            {previewError}
                         </div>
-                    </form>
-                    <div className="text-red-600 text-sm">
-                        {previewError}
+                    </div>
+                    <div className="rounded h-full w-full">
+                        {file && <div className="mt-5 w-full flex justify-between gap-5">
+                            <ConfigTable cols={cols} personFields={personFields} />
+                            <JournalPanel logs={previewLogs} />
+                        </div>}
                     </div>
                 </div>
-                <div className="rounded h-full w-full">
-                    {file && <div className="mt-5 w-full flex justify-between gap-5">
-                        <ConfigTable cols={cols} personFields={personFields} />
-                        <JournalPanel logs={previewLogs} />
-                    </div>}
-                </div>
-            </div>}
-            {activeStep === 2 && <div className="w-full mt-[4rem]">
-                <div className="rounded-lg h-24 w-full flex flex-col gap-3 justify-center items-center">
-                    <form onSubmit={handleLoadData}>
-                        <div className="flex gap-4 items-center">
-                            {persons && <Button
-                                type="submit"
-                                variant="gradient"
-                                color="blue"
-                                size="md"
-                                className="flex gap-4 items-center"
-                            >
-                                {loading ? "Загрузка данных..." : "Загрузить данных"}
-                                {loading ? <Spinner className="h-6 w-6" /> : <HiOutlineDatabase className="h-6 w-6" />}
-                            </Button>}
-                            {loadState?.persons && <span className="italic text-gray-600">Данные загружены</span>}
+            }
+            {
+                activeStep === 2 && <div className="w-full mt-[4rem]">
+                    <div className="rounded-lg h-24 w-full flex flex-col gap-3 justify-center items-center">
+                        <form onSubmit={handleLoadData}>
+                            <div className="flex gap-4 items-center">
+                                {persons && <Btn
+                                    type="submit"
+                                    className="flex gap-4 items-center"
+                                >
+                                    {loading ? "Загрузка данных..." : "Загрузить данных"}
+                                    {loading ? <Spinner className="h-6 w-6" /> : <HiOutlineDatabase className="h-6 w-6" />}
+                                </Btn>}
+                                {loadState?.persons && <span className="italic text-gray-600">Данные загружены</span>}
+                            </div>
+                        </form>
+                        <div className="text-red-600 text-sm">
+                            {loadState?.error}
                         </div>
-                    </form>
-                    <div className="text-red-600 text-sm">
-                        {loadState?.error}
+                    </div>
+                    <div className="w-full h-full rounded">
+                        {loadState?.logs && <JournalPanel logs={loadState?.logs || []} />}
                     </div>
                 </div>
-                <div className="w-full h-full rounded">
-                    {loadState?.logs && <JournalPanel logs={loadState?.logs || []} />}
-                </div>
-            </div>}
+            }
             <div className="mt-5 flex justify-between">
-                <Button onClick={handlePrev} disabled={isFirstStep} variant="gradient" color="blue">
+                <Btn onClick={handlePrev} disabled={isFirstStep}>
                     Предыдущий этап
-                </Button>
-                <Button onClick={handleNext} disabled={isLastStep} variant="gradient" color="blue">
+                </Btn>
+                <Btn onClick={handleNext} disabled={isLastStep}>
                     Следующий этап
-                </Button>
+                </Btn>
             </div>
-        </div>
+        </div >
     );
 } 
