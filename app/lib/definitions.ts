@@ -1,5 +1,3 @@
-import { ReactNode } from "react";
-
 export type Person = {
   lastName?: string | null;
   firstName?: string | null;

@@ -1,4 +1,5 @@
 import { AddShedullerJobButton, RemoveShedullerJobButton } from '@/app/ui/main/buttons';
+import { SocketClient } from './ui/socket';
 
 export default function Home() {
 
@@ -6,6 +7,7 @@ export default function Home() {
     <div>
       <AddShedullerJobButton />
       <RemoveShedullerJobButton />
+      <SocketClient />
     </div>
   );
 }
