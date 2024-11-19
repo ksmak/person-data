@@ -1,5 +1,7 @@
 import { fetchFilteredSubscriptions } from '@/app/lib/data';
+import { TableHead } from '@/app/lib/definitions';
 import Table from '@/app/ui/subscriptions/table';
+import { Tbl } from '@/app/ui/tables';
 
 export default async function UsersTable({
   query,
@@ -14,9 +16,17 @@ export default async function UsersTable({
 }) {
   const subs = await fetchFilteredSubscriptions(query, currentPage, orderBy, sort);
 
+  const tableHeads: TableHead[] = [
+    {
+      title: "Наименование",
+      name: "title",
+      fieldType: "string",
+    },
+  ]
+
   return (
     <>
-      <Table subs={subs} />
+      <Tbl tableHeads={tableHeads} tableRows={subs} url="/subscriptions" />
     </>
   );
 }

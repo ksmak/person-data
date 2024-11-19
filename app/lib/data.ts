@@ -15,6 +15,20 @@ export async function fetchFilteredUsers(
   const users = await prisma.user.findMany({
     skip: (currentPage - 1) * ITEMS_PER_PAGE,
     take: ITEMS_PER_PAGE,
+    select: {
+      id: true,
+      isActive: true,
+      lastName: true,
+      firstName: true,
+      middleName: true,
+      login: true,
+      expiredPwd: true,
+      subs: {
+        select: {
+          title: true,
+        }
+      },
+    },
     where: {
       OR: [
         {

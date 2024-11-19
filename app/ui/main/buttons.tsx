@@ -2,7 +2,7 @@
 
 import { addShedullerJob, removeShedullerJob } from "@/app/lib/actions";
 import { FormEvent, useState } from "react"
-import { Button } from "@/app/ui/button";
+import { Btn } from "@/app/ui/buttons";
 
 export function AddShedullerJobButton() {
     const [state, setState] = useState<string>('');
@@ -15,7 +15,7 @@ export function AddShedullerJobButton() {
     return (
         <div>
             <form onSubmit={handlerSubmit}>
-                <Button type="submit"> Запустить планировщик </Button>
+                <Btn type="submit"> Запустить планировщик </Btn>
                 {state}
             </form>
         </div>
@@ -33,7 +33,7 @@ export function RemoveShedullerJobButton() {
     return (
         <div>
             <form onSubmit={handlerSubmit}>
-                <Button type="submit"> Остановить планировщик </Button>
+                <Btn type="submit"> Остановить планировщик </Btn>
                 {state}
             </form>
         </div>

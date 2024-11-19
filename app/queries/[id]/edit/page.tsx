@@ -14,6 +14,13 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
         notFound();
     }
 
+    let queryBody;
+    try {
+        queryBody = formatQueryCondition(JSON.parse(query.body));
+    } catch {
+        queryBody = [];
+    }
+
     return (
         <main>
             <Breadcrumbs
@@ -29,16 +36,19 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                         },
                     ]}
             />
-            <div className="text-gray-800 font-medium">Количество совпадений: <span className="text-gray-950">{query.count}</span></div>
             <div>
-                <div>Запрос:</div>
-                <div className="">
-                    {formatQueryCondition(JSON.parse(query.body)).map((item: string) => (
-                        <div>{item}</div>
+                <div className="font-medium mt-5">Параметры поиска:</div>
+                <div className="m-2 p-4 bg-secondary rounded-lg">
+                    {formatQueryCondition(query.body).map((item: string) => (
+                        <div className="font-normal">{item}</div>
                     ))}
                 </div>
             </div>
-            <div className="overflow-y-auto">
+            {query.state === 'WAITING'
+                ? <div className="mt-5 font-medium border-b border-primary italic">Запрос в процессе обработки</div>
+                : <div className="mt-5 font-medium border-b border-primary italic">Запрос обработан. Количество совпадений: <span className="text-gray-950">{query.count}</span></div>
+            }
+            <div className="max-h-[600px] overflow-y-auto">
                 {query.result && JSON.parse(query.result).map((item: Person) => (<PersonCard key={item.id} person={item} />))}
             </div>
         </main>

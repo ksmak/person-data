@@ -1,10 +1,10 @@
 import { Metadata } from "next";
-import SearchPanel from "@/app/ui/queries/panel";
+import { SearchPanel } from "@/app/ui/queries/panels";
 import { QueriesTableSkeleton } from "@/app/ui/skeletons";
 import { Suspense } from "react";
 import Pagination from "@/app/ui/pagination";
 import WrapTable from '@/app/ui/queries/wrap_table';
-import { fetchQueriesPages } from "../lib/data";
+import { fetchQueriesPages } from "@/app/lib/data";
 
 export const metadata: Metadata = {
     title: 'Search',

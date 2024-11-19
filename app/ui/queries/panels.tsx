@@ -10,9 +10,9 @@ import {
 } from "@material-tailwind/react";
 import { FormEvent, useState } from "react";
 import { HiOutlineSearch } from "react-icons/hi";
-import { Button } from "../button";
+import { Btn } from "@/app/ui/buttons";
 
-export default function SearchPanel({ id }: { id: string }) {
+export function SearchPanel({ id }: { id: string }) {
     const [open, setOpen] = useState(false);
     const [message, setMessage] = useState('');
 
@@ -105,13 +105,13 @@ export default function SearchPanel({ id }: { id: string }) {
 
     return (
         <>
-            <Button
-                className="flex items-center gap-3"
+            <Btn
+                className="justify-center gap-2"
                 onClick={(e) => { e.preventDefault(); setOpen(true); }}
             >
-                Новый запрос
-                <HiOutlineSearch className="w-4 h-4" />
-            </Button>
+                <span className="hidden md:block">Новый запрос</span>{' '}
+                <HiOutlineSearch className="w-5 h-5" />
+            </Btn>
             <Dialog open={open} handler={handleOpen}>
                 <Alert
                     className="absolute top-5 rounded-none border-l-4 border-primary bg-select font-medium text-primarytxt"
@@ -149,18 +149,18 @@ export default function SearchPanel({ id }: { id: string }) {
                     </form>
                 </DialogBody>
                 <DialogFooter>
-                    <Button
+                    <Btn
                         form="createQueryForm"
                         type="submit"
                     >
                         Начать поиск
-                    </Button>
-                    <Button
+                    </Btn>
+                    <Btn
                         className="ml-5"
                         onClick={handleOpen}
                     >
                         <span>Отмена</span>
-                    </Button>
+                    </Btn>
                 </DialogFooter>
             </Dialog>
         </>

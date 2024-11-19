@@ -5,7 +5,7 @@ import { SubscriptionState, updateSubscription, createSubscription } from '@/app
 import { FormEvent, useState } from 'react';
 import { Subscription } from '@prisma/client';
 import { ModalDeleteUser } from '@/app/ui/subscriptions/modal';
-import { Button } from '../button';
+import { EditButtonsGroup } from '@/app/ui/buttons';
 import { Checkbox } from '@material-tailwind/react';
 
 export default function SubscriptionForm({
@@ -36,17 +36,7 @@ export default function SubscriptionForm({
   return (
     <form onSubmit={onSubmit}>
       <div className="mb-3 flex justify-end gap-4">
-        {sub?.id
-          ? <Button onClick={(e) => { e.preventDefault(); handleOpen() }} className='bg-red-600  w-32 justify-center'>Удалить</Button>
-          : null}
-        <Button type="submit" className='w-32 justify-center'>Сохранить</Button>
-        <Button>
-          <Link
-            href="/subscriptions"
-          >
-            Закрыть
-          </Link>
-        </Button>
+        <EditButtonsGroup item={sub} handleOpen={handleOpen} url='/subscriptions' />
       </div>
       <div className="rounded-md bg-secondary p-4 md:p-6">
         <p className="mt-2 text-sm text-red-500 text-center mb-2">{state.message}</p>

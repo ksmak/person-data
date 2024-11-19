@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 export type Person = {
   lastName?: string | null;
   firstName?: string | null;
@@ -38,3 +40,10 @@ export const personFields: PersonField[] = [
   { name: "building", title: "Дом" },
   { name: "apartment", title: "Квартира" },
 ];
+
+export type TableHead = {
+  title: string;
+  name: string;
+  fieldType: 'string' | 'boolean' | 'date' | 'datetime' | 'active' | 'nested' | 'queryBody' | 'queryState';
+  nestedName?: string;
+}

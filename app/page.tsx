@@ -1,7 +1,9 @@
-import { AddShedullerJobButton, RemoveShedullerJobButton } from '@/app/ui/main/button';
+import { AddShedullerJobButton, RemoveShedullerJobButton } from '@/app/ui/main/buttons';
+
 export default function Home() {
+
   return (
-    <div className='flex flex-col gap-5'>
+    <div>
       <AddShedullerJobButton />
       <RemoveShedullerJobButton />
     </div>

@@ -5,8 +5,8 @@ import { createUser, updateUser, State } from '@/app/lib/actions';
 import { FormEvent, useState } from 'react';
 import { Subscription, User } from '@prisma/client';
 import { ModalDeleteUser } from '@/app/ui/users/modal';
-import { Button } from '../button';
-import { Checkbox, Radio } from "@material-tailwind/react";
+import { Btn, DangerBtn, EditButtonsGroup } from '@/app/ui/buttons';
+import { Button, Checkbox, Radio } from "@material-tailwind/react";
 import { SubscriptionCard } from '../card';
 
 export default function UserForm({
@@ -39,17 +39,7 @@ export default function UserForm({
   return (
     <form onSubmit={onSubmit}>
       <div className="mb-3 flex justify-end gap-4">
-        {user?.id
-          ? <Button onClick={(e) => { e.preventDefault(); handleOpen() }} className='bg-red-600  w-32 justify-center'>Удалить</Button>
-          : null}
-        <Button type="submit" className='w-32 justify-center'>Сохранить</Button>
-        <Button>
-          <Link
-            href="/users"
-          >
-            Закрыть
-          </Link>
-        </Button>
+        <EditButtonsGroup item={user} handleOpen={handleOpen} url='/users' />
       </div>
       <div className="rounded-md bg-secondary p-4 md:p-6">
         <p className="mt-2 text-sm text-red-500 text-center mb-2">{state.message}</p>
@@ -223,6 +213,6 @@ export default function UserForm({
         </div>
       </div>
       {user?.id && <ModalDeleteUser id={user.id} open={open} handleOpen={handleOpen} />}
-    </form>
+    </form >
   );
 }

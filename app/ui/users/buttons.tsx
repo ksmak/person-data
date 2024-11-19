@@ -1,18 +1,18 @@
 import { HiOutlinePlusSm, HiOutlinePencil } from "react-icons/hi";
 import Link from 'next/link';
-import { Button } from "../button";
+import { Btn } from "../buttons";
 
 export function CreateUser() {
   return (
-    <Button>
+    <Btn>
       <Link
         href="/users/create"
-        className="flex items-center"
+        className="flex items-center gap-1"
       >
         <span className="hidden md:block">Добавить нового пользователя</span>{' '}
-        <HiOutlinePlusSm className="h-5 md:ml-4" />
+        <HiOutlinePlusSm className="h-5 w-5" />
       </Link>
-    </Button>
+    </Btn>
   );
 }
 

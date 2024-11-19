@@ -1,12 +1,31 @@
+'use client'
+
 import { Person } from "@prisma/client";
+import { useRef } from "react";
 
 export function PersonCard({ person }: { person: Person }) {
+    const refIin = useRef<HTMLSpanElement>(null)
+    const handleClick = async () => {
+        const selection = window.getSelection();
+        if (selection) {
+            await navigator.clipboard.writeText(selection.toString());
+            selection.empty();
+        }
+    }
     return (
-        <div className="bg-gray-50 rounded m-5 p-4">
-            <div className="font-bold text-md">{person.lastName} {person.firstName} {person.middleName}</div>
+        <div className="bg-secondary rounded m-2 p-4">
+            <div
+                className="font-bold text-md hover:select-all hover:cursor-pointer"
+                onClick={handleClick}>
+                {person.lastName} {person.firstName} {person.middleName}
+            </div>
             <div className="text-sm">
-                <div>ИИН: <span className="font-semibold">{person.iin}</span></div>
-                <div>Номер телефона: <span>{person.phone}</span></div>
+                <div>ИИН:
+                    <span className="font-semibold hover:select-all hover:cursor-pointer" onClick={handleClick} ref={refIin}>
+                        {person.iin}
+                    </span>
+                </div>
+                <div>Номер телефона: <span className="font-semibold hover:select-all hover:cursor-pointer" onClick={handleClick}>{person.phone}</span></div>
                 <div>
                     <div>Адрес проживания</div>
                     <div>
