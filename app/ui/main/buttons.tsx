@@ -15,8 +15,10 @@ export function AddShedullerJobButton() {
     return (
         <div>
             <form onSubmit={handlerSubmit}>
-                <Btn type="submit"> Запустить планировщик </Btn>
-                {state}
+                <div className="flex items-center gap-5">
+                    <Btn type="submit"> Запустить планировщик </Btn>
+                    {state}
+                </div>
             </form>
         </div>
     );
@@ -33,8 +35,10 @@ export function RemoveShedullerJobButton() {
     return (
         <div>
             <form onSubmit={handlerSubmit}>
-                <Btn type="submit"> Остановить планировщик </Btn>
-                {state}
+                <div className="flex items-center gap-5">
+                    <Btn type="submit"> Остановить планировщик </Btn>
+                    {state}
+                </div>
             </form>
         </div>
     );

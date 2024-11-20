@@ -331,14 +331,15 @@ export async function deleteSubscription(id: string) {
 export async function createQuery(
   id: string,
   prevState: string | undefined,
-  formData: FormData
+  person: Person
 ) {
   let body: any = [];
-  for (const pair of formData.entries()) {
-    if (pair[1]) {
+  for (const key of Object.keys(person)) {
+    const val = person[`${key}` as keyof typeof person];
+    if (val) {
       const condition = {
-        [`${pair[0]}`]: {
-          startsWith: `${pair[1]}`,
+        [`${key}`]: {
+          startsWith: val,
           mode: "insensitive",
         },
       };
@@ -346,8 +347,9 @@ export async function createQuery(
     }
   }
 
+  let query;
   try {
-    await prisma.query.create({
+    query = await prisma.query.create({
       data: {
         userId: id,
         body: JSON.stringify(body),
@@ -357,27 +359,23 @@ export async function createQuery(
   } catch (error) {
     throw error;
   }
-  revalidatePath("/queries");
-  redirect("/queries");
+
+  return {
+    query: query
+  }
 }
 
 export async function loadData(persons: Person[], prevState: ImportState) {
   const job = await queue.add("load-data", {
     persons: persons,
   });
-
-  const result = await job.waitUntilFinished(queueEvents);
-
-  console.log(result);
-
-  return result;
 }
 
 export async function addShedullerJob(prevState: string) {
   await queue.upsertJobScheduler(
-    'repeat-every-30s',
+    'repeat-every-10s',
     {
-      every: 30000,
+      every: 10000,
     },
     {
       name: 'process-queries',
@@ -389,7 +387,7 @@ export async function addShedullerJob(prevState: string) {
 
 export async function removeShedullerJob(prevState: string) {
   console.log('run remove sheduller')
-  await queue.removeJobScheduler('repeat-every-30s');
+  await queue.removeJobScheduler('repeat-every-10s');
 
   await queue.obliterate();
 

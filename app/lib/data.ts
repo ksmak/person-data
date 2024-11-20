@@ -1,6 +1,6 @@
 import prisma from "./db";
 
-const ITEMS_PER_PAGE = 20;
+const ITEMS_PER_PAGE = 8;
 
 export async function fetchSubscriptions() {
   return await prisma.subscription.findMany();

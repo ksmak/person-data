@@ -1,7 +1,6 @@
 import { fetchFilteredQueries } from '@/app/lib/data';
 import { TableHead } from '@/app/lib/definitions';
-import { Tbl } from '@/app/ui/tables';
-
+import QueriesTable from './table';
 
 export default async function WrapTable({
   userId,
@@ -45,7 +44,7 @@ export default async function WrapTable({
 
   return (
     <>
-      <Tbl tableHeads={tableHeads} tableRows={queries} url='/queries' />
+      <QueriesTable userId={userId} tableHeads={tableHeads} queries={queries} url={process.env.WS || "http://localhost:3001"} />
     </>
   );
 }

@@ -1,7 +1,8 @@
 'use client';
 
 import Papa from "papaparse";
-import { ChangeEvent, FormEvent, useRef, useState } from "react";
+import io from 'socket.io-client';
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import { Spinner, Stepper, Step, Button, Typography } from "@material-tailwind/react";
 import { HiOutlineUpload, HiOutlineDatabase, HiOutlineCog } from "react-icons/hi";
 import { ImportState, loadData } from "@/app/lib/actions";
@@ -13,7 +14,7 @@ import { formatPhone, formatStr } from "@/app/lib/utils";
 
 const LIMIT_ROW_COUNT = 1000
 
-export function ImportForm() {
+export function ImportForm({ url }: { url: string }) {
     const [activeStep, setActiveStep] = useState(0);
     const [isLastStep, setIsLastStep] = useState(false);
     const [isFirstStep, setIsFirstStep] = useState(false);
@@ -27,7 +28,7 @@ export function ImportForm() {
     const [cols, setCols] = useState<string[]>([]);
     const [uploadLogs, setUploadLogs] = useState<string[]>([]);
     const [uploadError, setUploadError] = useState<string>('');
-    const [persons, setPersons] = useState<Person[] | null>();
+    const [persons, setPersons] = useState<Person[]>([]);
     const [previewLogs, setPreviewLogs] = useState<string[]>([]);
     const [previewError, setPreviewError] = useState<string>('');
 
@@ -95,7 +96,6 @@ export function ImportForm() {
                 } as PersonField);
             }
         });
-        console.log(data);
         //load data into persons
         data.map((item: any) => {
             let person: Person = {};
@@ -114,13 +114,33 @@ export function ImportForm() {
     }
 
     const handleLoadData = async (event: FormEvent<HTMLFormElement>) => {
-        setLoadState({});
         event.preventDefault();
         setLoading(true);
-        const loadDataWithParams = loadData.bind(null, persons || []);
-        setLoadState(await loadDataWithParams({}));
-        setLoading(false);
+        // setLoadState({});
+        try {
+            const result = await loadData(persons, {});
+        } catch (e) {
+            setLoadState({ ...loadState, error: String(e) })
+        }
     }
+
+    useEffect(() => {
+        const socket = io(url);
+
+        socket.on('connect', () => {
+            console.log('Connected to WebSocket server');
+        });
+
+        socket.on('load-completed', (loadState: ImportState) => {
+            console.log('load data completed');
+            setLoadState(loadState);
+            setLoading(false);
+        })
+
+        return () => {
+            socket.disconnect();
+        };
+    }, []);
 
     return (
         <div className="w-full h-dvh">
@@ -268,7 +288,7 @@ export function ImportForm() {
                                     {loading ? "Загрузка данных..." : "Загрузить данных"}
                                     {loading ? <Spinner className="h-6 w-6" /> : <HiOutlineDatabase className="h-6 w-6" />}
                                 </Btn>}
-                                {loadState?.persons && <span className="italic text-gray-600">Данные загружены</span>}
+                                {loadState?.logs && <span className="italic text-gray-600">Данные загружены</span>}
                             </div>
                         </form>
                         <div className="text-red-600 text-sm">

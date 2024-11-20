@@ -8,98 +8,72 @@ import {
     DialogFooter,
     Alert
 } from "@material-tailwind/react";
-import { FormEvent, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { HiOutlineSearch } from "react-icons/hi";
 import { Btn } from "@/app/ui/buttons";
+import { Person, PersonField } from "@/app/lib/definitions";
+import { Query } from "@prisma/client";
 
-export function SearchPanel({ id }: { id: string }) {
+export function SearchPanel({ id, setData }: { id: string, setData: Dispatch<SetStateAction<Query[]>> }) {
     const [open, setOpen] = useState(false);
     const [message, setMessage] = useState('');
+    const [person, setPerson] = useState<Person>({});
 
-    const handleOpen = () => { setOpen(false) };
-
-    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-        const createQueryWithId = createQuery.bind(null, id);
-        const formData = new FormData(event.currentTarget);
-        if (checkingEmptyQuery(formData)) {
-            event.preventDefault();
+    const handleSearch = async () => {
+        if (Object.keys(person).length === 0) {
+            setMessage('Запрос должен содержать хотя бы одно условие');
             return;
         }
-        await createQueryWithId(undefined, formData);
-        handleOpen();
+        setOpen(false);
+        const createQueryWithId = createQuery.bind(null, id);
+        const query = await createQueryWithId(undefined, person);
+        setData(prev => [query.query].concat(prev));
     }
 
-    const checkingEmptyQuery = (formData: FormData) => {
-        for (const pair of formData.entries()) {
-            if (pair[1]) {
-                return false;
-            }
-        }
-        setMessage('Запрос должен содержать хотя бы одно условие');
-        return true;
-    }
-
-    type Field = {
-        title: string,
-        name: string,
-        fieldType: 'string' | 'number'
-    }
-
-    const fields: Field[] = [
+    const fields: PersonField[] = [
         {
             title: 'Фамилия',
             name: 'lastName',
-            fieldType: 'string'
         },
         {
             title: 'Имя',
             name: 'firstName',
-            fieldType: 'string'
         },
         {
             title: 'Отчество',
             name: 'middleName',
-            fieldType: 'string'
         },
         {
             title: 'ИИН',
             name: 'iin',
-            fieldType: 'string'
         },
         {
             title: 'Номер телефона',
             name: 'phone',
-            fieldType: 'string'
         },
         {
             title: 'Область',
             name: 'region',
-            fieldType: 'string'
         },
         {
             title: 'Район',
             name: 'district',
-            fieldType: 'string'
         },
         {
             title: 'Наименование улицы',
             name: 'street',
-            fieldType: 'string'
         },
         {
             title: 'Корпус',
             name: 'locality',
-            fieldType: 'string'
         },
         {
             title: 'Номер дома',
             name: 'house',
-            fieldType: 'string'
         },
         {
             title: 'Номер квартиры',
             name: 'apartment',
-            fieldType: 'string'
         },
     ]
 
@@ -107,12 +81,12 @@ export function SearchPanel({ id }: { id: string }) {
         <>
             <Btn
                 className="justify-center gap-2"
-                onClick={(e) => { e.preventDefault(); setOpen(true); }}
+                onClick={() => { setOpen(true); }}
             >
                 <span className="hidden md:block">Новый запрос</span>{' '}
                 <HiOutlineSearch className="w-5 h-5" />
             </Btn>
-            <Dialog open={open} handler={handleOpen}>
+            <Dialog open={open} handler={() => { setOpen(false); }}>
                 <Alert
                     className="absolute top-5 rounded-none border-l-4 border-primary bg-select font-medium text-primarytxt"
                     open={!!message}
@@ -126,38 +100,37 @@ export function SearchPanel({ id }: { id: string }) {
                     </div>
                 </DialogHeader>
                 <DialogBody className="overflow-y-scroll h-[40rem]">
-                    <form onSubmit={handleSubmit} id="createQueryForm">
-                        <div className="rounded-2xl bg-secondary p-4 md:p-6">
-                            {fields.map((fld: Field, index: number) => (
-                                <div className="mb-4" key={index}>
-                                    <label htmlFor="lastName" className="pl-2 mb-2 block text-sm font-medium">
-                                        {fld.title}
-                                    </label>
-                                    <div className="relative mt-2 rounded-md">
-                                        <div className="relative">
-                                            <input
-                                                className="font-medium block w-full rounded-md border border-gray-200 py-2 pl-2 text-sm outline-2"
-                                                name={fld.name}
-                                                type="text"
-                                                defaultValue=""
-                                            />
-                                        </div>
+                    <div className="rounded-2xl bg-secondary p-4 md:p-6">
+                        {fields.map((fld: PersonField, index: number) => (
+                            <div className="mb-4" key={index}>
+                                <label htmlFor="lastName" className="pl-2 mb-2 block text-sm font-medium">
+                                    {fld.title}
+                                </label>
+                                <div className="relative mt-2 rounded-md">
+                                    <div className="relative">
+                                        <input
+                                            className="font-medium block w-full rounded-md border border-gray-200 py-2 pl-2 text-sm outline-2"
+                                            name={fld.name}
+                                            type="text"
+                                            value={person[`${fld.name}` as keyof typeof person] ? String(person[`${fld.name}` as keyof typeof person]) : undefined}
+                                            onChange={(e) => setPerson({ ...person, [`${fld.name}` as keyof typeof person]: e.target.value })}
+                                        />
                                     </div>
                                 </div>
-                            ))}
-                        </div>
-                    </form>
+                            </div>
+                        ))}
+                    </div>
                 </DialogBody>
                 <DialogFooter>
                     <Btn
                         form="createQueryForm"
-                        type="submit"
+                        onClick={handleSearch}
                     >
                         Начать поиск
                     </Btn>
                     <Btn
                         className="ml-5"
-                        onClick={handleOpen}
+                        onClick={() => { setOpen(false); }}
                     >
                         <span>Отмена</span>
                     </Btn>

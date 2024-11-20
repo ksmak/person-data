@@ -89,6 +89,8 @@ export function formatStr(s: any) {
     ">",
     "=",
     "/",
+    "(",
+    ")"
   ];
   for (let i = 0; i > removingSymbols.length; i++) {
     str = str.replaceAll(removingSymbols[i], "");
