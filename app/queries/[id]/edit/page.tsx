@@ -1,9 +1,12 @@
 import { fetchQueryById } from "@/app/lib/data";
 import { formatQueryCondition } from "@/app/lib/utils";
+import { SecondaryBtn } from "@/app/ui/buttons";
 import Breadcrumbs from "@/app/ui/queries/breadcrumbs";
 import { PersonCard } from "@/app/ui/queries/cards";
-import { Person, Query } from "@prisma/client";
+import { Person } from "@prisma/client";
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { HiOutlinePrinter, HiOutlineX } from "react-icons/hi";
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
@@ -31,14 +34,36 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                         },
                         {
                             label: 'Результаты запроса',
-                            href: `/queries/${id}`,
+                            href: `/queries/${id}/edit`,
                             active: true,
                         },
                     ]}
             />
             <div>
-                <div className="font-medium mt-5">Параметры поиска:</div>
-                <div className="m-2 p-4 bg-secondary rounded-lg">
+                <div className="grid grid-cols-3">
+                    <div className="col-start-2 justify-self-center font-medium mt-5 italic">Параметры поиска:</div>
+                    <div className="justify-self-end flex items-center gap-2">
+                        <SecondaryBtn className='md:w-28 justify-center '>
+                            <Link
+                                className='flex items-center gap-1'
+                                href={`/queries/${id}/print`}
+                            >
+                                <span className="hidden md:block">Печать</span>{' '}
+                                <HiOutlinePrinter className='h-5 w-5' />
+                            </Link>
+                        </SecondaryBtn>
+                        <SecondaryBtn className='md:w-28 justify-center'>
+                            <Link
+                                className='flex items-center gap-1'
+                                href="/queries"
+                            >
+                                <span className="hidden md:block">Закрыть</span>{' '}
+                                <HiOutlineX className='h-5 w-5' />
+                            </Link>
+                        </SecondaryBtn>
+                    </div>
+                </div>
+                <div className="mt-2 p-4 bg-secondary rounded-lg border border-gray-100">
                     {formatQueryCondition(query.body).map((item: string) => (
                         <div className="font-normal">{item}</div>
                     ))}

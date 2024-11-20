@@ -13,7 +13,7 @@ export function PersonCard({ person }: { person: Person }) {
         }
     }
     return (
-        <div className="bg-secondary rounded m-2 p-4">
+        <div className="bg-secondary rounded my-3 p-4 border border-gray-100">
             <div
                 className="font-bold text-md hover:select-all hover:cursor-pointer"
                 onClick={handleClick}>
