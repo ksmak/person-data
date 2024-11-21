@@ -7,9 +7,18 @@ const redisConnection = new Redis("redis://redis:6379", {
 });
 
 const queueSingleton = () => {
-  return new Queue("queries", {
+  const queue = new Queue("queries", {
     connection: redisConnection,
   });
+
+  queue.upsertJobScheduler('repeat-every-10s', {
+    every: 10000
+  }, {
+    name: 'process-queries'
+  })
+    .then(() => console.log('Sheduler job started.'));
+
+  return queue;
 };
 
 declare const globalThis: {

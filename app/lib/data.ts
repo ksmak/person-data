@@ -189,3 +189,7 @@ export async function fetchQueryById(id: string) {
 
   return query;
 }
+
+export async function fetchDb() {
+  return await prisma.db.findMany();
+}

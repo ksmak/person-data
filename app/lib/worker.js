@@ -39,81 +39,101 @@ async function loadData(data) {
   logs.push(`Начат процесс загрузки данных...`);
   for (const person of data.persons) {
     if (person.iin) {
-      const findPersonByIin = await prisma.person.findUnique({
-        where: {
-          iin: person.iin,
-        },
-      });
-      if (findPersonByIin) {
-        try {
-          const p = await prisma.person.update({
-            data: {
-              firstName: person.firstName,
-              lastName: person.lastName,
-              middleName: person.middleName,
-              phone: person.phone,
-              region: person.region,
-              district: person.district,
-              building: person.building,
-              apartment: person.apartment,
-            },
-            where: {
-              id: findPersonByIin.id,
-            },
-          });
-          logs.push(`Обновление: ${JSON.stringify(p)}`);
-        } catch (e) {
-          error = true;
-          logs.push(`Ошибка при обновлении! (${person.iin})! ${e}`);
+      try {
+        const findPersonByIin = await prisma.person.findUnique({
+          where: {
+            db: person.db,
+            iin: String(person.iin),
+          },
+        });
+        if (findPersonByIin) {
+          try {
+            const p = await prisma.person.update({
+              data: {
+                firstName: person.firstName,
+                lastName: person.lastName,
+                middleName: person.middleName,
+                phone: person.phone,
+                region: person.region,
+                district: person.district,
+                building: person.building,
+                apartment: person.apartment,
+                extendedPersonData: person.extendedPersonData,
+              },
+              where: {
+                id: findPersonByIin.id,
+              },
+            });
+            logs.push(`Обновление: ${JSON.stringify(p)}`);
+          } catch (e) {
+            error = true;
+            logs.push(`Ошибка при обновлении! (${person.iin})! ${e}`);
+          }
+          continue;
         }
-        continue;
+      } catch (e) {
+        error = true;
+        logs.push(`Ошибка при проверке ИИН! (${person.iin})! ${e}`);
       }
+      continue;
     };
     if (person.firstName && person.lastName) {
-      const findPersonByFIO = await prisma.person.findFirst({
-        where: {
-          firstName: person.firstName,
-          lastName: person.lastName,
-          middleName: person.middleName,
-        },
-      });
-      if (findPersonByFIO) {
-        try {
-          const p = await prisma.person.update({
-            data: {
-              iin: person.iin,
-              phone: person.phone,
-              region: person.region,
-              district: person.district,
-              building: person.building,
-              apartment: person.apartment,
-            },
-            where: {
-              id: findPersonByFIO.id,
-            },
-          });
-          logs.push(`Обновление: ${JSON.stringify(p)}`);
-        } catch (e) {
-          error = true;
-          logs.push(
-            `Ошибка при обновлении! (${person.lastName} ${person.firstName} ${person.middleName})! ${e}`
-          );
+      try {
+        const findPersonByFIO = await prisma.person.findFirst({
+          where: {
+            db: person.db,
+            firstName: person.firstName,
+            lastName: person.lastName,
+            middleName: person.middleName,
+          },
+        });
+        if (findPersonByFIO) {
+          try {
+            const p = await prisma.person.update({
+              data: {
+                iin: String(person.iin),
+                phone: person.phone,
+                region: person.region,
+                district: person.district,
+                building: person.building,
+                apartment: person.apartment,
+                extendedPersonData: person.extendedPersonData,
+              },
+              where: {
+                id: findPersonByFIO.id,
+              },
+            });
+            logs.push(`Обновление: ${JSON.stringify(p)}`);
+          } catch (e) {
+            error = true;
+            logs.push(
+              `Ошибка при обновлении! (${person.lastName} ${person.firstName} ${person.middleName})! ${e}`
+            );
+          }
+          continue;
         }
-        continue;
+      } catch (e) {
+        error = true;
+        logs.push(
+          `Ошибка при проверке ФИО! (${person.lastName} ${person.firstName} ${person.middleName})! ${e}`
+        );
       }
+      continue;
     };
     try {
       const p = await prisma.person.create({
         data: {
+          db: person.db,
           firstName: person.firstName,
           lastName: person.lastName,
           middleName: person.middleName,
-          iin: person.iin,
+          iin: String(person.iin),
           phone: person.phone,
           region: person.region,
           district: person.district,
           building: person.building,
           apartment: person.apartment,
+          extendedPersonData: person.extendedPersonData,
         },
       });
       logs.push(`Вставка: ${JSON.stringify(p)}`);
@@ -165,7 +185,7 @@ async function processQuery() {
           count: persons.length,
           result:
             persons.length > 100
-              ? "Найдено больше 100 записей"
+              ? "[]"
               : JSON.stringify(persons),
           state: state,
         },

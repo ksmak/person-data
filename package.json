@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "dev": "NODE_OPTIONS='--inspect=0.0.0.0:9228' next dev",
+    "docker": "docker compose up --build --no-log-prefix --attach app"
   },
   "dependencies": {
     "@material-tailwind/react": "^2.1.10",
@@ -14,7 +15,9 @@
     "@types/papaparse": "^5.3.15",
     "autoprefixer": "^10.4.20",
     "bullmq": "^5.26.2",
+    "chart.js": "^4.4.6",
     "clsx": "^2.1.1",
+    "docx": "^9.0.3",
     "install": "^0.13.0",
     "ioredis": "^5.4.1",
     "moment": "^2.30.1",

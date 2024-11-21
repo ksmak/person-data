@@ -81,7 +81,7 @@ export function SearchPanel({ id, setData }: { id: string, setData: Dispatch<Set
         <>
             <Btn
                 className="justify-center gap-2"
-                onClick={() => { setOpen(true); }}
+                onClick={() => { setPerson({}); setOpen(true); }}
             >
                 <span className="hidden md:block">Новый запрос</span>{' '}
                 <HiOutlineSearch className="w-5 h-5" />
@@ -101,24 +101,25 @@ export function SearchPanel({ id, setData }: { id: string, setData: Dispatch<Set
                 </DialogHeader>
                 <DialogBody className="overflow-y-scroll h-[40rem]">
                     <div className="rounded-2xl bg-secondary p-4 md:p-6">
-                        {fields.map((fld: PersonField, index: number) => (
-                            <div className="mb-4" key={index}>
-                                <label htmlFor="lastName" className="pl-2 mb-2 block text-sm font-medium">
-                                    {fld.title}
-                                </label>
-                                <div className="relative mt-2 rounded-md">
-                                    <div className="relative">
-                                        <input
-                                            className="font-medium block w-full rounded-md border border-gray-200 py-2 pl-2 text-sm outline-2"
-                                            name={fld.name}
-                                            type="text"
-                                            value={person[`${fld.name}` as keyof typeof person] ? String(person[`${fld.name}` as keyof typeof person]) : undefined}
-                                            onChange={(e) => setPerson({ ...person, [`${fld.name}` as keyof typeof person]: e.target.value })}
-                                        />
+                        <form>
+                            {fields.map((fld: PersonField, index: number) => (
+                                <div className="mb-4" key={index}>
+                                    <label htmlFor="lastName" className="pl-2 mb-2 block text-sm font-medium">
+                                        {fld.title}
+                                    </label>
+                                    <div className="relative mt-2 rounded-md">
+                                        <div className="relative">
+                                            <input
+                                                className="font-medium block w-full rounded-md border border-gray-200 py-2 pl-2 text-sm outline-2"
+                                                type="text"
+                                                value={person[`${fld.name}` as keyof typeof person] ? String(person[`${fld.name}` as keyof typeof person]) : undefined}
+                                                onChange={(e) => setPerson({ ...person, [`${fld.name}` as keyof typeof person]: e.target.value })}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
+                        </form>
                     </div>
                 </DialogBody>
                 <DialogFooter>

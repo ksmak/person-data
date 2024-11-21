@@ -8,10 +8,10 @@ export function ConfigTable({
     personFields: PersonField[]
 }) {
     return (
-        <div className="grow-0 flex-col justify-center">
+        <div className="grow md:grow-0 flex-col justify-center">
             <div className="font-bold uppercase text-center p-2 w-full mb-4 h-5 text-sm">Настройка</div>
             <div className="overflow-y-auto bg-select">
-                <table className="hidden min-w-full text-gray-900 md:table">
+                <table className="min-w-full text-gray-900 md:table">
                     <thead className="block rounded-lg text-left text-sm font-normal[&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg">
                         <tr>
                             <th
@@ -26,7 +26,7 @@ export function ConfigTable({
                                 scope="col"
                                 className="px-4 py-5 font-medium hover:cursor-pointer"
                             >
-                                <div className="flex gap-3 items-center">
+                                <div className="flex gap-3 items-center ">
                                     <span>Соответствующее поле</span>
                                 </div>
                             </th>
@@ -36,7 +36,7 @@ export function ConfigTable({
                         {Array.isArray(cols) && cols.map((col: string, index: number) => (
                             <tr
                                 key={index}
-                                className="w-full border-b py-3 text-sm last-of-type:border-none [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg hover:cursor-pointer hover:bg-gray-50"
+                                className="flex justify-between border-b md:py-3 text-sm last-of-type:border-none [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg hover:cursor-pointer hover:bg-gray-50"
                             >
                                 <td className="whitespace-nowrap px-3 py-3">
                                     {col}

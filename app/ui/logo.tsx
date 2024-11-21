@@ -1,4 +1,4 @@
-import { HiOutlineSupport } from "react-icons/hi";
+// import { HiOutlineSupport } from "react-icons/hi";
 
 export default function Logo() {
   return (

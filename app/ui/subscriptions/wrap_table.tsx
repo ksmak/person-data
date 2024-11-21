@@ -22,6 +22,21 @@ export default async function UsersTable({
       name: "title",
       fieldType: "string",
     },
+    {
+      title: "Максим. кол-во запросов в день",
+      name: "maxQueriesDay",
+      fieldType: "string",
+    },
+    {
+      title: "Максим. кол-во запросов в месяц",
+      name: "maxQueriesMonth",
+      fieldType: "string",
+    },
+    {
+      title: "Максим. кол-во запросов",
+      name: "maxQueries",
+      fieldType: "string",
+    },
   ]
 
   return (

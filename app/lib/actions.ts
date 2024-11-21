@@ -370,26 +370,3 @@ export async function loadData(persons: Person[], prevState: ImportState) {
     persons: persons,
   });
 }
-
-export async function addShedullerJob(prevState: string) {
-  await queue.upsertJobScheduler(
-    'repeat-every-10s',
-    {
-      every: 10000,
-    },
-    {
-      name: 'process-queries',
-    },
-  );
-
-  return 'Планировщик запущен';
-}
-
-export async function removeShedullerJob(prevState: string) {
-  console.log('run remove sheduller')
-  await queue.removeJobScheduler('repeat-every-10s');
-
-  await queue.obliterate();
-
-  return 'Планировщик остановлен';
-}

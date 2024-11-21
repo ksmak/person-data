@@ -35,24 +35,33 @@ model User {
   subsId     String?
 }
 
-model Person {
-  id         String    @id @default(cuid())
-  firstName  String?
-  lastName   String?
-  middleName String?
-  iin        String?
-  phone      String?
-  photo      String?
-  region     String?
-  district   String?
-  locality   String?
-  street     String?
-  building   String?
-  apartment  String?
-  createdAt  DateTime? @default(now())
-  updatedAt  DateTime? @updatedAt
+model Db {
+  id      String   @id @default(cuid())
+  name    String
+  persons Person[]
+}
 
-  @@unique([iin])
+model Person {
+  id                 String    @id @default(cuid())
+  Db                 Db?       @relation(fields: [dbId], references: [id])
+  dbId               String?
+  firstName          String?
+  lastName           String?
+  middleName         String?
+  iin                String?
+  phone              String?
+  photo              String?
+  region             String?
+  district           String?
+  locality           String?
+  street             String?
+  building           String?
+  apartment          String?
+  extendedPersonData Json?
+  createdAt          DateTime? @default(now())
+  updatedAt          DateTime? @updatedAt
+
+  @@unique([dbId, iin])
 }
 
 model Query {
@@ -73,8 +82,8 @@ model Subscription {
   maxQueriesMonth  Int
   maxQueriesTotal  Int
   usageTimeLimit   Int
-  accessImportData Boolean
-  accessUsers      Boolean
-  accessMonitoring Boolean
+  accessImportData Boolean @default(false)
+  accessUsers      Boolean @default(false)
+  accessMonitoring Boolean @default(false)
   user             User[]
 }

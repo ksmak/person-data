@@ -3,7 +3,7 @@
 import Papa from "papaparse";
 import io from 'socket.io-client';
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
-import { Spinner, Stepper, Step, Button, Typography } from "@material-tailwind/react";
+import { Spinner, Stepper, Step, Button, Typography, Input } from "@material-tailwind/react";
 import { HiOutlineUpload, HiOutlineDatabase, HiOutlineCog } from "react-icons/hi";
 import { ImportState, loadData } from "@/app/lib/actions";
 import { ConfigTable } from "@/app/ui/import/tables";
@@ -11,10 +11,11 @@ import { JournalPanel } from "@/app/ui/import/panels";
 import { Person, PersonField, personFields } from "@/app/lib/definitions";
 import { Btn } from "@/app/ui/buttons";
 import { formatPhone, formatStr } from "@/app/lib/utils";
+import { Db } from "@prisma/client";
 
 const LIMIT_ROW_COUNT = 1000
 
-export function ImportForm({ url }: { url: string }) {
+export function ImportForm({ url, db }: { url: string, db: Db[] }) {
     const [activeStep, setActiveStep] = useState(0);
     const [isLastStep, setIsLastStep] = useState(false);
     const [isFirstStep, setIsFirstStep] = useState(false);
@@ -31,6 +32,7 @@ export function ImportForm({ url }: { url: string }) {
     const [persons, setPersons] = useState<Person[]>([]);
     const [previewLogs, setPreviewLogs] = useState<string[]>([]);
     const [previewError, setPreviewError] = useState<string>('');
+    const [categoryError, setCategoryError] = useState<string>('');
 
     const handleNext = () => !isLastStep && setActiveStep((cur) => cur + 1);
     const handlePrev = () => !isFirstStep && setActiveStep((cur) => cur - 1);
@@ -45,8 +47,9 @@ export function ImportForm({ url }: { url: string }) {
             const file = event.target.files[0];
             const extension = file.name.split(".").at(-1);
             setFile(file);
-            if (extension !== "csv" && extension !== "txt") {
-                setUploadError("Ошибка формата файла! Для загрузки данных необходимы файлы с расширением csv, txt");
+            if (extension !== "csv") {
+                setUploadError("Ошибка формата файла! Для загрузки данных необходимы файлы с расширением csv");
+                setUploading(false);
                 return;
             }
             let data: any[] = []
@@ -99,14 +102,26 @@ export function ImportForm({ url }: { url: string }) {
         //load data into persons
         data.map((item: any) => {
             let person: Person = {};
-            config.forEach((conf: PersonField) => {
-                const val = (conf.name === 'phone')
-                    ? formatPhone(item[`${conf.name}` as keyof typeof item])
-                    : formatStr(item[`${conf.name}` as keyof typeof item]);
+            let extendedData: any = {};
+            Object.keys(item).map((key: string) => {
+                const val = item[key];
                 if (val) {
-                    person[`${conf.value}` as keyof typeof person] = val;
+                    let existFlag = false;
+                    config.forEach((conf: PersonField) => {
+                        if (key === conf.name) {
+                            existFlag = true;
+                            const formatVal = (conf.name === 'phone')
+                                ? formatPhone(val)
+                                : formatStr(val);
+                            person[`${conf.value}` as keyof typeof person] = val;
+                        }
+                    });
+                    if (!existFlag) {
+                        extendedData[key] = val;
+                    }
                 }
-            });
+            })
+            person.extendedPersonData = extendedData;
             setPersons(prev => prev.concat([person]));
             setPreviewLogs(prev => prev.concat([JSON.stringify(person, null, 2)]));
         })
@@ -160,7 +175,7 @@ export function ImportForm({ url }: { url: string }) {
                         onClick={() => setActiveStep(0)}
                     >
                         <HiOutlineUpload className="h-5 w-5" />
-                        <div className="absolute -bottom-[4.5rem] w-max text-center">
+                        <div className="hidden md:block md:absolute md:-bottom-[4.5rem] md:w-max md:text-center">
                             <Typography
                                 variant="h6"
                                 color="gray"
@@ -182,7 +197,7 @@ export function ImportForm({ url }: { url: string }) {
                         onClick={() => setActiveStep(1)}
                     >
                         <HiOutlineCog className="h-5 w-5" />
-                        <div className="absolute -bottom-[4.5rem] w-max text-center">
+                        <div className="hidden md:block md:absolute md:-bottom-[4.5rem] md:w-max md:text-center">
                             <Typography
                                 variant="h6"
                                 color="gray"
@@ -204,7 +219,7 @@ export function ImportForm({ url }: { url: string }) {
                         onClick={() => setActiveStep(2)}
                     >
                         <HiOutlineDatabase className="h-5 w-5" />
-                        <div className="absolute -bottom-[4.5rem] w-max text-center">
+                        <div className="hidden md:block md:absolute md:-bottom-[4.5rem] md:w-max md:text-center">
                             <Typography
                                 variant="h6"
                                 color="gray"
@@ -222,29 +237,37 @@ export function ImportForm({ url }: { url: string }) {
                 </Stepper>
             </div>
             {activeStep === 0 && <div className="w-full mt-[4rem]">
-                <div className="rounded-lg h-24 w-full flex flex-col gap-3 justify-center items-center">
-                    <form id="uploadForm" ref={refForm}>
-                        <div className="w-full flex justify-start items-center gap-5">
-                            <label htmlFor="uploadFile1"
-                                className='flex items-center gap-3 rounded-lg p-2 text-xs  text-white uppercase bg-gradient-to-t from-emerald-500 to-emerald-400 hover:shadow-lg hover:shadow-emerald-200 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:bg-emerald-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50'
-                            >
-                                {uploading ? "Загрузка файла..." : "Выбрать файл"}
-                                {uploading ? <Spinner className="h-5 w-5" /> : <HiOutlineUpload className="h-6 w-6" />}
-                                <input
-                                    className="hidden"
-                                    id="uploadFile1"
-                                    type="file"
-                                    name="file"
-                                    onChange={handleSelectFile}
-                                />
-                            </label>
-                            {file && <span className="italic text-gray-600">Выбран файл: {file.name}</span>}
+                <form id="uploadForm" ref={refForm}>
+                    <div className="rounded-lg h-32 w-full grid grid-cols-2 justify-between items-center flex-wrap">
+                        <div className="col-1 justify-self-center">
+                            <label htmlFor="db" className="text-sm font-medium">Наименование БД:</label>
+                            <select name="db" id="db" className="text-sm p-2 border rounded w-72 outline-none ">
+                                {db && db.length > 0 && db?.map((it: Db) => (<option key={it.id} value={it.id}>{it.name}</option>))}
+                            </select>
                         </div>
-                    </form>
-                    <div className="text-red-600 text-sm">
-                        {uploadError}
+                        <div>
+                            <div className="col-2 w-full flex justify-center items-center gap-5 flex-wrap">
+                                <label htmlFor="uploadFile1"
+                                    className='flex items-center gap-3 rounded-lg p-2 text-xs  text-white uppercase bg-gradient-to-t from-emerald-500 to-emerald-400 hover:shadow-lg hover:shadow-emerald-200 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:bg-emerald-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50'
+                                >
+                                    {uploading ? "Загрузка файла..." : "Выбрать файл"}
+                                    {uploading ? <Spinner className="h-5 w-5" /> : <HiOutlineUpload className="h-6 w-6" />}
+                                    <input
+                                        className="hidden"
+                                        id="uploadFile1"
+                                        type="file"
+                                        name="file"
+                                        onChange={handleSelectFile}
+                                    />
+                                </label>
+                                {file && <span className="italic text-gray-600">Выбран файл: {file.name}</span>}
+                            </div>
+                            <div className="text-red-600 text-sm">
+                                {uploadError}
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </form>
                 <div className="rounded h-full w-full">
                     <JournalPanel logs={uploadLogs} />
                 </div>
@@ -253,7 +276,7 @@ export function ImportForm({ url }: { url: string }) {
                 activeStep === 1 && <div className="w-full mt-[4rem]">
                     <div className="rounded-lg h-24 w-full flex flex-col gap-3 justify-center items-center">
                         <form id="previewForm" onSubmit={handlePreviewData}>
-                            <div className="flex gap-4 items-center">
+                            <div className="flex gap-4 justify-center items-center sm:flex-wrap">
                                 {file && <Btn
                                     type="submit"
                                     className="flex gap-4 items-center"
@@ -261,7 +284,7 @@ export function ImportForm({ url }: { url: string }) {
                                     {previewing ? "Обработка данных..." : "Подготовить данные"}
                                     {previewing ? <Spinner className="h-6 w-6" /> : <HiOutlineCog className="h-6 w-6" />}
                                 </Btn>}
-                                {persons && <span className="italic text-gray-600">Данные подготовлены</span>}
+                                {persons.length > 0 && <span className="italic text-gray-600">Данные подготовлены</span>}
                             </div>
                         </form>
                         <div className="text-red-600 text-sm">
@@ -269,7 +292,7 @@ export function ImportForm({ url }: { url: string }) {
                         </div>
                     </div>
                     <div className="rounded h-full w-full">
-                        {file && <div className="mt-5 w-full flex justify-between gap-5">
+                        {file && <div className="mt-5 w-full flex justify-between gap-5 flex-wrap">
                             <ConfigTable cols={cols} personFields={personFields} />
                             <JournalPanel logs={previewLogs} />
                         </div>}
@@ -281,7 +304,7 @@ export function ImportForm({ url }: { url: string }) {
                     <div className="rounded-lg h-24 w-full flex flex-col gap-3 justify-center items-center">
                         <form onSubmit={handleLoadData}>
                             <div className="flex gap-4 items-center">
-                                {persons && <Btn
+                                {persons.length > 0 && <Btn
                                     type="submit"
                                     className="flex gap-4 items-center"
                                 >
