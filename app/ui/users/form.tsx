@@ -1,12 +1,11 @@
 'use client';
 
-import Link from 'next/link';
 import { createUser, updateUser, State } from '@/app/lib/actions';
 import { FormEvent, useState } from 'react';
 import { Subscription, User } from '@prisma/client';
 import { ModalDeleteUser } from '@/app/ui/users/modal';
-import { Btn, DangerBtn, EditButtonsGroup } from '@/app/ui/buttons';
-import { Button, Checkbox, Radio } from "@material-tailwind/react";
+import { EditButtonsGroup } from '@/app/ui/buttons';
+import { Checkbox, Radio } from "@material-tailwind/react";
 import { SubscriptionCard } from '../card';
 
 export default function UserForm({
@@ -96,7 +95,7 @@ export default function UserForm({
                 id="password"
                 name="password"
                 type="password"
-                defaultValue={user?.password ? user.password : ""}
+                defaultValue=""
                 aria-describedby="password-error"
               />
             </div>
@@ -209,6 +208,14 @@ export default function UserForm({
                 </div>
               </div>
             ))}
+            <div id="subsId-error" aria-live="polite" aria-atomic="true">
+              {state.errors?.subsId &&
+                state.errors.subsId.map((error: string) => (
+                  <p className="mt-2 text-sm text-red-500" key={error}>
+                    {error}
+                  </p>
+                ))}
+            </div>
           </div>
         </div>
       </div>

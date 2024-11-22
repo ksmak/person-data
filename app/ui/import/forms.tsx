@@ -1,9 +1,9 @@
 'use client';
 
 import Papa from "papaparse";
-import io from 'socket.io-client';
-import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
-import { Spinner, Stepper, Step, Button, Typography, Input } from "@material-tailwind/react";
+// import io from 'socket.io-client';
+import { ChangeEvent, FormEvent, useRef, useState } from "react";
+import { Spinner, Stepper, Step, Typography } from "@material-tailwind/react";
 import { HiOutlineUpload, HiOutlineDatabase, HiOutlineCog } from "react-icons/hi";
 import { ImportState, loadData } from "@/app/lib/actions";
 import { ConfigTable } from "@/app/ui/import/tables";
@@ -13,7 +13,7 @@ import { Btn } from "@/app/ui/buttons";
 import { formatPhone, formatStr } from "@/app/lib/utils";
 import { Db } from "@prisma/client";
 
-const LIMIT_ROW_COUNT = 1000
+const LIMIT_ROW_COUNT = 100
 
 export function ImportForm({ url, db }: { url: string, db: Db[] }) {
     const [activeStep, setActiveStep] = useState(0);
@@ -23,7 +23,6 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
     const [previewing, setPreviewing] = useState(false);
     const [loading, setLoading] = useState(false);
     const [loadState, setLoadState] = useState<ImportState>({});
-    const refForm = useRef<HTMLFormElement>(null);
     const [file, setFile] = useState<File | null>(null);
     const [data, setData] = useState<any[]>([]);
     const [cols, setCols] = useState<string[]>([]);
@@ -32,7 +31,10 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
     const [persons, setPersons] = useState<Person[]>([]);
     const [previewLogs, setPreviewLogs] = useState<string[]>([]);
     const [previewError, setPreviewError] = useState<string>('');
-    const [categoryError, setCategoryError] = useState<string>('');
+    const [dbId, setDbId] = useState<string>(db[0].id);
+    const [config, setConfig] = useState<PersonField[]>([]);
+
+    const refForm = useRef<HTMLFormElement>(null);
 
     const handleNext = () => !isLastStep && setActiveStep((cur) => cur + 1);
     const handlePrev = () => !isFirstStep && setActiveStep((cur) => cur - 1);
@@ -88,32 +90,35 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
         setPersons([]);
         const formData = new FormData(event.currentTarget);
         //get select cols
-        let config: PersonField[] = [];
+        let conf: PersonField[] = [];
         cols.forEach((item: string) => {
             const field = formData.get(item);
             if (field) {
-                config.push({
+                conf.push({
                     name: item,
                     title: item,
                     value: field,
                 } as PersonField);
             }
         });
+        setConfig(conf);
         //load data into persons
         data.map((item: any) => {
-            let person: Person = {};
+            let person: Person = {
+                dbId: dbId
+            };
             let extendedData: any = {};
             Object.keys(item).map((key: string) => {
                 const val = item[key];
                 if (val) {
                     let existFlag = false;
-                    config.forEach((conf: PersonField) => {
+                    conf.forEach((conf: PersonField) => {
                         if (key === conf.name) {
                             existFlag = true;
                             const formatVal = (conf.name === 'phone')
                                 ? formatPhone(val)
                                 : formatStr(val);
-                            person[`${conf.value}` as keyof typeof person] = val;
+                            person[`${conf.value}` as keyof typeof person] = formatVal;
                         }
                     });
                     if (!existFlag) {
@@ -131,31 +136,32 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
     const handleLoadData = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setLoading(true);
-        // setLoadState({});
+        setLoadState({});
         try {
-            const result = await loadData(persons, {});
+            setLoadState(await loadData(persons, {}));
         } catch (e) {
             setLoadState({ ...loadState, error: String(e) })
         }
-    }
+        setLoading(false);
+    };
 
-    useEffect(() => {
-        const socket = io(url);
+    // useEffect(() => {
+    //     const socket = io(url);
 
-        socket.on('connect', () => {
-            console.log('Connected to WebSocket server');
-        });
+    //     socket.on('connect', () => {
+    //         console.log('Connected to WebSocket server');
+    //     });
 
-        socket.on('load-completed', (loadState: ImportState) => {
-            console.log('load data completed');
-            setLoadState(loadState);
-            setLoading(false);
-        })
+    //     socket.on('load-completed', (loadState: ImportState) => {
+    //         console.log('load data completed');
+    //         setLoadState(loadState);
+    //         setLoading(false);
+    //     })
 
-        return () => {
-            socket.disconnect();
-        };
-    }, []);
+    //     return () => {
+    //         socket.disconnect();
+    //     };
+    // }, []);
 
     return (
         <div className="w-full h-dvh">
@@ -241,7 +247,8 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
                     <div className="rounded-lg h-32 w-full grid grid-cols-2 justify-between items-center flex-wrap">
                         <div className="col-1 justify-self-center">
                             <label htmlFor="db" className="text-sm font-medium">Наименование БД:</label>
-                            <select name="db" id="db" className="text-sm p-2 border rounded w-72 outline-none ">
+                            <select id="db" className="text-sm p-2 border rounded w-72 outline-none "
+                                value={dbId} onChange={e => setDbId(e.target.value)}>
                                 {db && db.length > 0 && db?.map((it: Db) => (<option key={it.id} value={it.id}>{it.name}</option>))}
                             </select>
                         </div>
@@ -293,7 +300,7 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
                     </div>
                     <div className="rounded h-full w-full">
                         {file && <div className="mt-5 w-full flex justify-between gap-5 flex-wrap">
-                            <ConfigTable cols={cols} personFields={personFields} />
+                            <ConfigTable cols={cols} personFields={personFields} config={config} setConfig={setConfig} />
                             <JournalPanel logs={previewLogs} />
                         </div>}
                     </div>

@@ -4,12 +4,37 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import prisma from "./db";
-import { ParsedData, Person, PersonField } from "./definitions";
-import queue, { queueEvents } from "./queue";
+import { Person } from "./definitions";
+// import queue from "./queue";
+import bcrypt from "bcrypt";
 
 const EXPIRED_PASSWORD_DAYS = 30;
 
-const FormSchema = z.object({
+const salt = 10;
+
+const CreateUserSchema = z.object({
+  id: z.string(),
+  isActive: z.boolean(),
+  login: z.string().min(3, {
+    message: "Логин должен состоять из не менее 3 символов",
+  }),
+  password: z.string().min(5, {
+    message: "Пароль должен состоять из не менее 5 символов",
+  }),
+  lastName: z.string().refine((data) => data.trim() !== "", {
+    message: "Поле не заполнено",
+  }),
+  firstName: z.string().refine((data) => data.trim() !== "", {
+    message: "Поле не заполнено",
+  }),
+  middleName: z.string(),
+  expiredPwd: z.date(),
+  subsId: z.string().refine((data) => data.trim() !== "", {
+    message: "Поле не заполнено",
+  }),
+});
+
+const UpdateUserSchema = z.object({
   id: z.string(),
   isActive: z.boolean(),
   login: z.string().min(3, {
@@ -17,14 +42,16 @@ const FormSchema = z.object({
   }),
   password: z.string(),
   lastName: z.string().refine((data) => data.trim() !== "", {
-    message: "Поле ввода не заполнено",
+    message: "Поле не заполнено",
   }),
   firstName: z.string().refine((data) => data.trim() !== "", {
-    message: "Поле ввода не заполнено",
+    message: "Поле не заполнено",
   }),
   middleName: z.string(),
   expiredPwd: z.date(),
-  subsId: z.string(),
+  subsId: z.string().refine((data) => data.trim() !== "", {
+    message: "Поле не заполнено",
+  }),
 });
 
 const SubscriptionFormSchema = z.object({
@@ -51,6 +78,7 @@ export type State = {
     firstName?: string[];
     middleName?: string[];
     expiredPwd?: string[];
+    subsId?: string[];
   };
   message?: string | null;
 };
@@ -78,12 +106,12 @@ export type ImportState = {
   logs?: string[];
 };
 
-const CreateUser = FormSchema.omit({
+const CreateUser = CreateUserSchema.omit({
   id: true,
   isActive: true,
   expiredPwd: true,
 });
-const UpdateUser = FormSchema.omit({
+const UpdateUser = UpdateUserSchema.omit({
   id: true,
   isActive: true,
   expiredPwd: true,
@@ -122,7 +150,7 @@ export async function createUser(prevState: State, formData: FormData) {
       data: {
         isActive: isActive,
         login: login,
-        password: password,
+        password: bcrypt.hashSync(password, salt),
         lastName: lastName,
         firstName: firstName,
         middleName: middleName,
@@ -170,21 +198,38 @@ export async function updateUser(
   const isActive = !!formData.get("isActive");
 
   try {
-    await prisma.user.update({
-      where: {
-        id: id,
-      },
-      data: {
-        isActive: isActive,
-        login: login,
-        password: password,
-        lastName: lastName,
-        firstName: firstName,
-        middleName: middleName,
-        expiredPwd: expiredPwd,
-        subsId: subsId,
-      },
-    });
+    if (password) {
+      await prisma.user.update({
+        where: {
+          id: id,
+        },
+        data: {
+          isActive: isActive,
+          login: login,
+          password: bcrypt.hashSync(password, salt),
+          lastName: lastName,
+          firstName: firstName,
+          middleName: middleName,
+          expiredPwd: expiredPwd,
+          subsId: subsId,
+        },
+      });
+    } else {
+      await prisma.user.update({
+        where: {
+          id: id,
+        },
+        data: {
+          isActive: isActive,
+          login: login,
+          lastName: lastName,
+          firstName: firstName,
+          middleName: middleName,
+          expiredPwd: expiredPwd,
+          subsId: subsId,
+        },
+      });
+    }
   } catch {
     return {
       message: "Ошибка в базе данных! Пользователь не обновлен!",
@@ -361,12 +406,134 @@ export async function createQuery(
   }
 
   return {
-    query: query
-  }
+    query: query,
+  };
 }
 
 export async function loadData(persons: Person[], prevState: ImportState) {
-  const job = await queue.add("load-data", {
-    persons: persons,
-  });
+  // const job = await queue.add("load-data", {
+  //   persons: persons,
+  // });
+  let logs = [];
+  // let persons = [];
+  let error = false;
+
+  logs.push(`Начат процесс загрузки данных...`);
+  for (const person of persons) {
+    if (person.iin) {
+      try {
+        const findPersonByIin = await prisma.person.findFirst({
+          where: {
+            dbId: person.dbId,
+            iin: String(person.iin),
+          },
+        });
+        if (findPersonByIin) {
+          try {
+            const p = await prisma.person.update({
+              data: {
+                firstName: person.firstName,
+                lastName: person.lastName,
+                middleName: person.middleName,
+                phone: person.phone,
+                region: person.region,
+                district: person.district,
+                building: person.building,
+                apartment: person.apartment,
+                extendedPersonData: person.extendedPersonData,
+              },
+              where: {
+                id: findPersonByIin.id,
+              },
+            });
+            logs.push(`Обновление: ${JSON.stringify(p)}`);
+          } catch (e) {
+            error = true;
+            logs.push(`Ошибка при обновлении! (${person.iin})! ${e}`);
+          }
+          continue;
+        }
+      } catch (e) {
+        error = true;
+        logs.push(`Ошибка при проверке ИИН! (${person.iin})! ${e}`);
+      }
+      continue;
+    }
+    if (person.firstName && person.lastName) {
+      try {
+        const findPersonByFIO = await prisma.person.findFirst({
+          where: {
+            dbId: person.dbId,
+            firstName: person.firstName,
+            lastName: person.lastName,
+            middleName: person.middleName,
+          },
+        });
+        if (findPersonByFIO) {
+          try {
+            const p = await prisma.person.update({
+              data: {
+                iin: String(person.iin),
+                phone: person.phone,
+                region: person.region,
+                district: person.district,
+                building: person.building,
+                apartment: person.apartment,
+                extendedPersonData: person.extendedPersonData,
+              },
+              where: {
+                id: findPersonByFIO.id,
+              },
+            });
+            logs.push(`Обновление: ${JSON.stringify(p)}`);
+          } catch (e) {
+            error = true;
+            logs.push(
+              `Ошибка при обновлении! (${person.lastName} ${person.firstName} ${person.middleName})! ${e}`
+            );
+          }
+          continue;
+        }
+      } catch (e) {
+        error = true;
+        logs.push(
+          `Ошибка при проверке ФИО! (${person.lastName} ${person.firstName} ${person.middleName})! ${e}`
+        );
+      }
+      continue;
+    }
+    try {
+      const p = await prisma.person.create({
+        data: {
+          dbId: person.dbId,
+          firstName: person.firstName,
+          lastName: person.lastName,
+          middleName: person.middleName,
+          iin: String(person.iin),
+          phone: person.phone,
+          region: person.region,
+          district: person.district,
+          building: person.building,
+          apartment: person.apartment,
+          extendedPersonData: person.extendedPersonData,
+        },
+      });
+      logs.push(`Вставка: ${JSON.stringify(p)}`);
+    } catch (e) {
+      error = true;
+      logs.push(`Ошибка при вставке! (${JSON.stringify(person)})! ${e}`);
+    }
+  }
+  logs.push(`Загрузка данных завершена.`);
+
+  if (error) {
+    return {
+      error: "В ходе загрузки данных возникли некоторые ошибки.",
+      logs: logs,
+    };
+  }
+
+  return {
+    logs: logs,
+  };
 }

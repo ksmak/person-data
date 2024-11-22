@@ -1,11 +1,16 @@
 import { PersonField } from "@/app/lib/definitions";
+import { SetStateAction } from "react";
 
 export function ConfigTable({
     cols,
     personFields,
+    config,
+    setConfig,
 }: {
     cols: string[],
-    personFields: PersonField[]
+    personFields: PersonField[],
+    config: PersonField[],
+    setConfig: SetStateAction<PersonField[]>
 }) {
     return (
         <div className="grow md:grow-0 flex-col justify-center">
@@ -44,10 +49,10 @@ export function ConfigTable({
                                 <td className="whitespace-nowrap px-3 py-3">
                                     <select
                                         id={col}
-                                        name={col}
                                         form="previewForm"
-                                        defaultValue=""
+                                        value={config[`${col}` as keyof typeof config] ? config[`${col}` as keyof typeof config] : ""}
                                         className="peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-2 text-sm outline-2 placeholder:text-gray-500"
+                                        onChange={e => setConfig([...config, [config[`${col}` as keyof typeof config]], e.target.value])}
                                     >
                                         <option value=""></option>
                                         {personFields.map((fld: { name: string, title: string }, index: number) => (

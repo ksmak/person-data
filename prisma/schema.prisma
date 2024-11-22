@@ -60,8 +60,6 @@ model Person {
   extendedPersonData Json?
   createdAt          DateTime? @default(now())
   updatedAt          DateTime? @updatedAt
-
-  @@unique([dbId, iin])
 }
 
 model Query {
