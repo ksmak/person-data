@@ -7,11 +7,11 @@ import { Spinner, Stepper, Step, Typography } from "@material-tailwind/react";
 import { HiChevronLeft, HiChevronRight, HiOutlineUpload, HiOutlineDatabase, HiOutlineCog } from "react-icons/hi";
 import { ImportState, loadData } from "@/app/lib/actions";
 import { ConfigTable } from "@/app/ui/import/tables";
-import { JournalPanel } from "@/app/ui/import/panels";
 import { Person, PersonField, personFields } from "@/app/lib/definitions";
 import { Btn } from "@/app/ui/buttons";
 import { formatPhone, formatStr } from "@/app/lib/utils";
 import { Db } from "@prisma/client";
+import { LogModal } from "./modals";
 
 const LIMIT_ROW_COUNT = 100
 
@@ -32,6 +32,10 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
     const [previewLogs, setPreviewLogs] = useState<string[]>([]);
     const [previewError, setPreviewError] = useState<string>('');
     const [dbId, setDbId] = useState<string>(db[0].id);
+    const [openUploadLog, setOpenUploadLog] = useState(false);
+    const [openPreviewLog, setOpenPreviewLog] = useState(false);
+    const [openLoadLog, setOpenLoadLog] = useState(false);
+    const [config, setConfig] = useState<PersonField[]>([]);
 
     const refForm = useRef<HTMLFormElement>(null);
 
@@ -100,6 +104,7 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
                 } as PersonField);
             }
         });
+        setConfig(conf);
         //load data into persons
         data.map((item: any) => {
             let person: Person = {
@@ -163,6 +168,9 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
 
     return (
         <div className="w-full h-dvh">
+            <LogModal open={openUploadLog} setOpen={setOpenUploadLog} logs={uploadLogs} />
+            <LogModal open={openPreviewLog} setOpen={setOpenPreviewLog} logs={previewLogs} />
+            <LogModal open={openLoadLog} setOpen={setOpenLoadLog} logs={loadState.logs || []} />
             <div className="w-full px-24 py-2">
                 <Stepper
                     activeStep={activeStep}
@@ -261,26 +269,29 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
                                     {db && db.length > 0 && db?.map((it: Db) => (<option key={it.id} value={it.id}>{it.name}</option>))}
                                 </select>
                             </div>
-                            <div className="mt-4">
-                                <label htmlFor="uploadFile1"
-                                    className='w-fit flex items-center gap-3 rounded-lg p-2 text-xs  text-white uppercase bg-gradient-to-t from-emerald-500 to-emerald-400 hover:shadow-lg hover:shadow-emerald-200 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:bg-emerald-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50'
-                                >
-                                    {uploading ? "Загрузка файла..." : "Выбрать файл"}
-                                    {uploading ? <Spinner className="h-5 w-5" /> : <HiOutlineUpload className="h-5 w-5" />}
-                                    <input
-                                        className="hidden"
-                                        id="uploadFile1"
-                                        type="file"
-                                        name="file"
-                                        onChange={handleSelectFile}
-                                    />
-                                </label>
-                                {file && <span className="text-sm mt-4 italic text-gray-600">Выбран файл: {file.name}</span>}
+                            <label htmlFor="uploadFile1"
+                                className='mt-5 w-fit flex items-center gap-3 rounded-lg p-2 text-xs  text-white uppercase bg-gradient-to-t from-emerald-500 to-emerald-400 hover:shadow-lg hover:shadow-emerald-200 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:bg-emerald-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50'
+                            >
+                                {uploading ? "Загрузка файла..." : "Выбрать файл"}
+                                {uploading ? <Spinner className="h-5 w-5" /> : <HiOutlineUpload className="h-5 w-5" />}
+                                <input
+                                    className="hidden"
+                                    id="uploadFile1"
+                                    type="file"
+                                    name="file"
+                                    onChange={handleSelectFile}
+                                />
+                            </label>
+                            {file && <span className="self-center text-sm mt-4 italic text-gray-600">Выбран файл: {file.name}</span>}
 
-                                <div className="mt-4 text-red-600 text-sm">
-                                    {uploadError}
-                                </div>
-                                <div className="mt-2 text-sm italic underline hover:cursor-pointer">{uploadLogs.length > 0 && 'Смотреть журнал'}</div>
+                            <div className="self-center mt-4 text-red-600 text-sm">
+                                {uploadError}
+                            </div>
+                            <div
+                                className="mt-2 text-sm italic underline hover:cursor-pointer"
+                                onClick={() => setOpenUploadLog(true)}
+                            >
+                                {uploadLogs.length > 0 && 'Смотреть журнал'}
                             </div>
                         </div>
                     </form>}
@@ -296,13 +307,22 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
                                     {previewing ? <Spinner className="h-5 w-5" /> : <HiOutlineCog className="h-5 w-5" />}
                                 </Btn>}
                                 {persons.length > 0 && <span className="self-center italic text-gray-600">Данные подготовлены</span>}
-                                <div className="mt-2 self-center text-sm italic underline hover:cursor-pointer">{previewLogs.length > 0 && 'Смотреть журнал'}</div>
+                                <div
+                                    className="mt-2 self-center text-sm italic underline hover:cursor-pointer"
+                                    onClick={() => setOpenPreviewLog(true)}
+                                >
+                                    {previewLogs.length > 0 && 'Смотреть журнал'}
+                                </div>
                                 <div className="self-center text-red-600 text-sm">
                                     {previewError}
                                 </div>
                             </div>
                             <div className="mt-4 w-full md:w-fit">
-                                {file && <ConfigTable cols={cols} personFields={personFields} />}
+                                {file && <ConfigTable
+                                    cols={cols}
+                                    personFields={personFields}
+                                    config={config}
+                                />}
                             </div>
                         </div>
                     </form>
@@ -319,7 +339,12 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
                                     {loading ? <Spinner className="h-5 w-5" /> : <HiOutlineDatabase className="h-5 w-5" />}
                                 </Btn>}
                                 {loadState?.logs && <span className="self-center italic text-gray-600">Данные загружены</span>}
-                                <div className="mt-2 self-center text-sm italic underline hover:cursor-pointer">{loadState.logs && 'Смотреть журнал'}</div>
+                                <div
+                                    className="mt-2 self-center text-sm italic underline hover:cursor-pointer"
+                                    onClick={() => setOpenLoadLog(true)}
+                                >
+                                    {loadState.logs && 'Смотреть журнал'}
+                                </div>
                             </div>
                             <div className="text-red-600 text-sm">
                                 {loadState?.error}

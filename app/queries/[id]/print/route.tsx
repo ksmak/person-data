@@ -1,5 +1,5 @@
-// import * as fs from "fs";
-import { AlignmentType, Document, FileChild, HeadingLevel, Packer, Paragraph, ShadingType, TextRun } from "docx";
+import * as fs from "fs";
+import { AlignmentType, Document, FileChild, HeadingLevel, ImageRun, Packer, Paragraph, ShadingType, TextRun } from "docx";
 import { fetchQueryById } from "@/app/lib/data";
 import { Person } from "@prisma/client";
 
@@ -12,6 +12,7 @@ export async function GET(request: Request,
 
     const query = await fetchQueryById(id);
 
+
     let items: FileChild[] = [];
 
     if (query?.result) {
@@ -19,11 +20,32 @@ export async function GET(request: Request,
             const data = JSON.parse(query.result);
             if (data && data.length) {
                 data.map((item: Person) => {
+                    const image = new ImageRun({
+                        type: 'jpg',
+                        data:
+                            item.phone && fs.existsSync(`./images/${item.phone}`)
+                                ? fs.readFileSync(`./images/${item.phone}`)
+                                : fs.readFileSync("./public/default.jpg"),
+                        transformation: {
+                            width: 200,
+                            height: 200,
+                        },
+                    });
+                    items.push(new Paragraph({
+                        children: [image]
+                    }));
                     items.push(new Paragraph({
                         children: [
                             new TextRun({
                                 text: `${item.lastName ? item.lastName : ""} ${item.firstName ? item.lastName : ""} ${item.middleName ? item.middleName : ""}`,
                                 bold: true,
+                            }),
+                        ]
+                    }));
+                    items.push(new Paragraph({
+                        children: [
+                            new TextRun({
+                                text: "",
                             }),
                         ]
                     }));
@@ -38,6 +60,13 @@ export async function GET(request: Request,
                         children: [
                             new TextRun({
                                 text: `Номер телефона: ${item.phone ? item.phone : ""}`,
+                            }),
+                        ]
+                    }));
+                    items.push(new Paragraph({
+                        children: [
+                            new TextRun({
+                                text: "",
                             }),
                         ]
                     }));
@@ -87,6 +116,41 @@ export async function GET(request: Request,
                         children: [
                             new TextRun({
                                 text: `Квартира: ${item.apartment ? item.apartment : ""}`,
+                            }),
+                        ]
+                    }));
+
+                    const extend = item.extendedPersonData;
+                    if (extend) {
+                        items.push(new Paragraph({
+                            children: [
+                                new TextRun({
+                                    text: "",
+                                }),
+                            ]
+                        }));
+                        items.push(new Paragraph({
+                            children: [
+                                new TextRun({
+                                    text: "Дополнительная информация: ",
+                                }),
+                            ]
+                        }));
+                        Object.keys(extend).map((key) => {
+                            items.push(new Paragraph({
+                                children: [
+                                    new TextRun({
+                                        text: `${key}: ${extend[`${key}` as keyof typeof extend]}`,
+                                    }),
+                                ]
+                            }));
+                        })
+                    };
+
+                    items.push(new Paragraph({
+                        children: [
+                            new TextRun({
+                                text: "",
                             }),
                         ]
                     }));

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 // import localFont from "next/font/local";
 import "./globals.css";
 import SideNav from "./ui/sidenav";
+import Link from "next/link";
 
 // const geistSans = localFont({
 //   src: "./fonts/GeistVF.woff",
@@ -21,8 +22,12 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
+  log,
+  auth,
   children,
 }: Readonly<{
+  log: React.ReactNode;
+  auth: React.ReactNode;
   children: React.ReactNode;
 }>) {
   return (
@@ -36,6 +41,7 @@ export default function RootLayout({
           </div>
           <div className="md:h-[screen-3rem] h-[screen-1.5rem] flex-grow p-6 md:overflow-y-auto md:p-12">{children}</div>
         </div>
+        {log}
       </body>
     </html>
   );
