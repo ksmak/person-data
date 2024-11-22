@@ -2,9 +2,6 @@
 import { AlignmentType, Document, FileChild, HeadingLevel, Packer, Paragraph, ShadingType, TextRun } from "docx";
 import { fetchQueryById } from "@/app/lib/data";
 import { Person } from "@prisma/client";
-import { randomUUID } from "crypto";
-import fs from 'fs';
-import path from 'path';
 
 export const dynamic = 'force-static'
 

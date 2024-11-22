@@ -2,6 +2,7 @@ const { Worker } = require("bullmq");
 const Redis = require("ioredis");
 const { PrismaClient } = require("@prisma/client");
 const { io } = require("socket.io-client");
+const { select } = require("@material-tailwind/react");
 
 const redisConnection = new Redis("redis://redis:6379", {
   enableReadyCheck: false,
@@ -30,17 +31,25 @@ const worker = new Worker(
   }
 );
 
+worker.on('failed', (job, error, prev) => {
+  console.log(`Job:${job.name} is failed. ${error.message}`);
+});
+
+worker.on('completed', (job) => {
+  console.log(`Job:${job.name} is completed.`);
+});
+
 //Job load-data
 async function loadData(data) {
   let logs = [];
-  let persons = [];
   let error = false;
 
   logs.push(`Начат процесс загрузки данных...`);
+
   for (const person of data.persons) {
     if (person.iin) {
       try {
-        const findPersonByIin = await prisma.person.findUnique({
+        const findPersonByIin = await prisma.person.findFirst({
           where: {
             db: person.db,
             iin: String(person.iin),
@@ -75,7 +84,6 @@ async function loadData(data) {
         error = true;
         logs.push(`Ошибка при проверке ИИН! (${person.iin})! ${e}`);
       }
-      continue;
     };
     if (person.firstName && person.lastName) {
       try {
@@ -118,12 +126,11 @@ async function loadData(data) {
           `Ошибка при проверке ФИО! (${person.lastName} ${person.firstName} ${person.middleName})! ${e}`
         );
       }
-      continue;
     };
     try {
       const p = await prisma.person.create({
         data: {
-          db: person.db,
+          dbId: person.dbId,
           firstName: person.firstName,
           lastName: person.lastName,
           middleName: person.middleName,
@@ -170,12 +177,16 @@ async function processQuery() {
         where: {
           AND: [...JSON.parse(query.body)],
         },
+        include: {
+          Db: true,
+        }
       })
       state = 'SUCCESS';
     } catch (e) {
       console.log(e);
       state = 'ERROR';
     }
+    console.log(persons)
     try {
       const updatedQuery = await prisma.query.update({
         where: {

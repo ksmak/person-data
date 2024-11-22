@@ -1,6 +1,5 @@
 const { createServer } = require('http');
 const { Server } = require('socket.io');
-// let count = 0;
 
 let httpServer = createServer()
 const io = new Server(httpServer, {

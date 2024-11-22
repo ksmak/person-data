@@ -17,7 +17,7 @@ const config: Config = {
       },
       fontFamily: {
         serif: ["DMSerifText-Regular", "serif"],
-        mono: ["GeistMonoVF", "mono"],
+        mono: ["RobotoMono-Regular", "mono"],
         sans: ["GeistVF", "sans"],
       },
     },

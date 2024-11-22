@@ -23,13 +23,13 @@ export function SubscriptionCard({
                 &#9745; Ограничение использования системы по времени (в часах): <strong>{sub.usageTimeLimit > 0 ? sub.usageTimeLimit : "неограничено"}</strong>
             </div>
             {sub.accessImportData && <div className="font-normal text-sm">
-                &#9745; Доступ к подсистеме "Загрузка данных"
+                &#9745; Доступ к подсистеме &quot;Загрузка данных&quot;
             </div>}
             {sub.accessMonitoring && <div className="font-normal text-sm">
-                &#9745; Доступ к подсистеме "Мониторинг запросов"
+                &#9745; Доступ к подсистеме &quot;Мониторинг запросов&quot;
             </div>}
             {sub.accessUsers && <div className="font-normal text-sm">
-                &#9745; Доступ к подсистеме "Пользователи"
+                &#9745; Доступ к подсистеме &quot;Пользователи&quot;
             </div>}
         </div>
     )

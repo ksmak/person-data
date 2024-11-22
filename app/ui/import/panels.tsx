@@ -23,7 +23,7 @@ export function JournalPanel({
                     Копировать
                 </SecondaryBtn>}
             </div>
-            <div className="mt-4 bg-secondary w-full rounded-md h-[25rem] overflow-auto">
+            <div className="mt-4 bg-secondary w-full rounded-md h-[24rem] overflow-auto">
                 {logs.map((log: string, index: number) => (
                     <pre key={index} className="text-sm font-sans font-normal">{log}</pre>
                 ))}

@@ -1,6 +1,7 @@
 import { JsonObject } from "@prisma/client/runtime/library";
 
 export type Person = {
+  db?: { id: string, name: string } | null;
   dbId?: string | null;
   lastName?: string | null;
   firstName?: string | null;
@@ -46,13 +47,21 @@ export type TableHead = {
   title: string;
   name: string;
   fieldType:
-    | "string"
-    | "boolean"
-    | "date"
-    | "datetime"
-    | "active"
-    | "nested"
-    | "queryBody"
-    | "queryState";
+  | "string"
+  | "boolean"
+  | "date"
+  | "datetime"
+  | "active"
+  | "nested"
+  | "queryBody"
+  | "queryState";
   nestedName?: string;
 };
+
+export type UsersQueries = {
+  id: string;
+  fio: string;
+  queries_day: number;
+  queries_month: number;
+  queries_total: number;
+}

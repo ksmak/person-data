@@ -1,4 +1,5 @@
 import prisma from "./db";
+import { UsersQueries } from "./definitions";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -192,4 +193,43 @@ export async function fetchQueryById(id: string) {
 
 export async function fetchDb() {
   return await prisma.db.findMany();
+}
+
+export async function getFirstUserId() {
+  const user = await prisma.user.findFirst({});
+  return user?.id;
+}
+
+export async function fetchFilteredUsersQueries(
+  query: string,
+  currentPage: number,
+  orderBy: string,
+  sort: string
+) {
+  const result = await prisma.$queryRawUnsafe(`
+    select "User".id, 
+    "User"."lastName" || ' ' || "User"."firstName" || ' ' || "User"."middleName" as fio,
+    (select count(*) from "Query" where "Query"."userId" = "User".id 
+    and make_date(
+      cast(date_part('year', "Query"."createdAt") as int),
+      cast(date_part('month', "Query"."createdAt") as int),
+      cast(date_part('day', "Query"."createdAt") as int)
+    ) = current_date) as queries_day,
+    (select count(*) from "Query" where "Query"."userId" = "User".id) as queries_month,
+    (select count(*) from "Query" where "Query"."userId" = "User".id) as queries_total
+    from "User"
+    where "User"."firstName" ilike '%${query}%' or "User"."lastName" ilike '%${query}%' or "User"."middleName" ilike '%${query}%'
+    order by ${orderBy} ${sort}
+    limit ${ITEMS_PER_PAGE}
+    offset ${(currentPage - 1) * ITEMS_PER_PAGE}
+  `);
+  return result as UsersQueries[];
+}
+
+export async function fetchUsersQueriesPages() {
+  const queriesCount = await prisma.user.count({});
+
+  const totalPages = Math.ceil(queriesCount / ITEMS_PER_PAGE);
+
+  return totalPages;
 }

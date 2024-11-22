@@ -1,10 +1,10 @@
 'use client';
 
 import Papa from "papaparse";
-// import io from 'socket.io-client';
-import { ChangeEvent, FormEvent, useRef, useState } from "react";
+import io from 'socket.io-client';
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import { Spinner, Stepper, Step, Typography } from "@material-tailwind/react";
-import { HiOutlineUpload, HiOutlineDatabase, HiOutlineCog } from "react-icons/hi";
+import { HiChevronLeft, HiChevronRight, HiOutlineUpload, HiOutlineDatabase, HiOutlineCog } from "react-icons/hi";
 import { ImportState, loadData } from "@/app/lib/actions";
 import { ConfigTable } from "@/app/ui/import/tables";
 import { JournalPanel } from "@/app/ui/import/panels";
@@ -32,7 +32,6 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
     const [previewLogs, setPreviewLogs] = useState<string[]>([]);
     const [previewError, setPreviewError] = useState<string>('');
     const [dbId, setDbId] = useState<string>(db[0].id);
-    const [config, setConfig] = useState<PersonField[]>([]);
 
     const refForm = useRef<HTMLFormElement>(null);
 
@@ -72,7 +71,7 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
                         parser.abort();
                     }
                 },
-                complete: (results) => {
+                complete: () => {
                     setUploadLogs(prev => prev.concat([']']));
                     setCols(cols);
                     setData(data);
@@ -101,13 +100,12 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
                 } as PersonField);
             }
         });
-        setConfig(conf);
         //load data into persons
         data.map((item: any) => {
             let person: Person = {
-                dbId: dbId
+                dbId: dbId,
+                extendedPersonData: {},
             };
-            let extendedData: any = {};
             Object.keys(item).map((key: string) => {
                 const val = item[key];
                 if (val) {
@@ -118,15 +116,16 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
                             const formatVal = (conf.name === 'phone')
                                 ? formatPhone(val)
                                 : formatStr(val);
-                            person[`${conf.value}` as keyof typeof person] = formatVal;
+                            if (conf.value) {
+                                person[`${conf.value}` as keyof typeof person] = formatVal;
+                            }
                         }
                     });
                     if (!existFlag) {
-                        extendedData[key] = val;
+                        person.extendedPersonData ? person.extendedPersonData[`${key}`] = formatStr(val) : null;
                     }
                 }
             })
-            person.extendedPersonData = extendedData;
             setPersons(prev => prev.concat([person]));
             setPreviewLogs(prev => prev.concat([JSON.stringify(person, null, 2)]));
         })
@@ -138,30 +137,29 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
         setLoading(true);
         setLoadState({});
         try {
-            setLoadState(await loadData(persons, {}));
+            await loadData(persons);
         } catch (e) {
             setLoadState({ ...loadState, error: String(e) })
         }
-        setLoading(false);
     };
 
-    // useEffect(() => {
-    //     const socket = io(url);
+    useEffect(() => {
+        const socket = io(url);
 
-    //     socket.on('connect', () => {
-    //         console.log('Connected to WebSocket server');
-    //     });
+        socket.on('connect', () => {
+            console.log('Connected to WebSocket server');
+        });
 
-    //     socket.on('load-completed', (loadState: ImportState) => {
-    //         console.log('load data completed');
-    //         setLoadState(loadState);
-    //         setLoading(false);
-    //     })
+        socket.on('load-completed', (loadState: ImportState) => {
+            console.log('load data completed');
+            setLoadState(loadState);
+            setLoading(false);
+        })
 
-    //     return () => {
-    //         socket.disconnect();
-    //     };
-    // }, []);
+        return () => {
+            socket.disconnect();
+        };
+    }, []);
 
     return (
         <div className="w-full h-dvh">
@@ -236,29 +234,39 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
                                 color="gray"
                                 className="font-normal"
                             >
-                                Загрузка данных в базу данных.
+                                Загрузка данных в базу.
                             </Typography>
                         </div>
                     </Step>
                 </Stepper>
             </div>
-            {activeStep === 0 && <div className="w-full mt-[4rem]">
-                <form id="uploadForm" ref={refForm}>
-                    <div className="rounded-lg h-32 w-full grid grid-cols-2 justify-between items-center flex-wrap">
-                        <div className="col-1 justify-self-center">
-                            <label htmlFor="db" className="text-sm font-medium">Наименование БД:</label>
-                            <select id="db" className="text-sm p-2 border rounded w-72 outline-none "
-                                value={dbId} onChange={e => setDbId(e.target.value)}>
-                                {db && db.length > 0 && db?.map((it: Db) => (<option key={it.id} value={it.id}>{it.name}</option>))}
-                            </select>
-                        </div>
-                        <div>
-                            <div className="col-2 w-full flex justify-center items-center gap-5 flex-wrap">
+            <div className="md:mt-[4.5rem] flex justify-between">
+                <Btn onClick={handlePrev} disabled={isFirstStep}>
+                    <HiChevronLeft className="h-4 w-4" />
+                    <span className="hidden md:block">Предыдущий этап</span>
+                </Btn>
+                <Btn onClick={handleNext} disabled={isLastStep}>
+                    <span className="hidden md:block">Следующий этап</span>
+                    <HiChevronRight className="h-4 w-4" />
+                </Btn>
+            </div>
+            <div className="w-full mt-5">
+                {
+                    activeStep === 0 && <form id="uploadForm" ref={refForm}>
+                        <div className="w-full flex flex-col justify-center items-center">
+                            <div className="w-full md:w-96">
+                                <label htmlFor="db" className="text-sm font-medium">Наименование БД:</label>
+                                <select id="db" className="text-sm p-2 border rounded w-full outline-none "
+                                    value={dbId} onChange={e => setDbId(e.target.value)}>
+                                    {db && db.length > 0 && db?.map((it: Db) => (<option key={it.id} value={it.id}>{it.name}</option>))}
+                                </select>
+                            </div>
+                            <div className="mt-4">
                                 <label htmlFor="uploadFile1"
-                                    className='flex items-center gap-3 rounded-lg p-2 text-xs  text-white uppercase bg-gradient-to-t from-emerald-500 to-emerald-400 hover:shadow-lg hover:shadow-emerald-200 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:bg-emerald-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50'
+                                    className='w-fit flex items-center gap-3 rounded-lg p-2 text-xs  text-white uppercase bg-gradient-to-t from-emerald-500 to-emerald-400 hover:shadow-lg hover:shadow-emerald-200 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:bg-emerald-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50'
                                 >
                                     {uploading ? "Загрузка файла..." : "Выбрать файл"}
-                                    {uploading ? <Spinner className="h-5 w-5" /> : <HiOutlineUpload className="h-6 w-6" />}
+                                    {uploading ? <Spinner className="h-5 w-5" /> : <HiOutlineUpload className="h-5 w-5" />}
                                     <input
                                         className="hidden"
                                         id="uploadFile1"
@@ -267,76 +275,58 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
                                         onChange={handleSelectFile}
                                     />
                                 </label>
-                                {file && <span className="italic text-gray-600">Выбран файл: {file.name}</span>}
-                            </div>
-                            <div className="text-red-600 text-sm">
-                                {uploadError}
+                                {file && <span className="text-sm mt-4 italic text-gray-600">Выбран файл: {file.name}</span>}
+
+                                <div className="mt-4 text-red-600 text-sm">
+                                    {uploadError}
+                                </div>
+                                <div className="mt-2 text-sm italic underline hover:cursor-pointer">{uploadLogs.length > 0 && 'Смотреть журнал'}</div>
                             </div>
                         </div>
-                    </div>
-                </form>
-                <div className="rounded h-full w-full">
-                    <JournalPanel logs={uploadLogs} />
-                </div>
-            </div >}
-            {
-                activeStep === 1 && <div className="w-full mt-[4rem]">
-                    <div className="rounded-lg h-24 w-full flex flex-col gap-3 justify-center items-center">
-                        <form id="previewForm" onSubmit={handlePreviewData}>
-                            <div className="flex gap-4 justify-center items-center sm:flex-wrap">
+                    </form>}
+                {
+                    activeStep === 1 && <form id="previewForm" onSubmit={handlePreviewData}>
+                        <div className="w-full flex flex-col justify-center items-center">
+                            <div className="flex flex-col">
                                 {file && <Btn
                                     type="submit"
                                     className="flex gap-4 items-center"
                                 >
                                     {previewing ? "Обработка данных..." : "Подготовить данные"}
-                                    {previewing ? <Spinner className="h-6 w-6" /> : <HiOutlineCog className="h-6 w-6" />}
+                                    {previewing ? <Spinner className="h-5 w-5" /> : <HiOutlineCog className="h-5 w-5" />}
                                 </Btn>}
-                                {persons.length > 0 && <span className="italic text-gray-600">Данные подготовлены</span>}
+                                {persons.length > 0 && <span className="self-center italic text-gray-600">Данные подготовлены</span>}
+                                <div className="mt-2 self-center text-sm italic underline hover:cursor-pointer">{previewLogs.length > 0 && 'Смотреть журнал'}</div>
+                                <div className="self-center text-red-600 text-sm">
+                                    {previewError}
+                                </div>
                             </div>
-                        </form>
-                        <div className="text-red-600 text-sm">
-                            {previewError}
+                            <div className="mt-4 w-full md:w-fit">
+                                {file && <ConfigTable cols={cols} personFields={personFields} />}
+                            </div>
                         </div>
-                    </div>
-                    <div className="rounded h-full w-full">
-                        {file && <div className="mt-5 w-full flex justify-between gap-5 flex-wrap">
-                            <ConfigTable cols={cols} personFields={personFields} config={config} setConfig={setConfig} />
-                            <JournalPanel logs={previewLogs} />
-                        </div>}
-                    </div>
-                </div>
-            }
-            {
-                activeStep === 2 && <div className="w-full mt-[4rem]">
-                    <div className="rounded-lg h-24 w-full flex flex-col gap-3 justify-center items-center">
-                        <form onSubmit={handleLoadData}>
-                            <div className="flex gap-4 items-center">
+                    </form>
+                }
+                {
+                    activeStep === 2 && <form id="loadForm" onSubmit={handleLoadData}>
+                        <div className="w-full flex flex-col justify-center items-center">
+                            <div className="flex flex-col justify-center">
                                 {persons.length > 0 && <Btn
                                     type="submit"
                                     className="flex gap-4 items-center"
                                 >
-                                    {loading ? "Загрузка данных..." : "Загрузить данных"}
-                                    {loading ? <Spinner className="h-6 w-6" /> : <HiOutlineDatabase className="h-6 w-6" />}
+                                    {loading ? "Загрузка данных..." : "Загрузить данные"}
+                                    {loading ? <Spinner className="h-5 w-5" /> : <HiOutlineDatabase className="h-5 w-5" />}
                                 </Btn>}
-                                {loadState?.logs && <span className="italic text-gray-600">Данные загружены</span>}
+                                {loadState?.logs && <span className="self-center italic text-gray-600">Данные загружены</span>}
+                                <div className="mt-2 self-center text-sm italic underline hover:cursor-pointer">{loadState.logs && 'Смотреть журнал'}</div>
                             </div>
-                        </form>
-                        <div className="text-red-600 text-sm">
-                            {loadState?.error}
+                            <div className="text-red-600 text-sm">
+                                {loadState?.error}
+                            </div>
                         </div>
-                    </div>
-                    <div className="w-full h-full rounded">
-                        {loadState?.logs && <JournalPanel logs={loadState?.logs || []} />}
-                    </div>
-                </div>
-            }
-            <div className="mt-5 flex justify-between">
-                <Btn onClick={handlePrev} disabled={isFirstStep}>
-                    Предыдущий этап
-                </Btn>
-                <Btn onClick={handleNext} disabled={isLastStep}>
-                    Следующий этап
-                </Btn>
+                    </form>
+                }
             </div>
         </div >
     );

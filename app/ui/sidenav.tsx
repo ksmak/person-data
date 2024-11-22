@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import NavLinks from '@/app/ui/nav-links';
 import Logo from '@/app/ui/logo';
-import { HiOutlineLightningBolt } from "react-icons/hi";
 
 export default function SideNav() {
     return (

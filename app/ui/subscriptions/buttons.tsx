@@ -1,6 +1,5 @@
 import { HiOutlinePlusSm, HiOutlinePencil } from "react-icons/hi";
 import Link from 'next/link';
-import { deleteSubscription } from '@/app/lib/actions';
 import { Btn } from "@/app/ui/buttons";
 
 export function CreateSubscription() {

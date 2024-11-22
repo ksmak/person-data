@@ -1,6 +1,5 @@
 import { fetchFilteredSubscriptions } from '@/app/lib/data';
 import { TableHead } from '@/app/lib/definitions';
-import Table from '@/app/ui/subscriptions/table';
 import { Tbl } from '@/app/ui/tables';
 
 export default async function UsersTable({

@@ -138,3 +138,38 @@ export function QueriesTableSkeleton() {
         </div>
     );
 }
+
+export function UsersQueriesTableSkeleton() {
+    return (
+        <div className="mt-6 flow-root">
+            <div className="inline-block min-w-full align-middle">
+                <div className="rounded-lg bg-select p-2 md:pt-0">
+                    <table className="hidden min-w-full text-gray-900 md:table">
+                        <thead className="rounded-lg text-left text-sm font-normal">
+                            <tr>
+                                <th scope="col" className="px-4 py-5 font-medium">
+                                    Ф.И.О.
+                                </th>
+                                <th scope="col" className="px-4 py-5 font-medium">
+                                    Кол-во запросов за день
+                                </th>
+                                <th scope="col" className="px-4 py-5 font-medium">
+                                    Кол-во запросов за месяц
+                                </th>
+                                <th scope="col" className="px-4 py-5 font-medium">
+                                    Общее кол-во запросов
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white">
+                            <QueriesTableRowSkeleton />
+                            <QueriesTableRowSkeleton />
+                            <QueriesTableRowSkeleton />
+                            <QueriesTableRowSkeleton />
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    );
+}

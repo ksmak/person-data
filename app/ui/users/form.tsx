@@ -6,7 +6,7 @@ import { Subscription, User } from '@prisma/client';
 import { ModalDeleteUser } from '@/app/ui/users/modal';
 import { EditButtonsGroup } from '@/app/ui/buttons';
 import { Checkbox, Radio } from "@material-tailwind/react";
-import { SubscriptionCard } from '../card';
+import { SubscriptionCard } from '@/app/ui/users/cards';
 
 export default function UserForm({
   user,

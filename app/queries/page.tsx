@@ -1,10 +1,9 @@
 import { Metadata } from "next";
-import { SearchPanel } from "@/app/ui/queries/panels";
 import { QueriesTableSkeleton } from "@/app/ui/skeletons";
 import { Suspense } from "react";
 import Pagination from "@/app/ui/pagination";
 import WrapTable from '@/app/ui/queries/wrap_table';
-import { fetchQueriesPages } from "@/app/lib/data";
+import { fetchQueriesPages, getFirstUserId } from "@/app/lib/data";
 
 export const metadata: Metadata = {
     title: 'Search',
@@ -17,7 +16,7 @@ export default async function Page(props: {
         sort?: string;
     }>;
 }) {
-    const userId = 'cm3mq094u0002zajjs6hs3txz'; //for test!!!
+    const userId = await getFirstUserId(); //for test!!!
     const searchParams = await props.searchParams;
     const currentPage = Number(searchParams?.page) || 1;
     const totalPages = await fetchQueriesPages(userId);

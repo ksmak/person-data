@@ -3,7 +3,7 @@
 import io from 'socket.io-client';
 import { TableHead } from "@/app/lib/definitions";
 import { Tbl } from "../tables";
-import { Query, QueryStateType } from "@prisma/client";
+import { Query } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { SearchPanel } from './panels';
 

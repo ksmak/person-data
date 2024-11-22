@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import prisma from "./db";
 import { Person } from "./definitions";
-// import queue from "./queue";
+import queue from "./queue";
 import bcrypt from "bcrypt";
 
 const EXPIRED_PASSWORD_DAYS = 30;
@@ -378,7 +378,7 @@ export async function createQuery(
   prevState: string | undefined,
   person: Person
 ) {
-  let body: any = [];
+  let body: any[] = [];
   for (const key of Object.keys(person)) {
     const val = person[`${key}` as keyof typeof person];
     if (val) {
@@ -410,130 +410,8 @@ export async function createQuery(
   };
 }
 
-export async function loadData(persons: Person[], prevState: ImportState) {
-  // const job = await queue.add("load-data", {
-  //   persons: persons,
-  // });
-  let logs = [];
-  // let persons = [];
-  let error = false;
-
-  logs.push(`Начат процесс загрузки данных...`);
-  for (const person of persons) {
-    if (person.iin) {
-      try {
-        const findPersonByIin = await prisma.person.findFirst({
-          where: {
-            dbId: person.dbId,
-            iin: String(person.iin),
-          },
-        });
-        if (findPersonByIin) {
-          try {
-            const p = await prisma.person.update({
-              data: {
-                firstName: person.firstName,
-                lastName: person.lastName,
-                middleName: person.middleName,
-                phone: person.phone,
-                region: person.region,
-                district: person.district,
-                building: person.building,
-                apartment: person.apartment,
-                extendedPersonData: person.extendedPersonData,
-              },
-              where: {
-                id: findPersonByIin.id,
-              },
-            });
-            logs.push(`Обновление: ${JSON.stringify(p)}`);
-          } catch (e) {
-            error = true;
-            logs.push(`Ошибка при обновлении! (${person.iin})! ${e}`);
-          }
-          continue;
-        }
-      } catch (e) {
-        error = true;
-        logs.push(`Ошибка при проверке ИИН! (${person.iin})! ${e}`);
-      }
-      continue;
-    }
-    if (person.firstName && person.lastName) {
-      try {
-        const findPersonByFIO = await prisma.person.findFirst({
-          where: {
-            dbId: person.dbId,
-            firstName: person.firstName,
-            lastName: person.lastName,
-            middleName: person.middleName,
-          },
-        });
-        if (findPersonByFIO) {
-          try {
-            const p = await prisma.person.update({
-              data: {
-                iin: String(person.iin),
-                phone: person.phone,
-                region: person.region,
-                district: person.district,
-                building: person.building,
-                apartment: person.apartment,
-                extendedPersonData: person.extendedPersonData,
-              },
-              where: {
-                id: findPersonByFIO.id,
-              },
-            });
-            logs.push(`Обновление: ${JSON.stringify(p)}`);
-          } catch (e) {
-            error = true;
-            logs.push(
-              `Ошибка при обновлении! (${person.lastName} ${person.firstName} ${person.middleName})! ${e}`
-            );
-          }
-          continue;
-        }
-      } catch (e) {
-        error = true;
-        logs.push(
-          `Ошибка при проверке ФИО! (${person.lastName} ${person.firstName} ${person.middleName})! ${e}`
-        );
-      }
-      continue;
-    }
-    try {
-      const p = await prisma.person.create({
-        data: {
-          dbId: person.dbId,
-          firstName: person.firstName,
-          lastName: person.lastName,
-          middleName: person.middleName,
-          iin: String(person.iin),
-          phone: person.phone,
-          region: person.region,
-          district: person.district,
-          building: person.building,
-          apartment: person.apartment,
-          extendedPersonData: person.extendedPersonData,
-        },
-      });
-      logs.push(`Вставка: ${JSON.stringify(p)}`);
-    } catch (e) {
-      error = true;
-      logs.push(`Ошибка при вставке! (${JSON.stringify(person)})! ${e}`);
-    }
-  }
-  logs.push(`Загрузка данных завершена.`);
-
-  if (error) {
-    return {
-      error: "В ходе загрузки данных возникли некоторые ошибки.",
-      logs: logs,
-    };
-  }
-
-  return {
-    logs: logs,
-  };
+export async function loadData(persons: Person[]) {
+  await queue.add("load-data", {
+    persons: persons,
+  });
 }

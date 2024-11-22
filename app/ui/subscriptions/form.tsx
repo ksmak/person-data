@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { SubscriptionState, updateSubscription, createSubscription } from '@/app/lib/actions';
 import { FormEvent, useState } from 'react';
 import { Subscription } from '@prisma/client';
@@ -181,7 +180,7 @@ export default function SubscriptionForm({
               defaultChecked={sub ? sub.accessImportData : false}
             />
             <div className="text-sm font-medium">
-              Доступ к подсистеме "Загрузка данных"
+              Доступ к подсистеме &quot;Загрузка данных&quot;
             </div>
           </div>
         </div>
@@ -196,7 +195,7 @@ export default function SubscriptionForm({
               defaultChecked={sub ? sub.accessMonitoring : false}
             />
             <div className="text-sm font-medium">
-              Доступ к подсистеме "Мониторинг запросов"
+              Доступ к подсистеме &quot;Мониторинг запросов&quot;
             </div>
           </div>
         </div>
@@ -211,7 +210,7 @@ export default function SubscriptionForm({
               defaultChecked={sub ? sub.accessUsers : false}
             />
             <div className="text-sm font-medium">
-              Доступ к подсистеме "Пользователи"
+              Доступ к подсистеме &quot;Пользователи&quot;
             </div>
           </div>
         </div>

@@ -1,7 +1,6 @@
 'use client';
 
 import { deleteSubscription } from "@/app/lib/actions";
-import { DeleteSubscription } from "@/app/ui/subscriptions/buttons";
 import {
     Dialog,
     DialogHeader,

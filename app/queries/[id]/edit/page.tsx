@@ -17,13 +17,6 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
         notFound();
     }
 
-    let queryBody;
-    try {
-        queryBody = formatQueryCondition(JSON.parse(query.body));
-    } catch {
-        queryBody = [];
-    }
-
     return (
         <main>
             <Breadcrumbs
