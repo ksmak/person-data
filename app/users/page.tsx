@@ -6,6 +6,7 @@ import { UsersTableSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
 import { fetchUsersPages } from '@/app/lib/data';
 import { Metadata } from 'next';
+import { auth } from '@/auth'
 
 export const metadata: Metadata = {
     title: 'Users',
@@ -19,6 +20,10 @@ export default async function Page(props: {
         sort?: string;
     }>;
 }) {
+    const session = await auth();
+
+    if (!session) return <div>Not authenticated</div>
+
     const searchParams = await props.searchParams;
     const query = searchParams?.query || '';
     const currentPage = Number(searchParams?.page) || 1;

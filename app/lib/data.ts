@@ -22,12 +22,12 @@ export async function fetchFilteredUsers(
       lastName: true,
       firstName: true,
       middleName: true,
-      login: true,
+      email: true,
       expiredPwd: true,
       subs: {
         select: {
           title: true,
-        }
+        },
       },
     },
     where: {
@@ -172,7 +172,7 @@ export async function fetchFilteredQueries(
 export async function fetchQueriesPages(userId: string) {
   const queriesCount = await prisma.query.count({
     where: {
-      userId: userId
+      userId: userId,
     },
   });
 
@@ -232,4 +232,13 @@ export async function fetchUsersQueriesPages() {
   const totalPages = Math.ceil(queriesCount / ITEMS_PER_PAGE);
 
   return totalPages;
+}
+
+export async function getUserFromDb(email: string, hash: string) {
+  return await prisma.user.findFirst({
+    where: {
+      email: email,
+      password: hash,
+    },
+  });
 }

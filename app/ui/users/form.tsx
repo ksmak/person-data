@@ -57,25 +57,25 @@ export default function UserForm({
             </div>
           </div>
         </div>
-        {/* login */}
+        {/* email */}
         <div className="mb-4">
-          <label htmlFor="login" className="pl-2 mb-2 block text-sm font-medium">
+          <label htmlFor="email" className="pl-2 mb-2 block text-sm font-medium">
             Логин
           </label>
           <div className="relative mt-2 rounded-md">
             <div className="relative">
               <input
                 className="peer block w-full rounded-md border border-gray-200 py-2 pl-2 text-sm outline-2 placeholder:text-gray-500"
-                id="login"
-                name="login"
+                id="email"
+                name="email"
                 type="text"
-                defaultValue={user?.login ? user.login : ""}
-                aria-describedby="login-error"
+                defaultValue={user?.email ? user.email : ""}
+                aria-describedby="email-error"
               />
             </div>
-            <div id="login-error" aria-live="polite" aria-atomic="true">
-              {state.errors?.login &&
-                state.errors.login.map((error: string) => (
+            <div id="email-error" aria-live="polite" aria-atomic="true">
+              {state.errors?.email &&
+                state.errors.email.map((error: string) => (
                   <p className="mt-2 text-sm text-red-500" key={error}>
                     {error}
                   </p>

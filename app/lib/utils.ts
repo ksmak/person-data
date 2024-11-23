@@ -1,4 +1,7 @@
 import { personFields } from "./definitions";
+import bcrypt from "bcryptjs";
+
+const salt = bcrypt.genSaltSync(10);
 
 export const formatDateToLocal = (
   dateStr: string,
@@ -90,7 +93,7 @@ export function formatStr(s: any) {
     "=",
     "/",
     "(",
-    ")"
+    ")",
   ];
   for (let i = 0; i > removingSymbols.length; i++) {
     str = str.replaceAll(removingSymbols[i], "");
@@ -105,4 +108,8 @@ export function formatPhone(s: any) {
     return "7" + String(converStr).slice(1);
   }
   return converStr;
+}
+
+export function saltAndHashPassword(password: string) {
+  return bcrypt.hashSync(password, salt);
 }

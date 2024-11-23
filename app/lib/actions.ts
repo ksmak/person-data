@@ -6,18 +6,19 @@ import { redirect } from "next/navigation";
 import prisma from "./db";
 import { Person } from "./definitions";
 import queue from "./queue";
-import bcrypt from "bcrypt";
+import { saltAndHashPassword } from "./utils";
 
 const EXPIRED_PASSWORD_DAYS = 30;
-
-const salt = 10;
 
 const CreateUserSchema = z.object({
   id: z.string(),
   isActive: z.boolean(),
-  login: z.string().min(3, {
-    message: "Логин должен состоять из не менее 3 символов",
-  }),
+  email: z
+    .string()
+    .min(1, {
+      message: "Поле должно быть заполнено",
+    })
+    .email("Некорректный почтовый ящик"),
   password: z.string().min(5, {
     message: "Пароль должен состоять из не менее 5 символов",
   }),
@@ -37,9 +38,12 @@ const CreateUserSchema = z.object({
 const UpdateUserSchema = z.object({
   id: z.string(),
   isActive: z.boolean(),
-  login: z.string().min(3, {
-    message: "Логин должен состоять из не менее 3 символов",
-  }),
+  email: z
+    .string()
+    .min(1, {
+      message: "Поле должно быть заполнено",
+    })
+    .email("Некорректный почтовый ящик"),
   password: z.string(),
   lastName: z.string().refine((data) => data.trim() !== "", {
     message: "Поле не заполнено",
@@ -72,7 +76,7 @@ export type State = {
   errors?: {
     id?: string[];
     isActive?: string[];
-    login?: string[];
+    email?: string[];
     password?: string[];
     lastName?: string[];
     firstName?: string[];
@@ -122,7 +126,7 @@ const UpdateSubscription = SubscriptionFormSchema.omit({ id: true });
 export async function createUser(prevState: State, formData: FormData) {
   const validatedFields = CreateUser.safeParse({
     isActive: formData.get("isActive"),
-    login: formData.get("login"),
+    email: formData.get("email"),
     password: formData.get("password"),
     lastName: formData.get("lastName"),
     firstName: formData.get("firstName"),
@@ -137,7 +141,7 @@ export async function createUser(prevState: State, formData: FormData) {
     };
   }
 
-  const { login, password, lastName, firstName, middleName, subsId } =
+  const { email, password, lastName, firstName, middleName, subsId } =
     validatedFields.data;
   const now = new Date();
   const expiredPwd = new Date(
@@ -149,8 +153,8 @@ export async function createUser(prevState: State, formData: FormData) {
     await prisma.user.create({
       data: {
         isActive: isActive,
-        login: login,
-        password: bcrypt.hashSync(password, salt),
+        email: email,
+        password: saltAndHashPassword(password),
         lastName: lastName,
         firstName: firstName,
         middleName: middleName,
@@ -174,7 +178,7 @@ export async function updateUser(
   formData: FormData
 ) {
   const validatedFields = UpdateUser.safeParse({
-    login: formData.get("login"),
+    email: formData.get("email"),
     password: formData.get("password"),
     lastName: formData.get("lastName"),
     firstName: formData.get("firstName"),
@@ -189,7 +193,7 @@ export async function updateUser(
     };
   }
 
-  const { login, password, lastName, firstName, middleName, subsId } =
+  const { email, password, lastName, firstName, middleName, subsId } =
     validatedFields.data;
   const now = new Date();
   const expiredPwd = new Date(
@@ -205,8 +209,8 @@ export async function updateUser(
         },
         data: {
           isActive: isActive,
-          login: login,
-          password: bcrypt.hashSync(password, salt),
+          email: email,
+          password: saltAndHashPassword(password),
           lastName: lastName,
           firstName: firstName,
           middleName: middleName,
@@ -221,7 +225,7 @@ export async function updateUser(
         },
         data: {
           isActive: isActive,
-          login: login,
+          email: email,
           lastName: lastName,
           firstName: firstName,
           middleName: middleName,

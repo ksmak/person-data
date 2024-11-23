@@ -38,7 +38,7 @@ export default async function UsersTable({
     },
     {
       title: "Логин",
-      name: "login",
+      name: "email",
       fieldType: 'string',
     },
     {

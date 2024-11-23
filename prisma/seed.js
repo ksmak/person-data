@@ -1,10 +1,10 @@
 const { PrismaClient } = require("@prisma/client");
-const { hash } = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const random = require("random-name");
 
 const prisma = new PrismaClient();
 
-const salt = 10;
+const salt = bcrypt.genSaltSync(10);
 
 async function main() {
   await prisma.subscription.deleteMany({});
@@ -34,8 +34,8 @@ async function main() {
     await prisma.user.create({
       data: {
         isActive: true,
-        login: first.toLowerCase(),
-        password: await hash("12345", salt),
+        email: `${first.toLowerCase()}@mail.ru`,
+        password: bcrypt.hashSync('12345', salt),
         firstName: first,
         lastName: random.last(),
         middleName: random.middle(),
