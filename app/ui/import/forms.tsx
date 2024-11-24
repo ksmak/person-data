@@ -126,8 +126,8 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
                             }
                         }
                     });
-                    if (!existFlag) {
-                        person.extendedPersonData ? person.extendedPersonData[`${key}`] = formatStr(val) : null;
+                    if (!existFlag && person.extendedPersonData) {
+                        person.extendedPersonData[`${key}`] = formatStr(val);
                     }
                 }
             })

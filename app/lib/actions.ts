@@ -13,22 +13,22 @@ import { AuthError, User } from "next-auth";
 const EXPIRED_PASSWORD_DAYS = 30;
 
 export type LoginState = {
-  user?: User,
+  user?: User;
   errors?: {
-    email?: string,
-    password?: string,
-  }
-  message?: string,
-}
+    email?: string;
+    password?: string;
+  };
+  message?: string;
+};
 
 const signInSchema = z.object({
-  email: z.string()
+  email: z
+    .string()
     .min(1, {
       message: "Поле должно быть заполнено.",
     })
     .email("Некорректный почтовый ящик."),
-  password: z.string()
-    .min(5, "Длина пароля не должен быть меньше 5 символов."),
+  password: z.string().min(5, "Длина пароля не должен быть меньше 5 символов."),
 });
 
 const loginUser = signInSchema.omit({});
@@ -445,8 +445,8 @@ export async function loadData(persons: Person[]) {
 
 export async function login(formData: FormData) {
   const validatedFields = await loginUser.safeParseAsync({
-    email: formData.get('email'),
-    password: formData.get('password'),
+    email: formData.get("email"),
+    password: formData.get("password"),
   });
 
   if (!validatedFields.success) {
@@ -459,28 +459,32 @@ export async function login(formData: FormData) {
   const { email, password } = validatedFields.data;
 
   try {
-    await signIn('credentials', { email: email, password: password, redirect: false });
+    await signIn("credentials", {
+      email: email,
+      password: password,
+      redirect: false,
+    });
     return {};
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
-        case 'CredentialsSignin':
+        case "CredentialsSignin":
           return {
-            message: "Ошибка! Неверный логин или пароль."
-          }
+            message: "Ошибка! Неверный логин или пароль.",
+          };
         default:
           return {
-            message: `Ошибка! ${error.message}`
-          }
+            message: "Ошибка! Неверный логин или пароль.",
+          };
       }
     }
     return {
-      message: `Ошибка!`
-    }
+      message: `Ошибка! ${error}`,
+    };
   }
 }
 
 export async function logout() {
   await signOut();
-  redirect('/dashboard');
+  redirect("/dashboard");
 }
