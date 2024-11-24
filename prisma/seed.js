@@ -34,7 +34,7 @@ async function main() {
     await prisma.user.create({
       data: {
         isActive: true,
-        email: `${first.toLowerCase()}@mail.ru`,
+        email: `user${i + 1}@mail.ru`,
         password: bcrypt.hashSync('12345', salt),
         firstName: first,
         lastName: random.last(),

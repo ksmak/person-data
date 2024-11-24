@@ -40,7 +40,7 @@ export default async function UsersTable({
 
   return (
     <>
-      <Tbl tableHeads={tableHeads} tableRows={subs} url="/subscriptions" />
+      <Tbl tableHeads={tableHeads} tableRows={subs} url="/dashboard/subscriptions" />
     </>
   );
 }

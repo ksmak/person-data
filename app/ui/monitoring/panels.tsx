@@ -2,7 +2,7 @@ import { fetchFilteredQueries, fetchQueriesPages, fetchUserById } from "@/app/li
 import { notFound } from "next/navigation";
 import Pagination from "@/app/ui/pagination";
 import { TableHead } from "@/app/lib/definitions";
-import { Tbl } from "../tables";
+import { Tbl } from "@/app/ui/tables";
 
 export default async function UserQueriesPanel({
     userId, currentPage, orderBy, sort

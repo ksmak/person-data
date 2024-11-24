@@ -4,42 +4,76 @@ import { HiOutlineSearch, HiOutlineChartBar, HiOutlineUser, HiOutlineKey, HiOutl
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
+import { Session } from "next-auth";
 
 const links = [
   {
-    name: 'Поиск информации',
-    href: '/queries',
+    title: 'Поиск информации',
+    name: 'accessQueries',
+    href: '/dashboard/queries',
     icon: HiOutlineSearch,
   },
   {
-    name: 'Загрузка данных',
-    href: '/import',
+    title: 'Загрузка данных',
+    name: 'accessImportData',
+    href: '/dashboard/import',
     icon: HiOutlineDatabase,
   },
   {
-    name: 'Мониторинг запросов',
-    href: '/monitoring',
+    title: 'Мониторинг запросов',
+    name: 'accessMonitoring',
+    href: '/dashboard/monitoring',
     icon: HiOutlineChartBar,
   },
   {
-    name: 'Пользователи',
-    href: '/users',
+    title: 'Пользователи',
+    name: 'accessUsers',
+    href: '/dashboard/users',
     icon: HiOutlineUser,
   },
   {
-    name: 'Подписки',
-    href: '/subscriptions',
+    title: 'Подписки',
+    name: 'accessSubscriptions',
+    href: '/dashboard/subscriptions',
     icon: HiOutlineKey,
   },
 ];
 
-export default function NavLinks() {
+export default function NavLinks({ session }: { session: Session | null }) {
   const pathname = usePathname();
 
   return (
     <>
       {links.map((link) => {
+        let access: boolean = true;
+        switch (link.name) {
+          case 'accessQueries': {
+            access = session?.user?.subs?.accessQueries ? session?.user?.subs?.accessQueries : true;
+            break;
+          }
+          case 'accessImportData': {
+            access = session?.user?.subs?.accessImportData ? session?.user?.subs?.accessImportData : true;
+            break;
+          }
+          case 'accessMonitoring': {
+            access = session?.user?.subs?.accessMonitoring ? session?.user?.subs?.accessMonitoring : true;
+            break;
+          }
+          case 'accessUsers': {
+            access = session?.user?.subs?.accessUsers ? session?.user?.subs?.accessUsers : true;
+            break;
+          }
+          case 'accessSubscriptions': {
+            access = session?.user?.subs?.accessSubscriptions ? session?.user?.subs?.accessSubscriptions : true;
+            break;
+          }
+        }
         const LinkIcon = link.icon;
+
+        if (!access) return (
+          <div key={link.name} className="hidden"></div>
+        );
+
         return (
           <Link
             key={link.name}
@@ -52,7 +86,7 @@ export default function NavLinks() {
             )}
           >
             <LinkIcon className="w-6" />
-            <p className="hidden md:block">{link.name}</p>
+            <p className="hidden md:block">{link.title}</p>
           </Link>
         );
       })}

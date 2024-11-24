@@ -110,14 +110,16 @@ model Query {
 }
 
 model Subscription {
-  id               String  @id @default(cuid())
-  title            String
-  maxQueriesDay    Int
-  maxQueriesMonth  Int
-  maxQueriesTotal  Int
-  usageTimeLimit   Int
-  accessImportData Boolean @default(false)
-  accessUsers      Boolean @default(false)
-  accessMonitoring Boolean @default(false)
-  user             User[]
+  id                  String  @id @default(cuid())
+  title               String
+  maxQueriesDay       Int
+  maxQueriesMonth     Int
+  maxQueriesTotal     Int
+  usageTimeLimit      Int
+  accessQueries       Boolean @default(true)
+  accessImportData    Boolean @default(false)
+  accessMonitoring    Boolean @default(false)
+  accessUsers         Boolean @default(false)
+  accessSubscriptions Boolean @default(false)
+  user                User[]
 }

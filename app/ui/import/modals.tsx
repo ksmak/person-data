@@ -2,9 +2,8 @@ import {
     Dialog,
     DialogHeader,
     DialogBody,
-    DialogFooter,
 } from "@material-tailwind/react";
-import { Btn, SecondaryBtn } from "../buttons";
+import { SecondaryBtn } from "@/app/ui/buttons";
 import { Dispatch, SetStateAction } from "react";
 import { HiOutlineX } from "react-icons/hi";
 

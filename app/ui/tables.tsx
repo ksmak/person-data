@@ -1,12 +1,12 @@
 'use client'
 
 import { Card, Typography } from "@material-tailwind/react";
-import { TableHead } from "../lib/definitions";
+import { TableHead } from "@/app/lib/definitions";
 import clsx from "clsx";
 import moment from "moment";
 import { HiOutlineChevronDown, HiOutlineChevronUp } from "react-icons/hi";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { formatQueryCondition } from "../lib/utils";
+import { formatQueryCondition } from "@/app/lib/utils";
 
 export function Tbl({ tableHeads, tableRows, url
 }: { tableHeads: TableHead[], tableRows: any[], url: string }) {

@@ -113,3 +113,7 @@ export function formatPhone(s: any) {
 export function saltAndHashPassword(password: string) {
   return bcrypt.hashSync(password, salt);
 }
+
+export function comparePasswords(pwd1: string, pwd2: string) {
+  return bcrypt.compareSync(pwd1, pwd2);
+}

@@ -55,7 +55,7 @@ export default async function UsersTable({
   ]
   return (
     <>
-      <Tbl tableHeads={tableHeads} tableRows={users} url='/users' />
+      <Tbl tableHeads={tableHeads} tableRows={users} url='/dashboard/users' />
     </>
   );
 }

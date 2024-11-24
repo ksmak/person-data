@@ -7,8 +7,31 @@ import prisma from "./db";
 import { Person } from "./definitions";
 import queue from "./queue";
 import { saltAndHashPassword } from "./utils";
+import { signIn, signOut } from "@/auth";
+import { AuthError, User } from "next-auth";
 
 const EXPIRED_PASSWORD_DAYS = 30;
+
+export type LoginState = {
+  user?: User,
+  errors?: {
+    email?: string,
+    password?: string,
+  }
+  message?: string,
+}
+
+const signInSchema = z.object({
+  email: z.string()
+    .min(1, {
+      message: "Поле должно быть заполнено.",
+    })
+    .email("Некорректный почтовый ящик."),
+  password: z.string()
+    .min(5, "Длина пароля не должен быть меньше 5 символов."),
+});
+
+const loginUser = signInSchema.omit({});
 
 const CreateUserSchema = z.object({
   id: z.string(),
@@ -16,11 +39,11 @@ const CreateUserSchema = z.object({
   email: z
     .string()
     .min(1, {
-      message: "Поле должно быть заполнено",
+      message: "Поле должно быть заполнено.",
     })
     .email("Некорректный почтовый ящик"),
   password: z.string().min(5, {
-    message: "Пароль должен состоять из не менее 5 символов",
+    message: "Пароль должен состоять из не менее 5 символов.",
   }),
   lastName: z.string().refine((data) => data.trim() !== "", {
     message: "Поле не заполнено",
@@ -418,4 +441,46 @@ export async function loadData(persons: Person[]) {
   await queue.add("load-data", {
     persons: persons,
   });
+}
+
+export async function login(formData: FormData) {
+  const validatedFields = await loginUser.safeParseAsync({
+    email: formData.get('email'),
+    password: formData.get('password'),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "Ошибка!",
+    };
+  }
+
+  const { email, password } = validatedFields.data;
+
+  try {
+    await signIn('credentials', { email: email, password: password, redirect: false });
+    return {};
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case 'CredentialsSignin':
+          return {
+            message: "Ошибка! Неверный логин или пароль."
+          }
+        default:
+          return {
+            message: `Ошибка! ${error.message}`
+          }
+      }
+    }
+    return {
+      message: `Ошибка!`
+    }
+  }
+}
+
+export async function logout() {
+  await signOut();
+  redirect('/dashboard');
 }

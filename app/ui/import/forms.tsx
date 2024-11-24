@@ -11,7 +11,7 @@ import { Person, PersonField, personFields } from "@/app/lib/definitions";
 import { Btn } from "@/app/ui/buttons";
 import { formatPhone, formatStr } from "@/app/lib/utils";
 import { Db } from "@prisma/client";
-import { LogModal } from "./modals";
+import { LogModal } from "@/app/ui/import/modals";
 
 const LIMIT_ROW_COUNT = 100
 

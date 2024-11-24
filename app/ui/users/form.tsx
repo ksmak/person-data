@@ -38,7 +38,7 @@ export default function UserForm({
   return (
     <form onSubmit={onSubmit}>
       <div className="mb-3 flex justify-end gap-4">
-        <EditButtonsGroup item={user} handleOpen={handleOpen} url='/users' />
+        <EditButtonsGroup item={user} handleOpen={handleOpen} url='/dashboard/users' />
       </div>
       <div className="rounded-md bg-secondary p-4 md:p-6">
         <p className="mt-2 text-sm text-red-500 text-center mb-2">{state.message}</p>

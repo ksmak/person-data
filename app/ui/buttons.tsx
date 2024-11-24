@@ -11,7 +11,7 @@ export function Btn({ children, className, ...rest }: ButtonProps) {
     <button
       {...rest}
       className={clsx(
-        'flex items-center rounded-lg p-2 text-xs  text-white uppercase bg-gradient-to-t from-emerald-500 to-emerald-400 hover:shadow-lg hover:shadow-emerald-200 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:bg-emerald-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50',
+        'flex items-center rounded-lg p-2 text-xs  text-white uppercase bg-gradient-to-t from-emerald500 to-emerald400 hover:shadow-lg hover:shadow-emerald200 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald500 active:bg-emerald600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50',
         className,
       )}
     >
@@ -59,7 +59,7 @@ export function EditButtonsGroup({ item, handleOpen, url }: {
         ? <DangerBtn
           onClick={(e) => { e.preventDefault(); handleOpen() }}
           className='md:w-28 justify-center gap-2' >
-          <span className="hidden md:block font-sans">Удалить</span>{' '}
+          <span className="hidden md:block">Удалить</span>{' '}
           <HiOutlineTrash className='h-5 w-5' />
         </DangerBtn >
         : null}

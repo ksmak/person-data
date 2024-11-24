@@ -1,5 +1,6 @@
 import prisma from "./db";
 import { UsersQueries } from "./definitions";
+import { comparePasswords } from "./utils";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -234,11 +235,36 @@ export async function fetchUsersQueriesPages() {
   return totalPages;
 }
 
-export async function getUserFromDb(email: string, hash: string) {
-  return await prisma.user.findFirst({
+export async function fetchUserByEmailAndPassword(email: string | unknown, password: string | unknown) {
+  if (typeof email !== 'string' || typeof password !== 'string') return null;
+
+  const user = await prisma.user.findFirst({
+    include: {
+      subs: true,
+    },
     where: {
-      email: email,
-      password: hash,
+      email: email
     },
   });
+
+  if (!user) {
+    return null;
+  }
+
+  if (!comparePasswords(password, user.password)) {
+    return null;
+  }
+
+  return user;
+}
+
+export async function fetchUserWithSubs(id: string) {
+  return await prisma.user.findFirst({
+    where: {
+      id: id
+    },
+    include: {
+      subs: true,
+    }
+  })
 }

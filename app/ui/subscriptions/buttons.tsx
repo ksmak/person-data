@@ -6,7 +6,7 @@ export function CreateSubscription() {
   return (
     <Btn>
       <Link
-        href="/subscriptions/create"
+        href="/dashboard/subscriptions/create"
         className="flex items-center g-1"
       >
         <span className="hidden md:block">Добавить новую подписку</span>{' '}
@@ -19,7 +19,7 @@ export function CreateSubscription() {
 export function UpdateSubscription({ id }: { id: string }) {
   return (
     <Link
-      href={`/subscriptions/${id}/edit`}
+      href={`/dashboard/subscriptions/${id}/edit`}
       className="rounded-md border p-2 hover:bg-gray-100"
     >
       <HiOutlinePencil className="w-5" />
