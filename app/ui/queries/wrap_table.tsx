@@ -44,7 +44,7 @@ export default async function WrapTable({
 
   return (
     <>
-      <QueriesTable userId={userId} tableHeads={tableHeads} queries={queries} url={process.env.WS || "http://localhost:3001"} />
+      <QueriesTable userId={userId} tableHeads={tableHeads} queries={queries} url={process.env.WS_URL || "http://localhost:3001"} />
     </>
   );
 }

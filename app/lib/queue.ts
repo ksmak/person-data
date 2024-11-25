@@ -1,17 +1,16 @@
 import { Queue, QueueEvents } from "bullmq";
-import Redis from "ioredis";
+import IORedis from "ioredis";
 
-const redisConnection = new Redis({
+const connection = new IORedis({
+  // host: "redis",
   host: process.env.REDIS_URL,
   port: 6379,
-  username: "default",
-  password: "e6423dba74e4493a88a5a0f090cf8453",
-  family: 6,
+  maxRetriesPerRequest: null,
 });
 
 const queueSingleton = () => {
   const queue = new Queue("queries", {
-    connection: redisConnection,
+    connection: connection,
   });
 
   queue
@@ -40,5 +39,5 @@ export default queue;
 if (process.env.NODE_ENV !== "production") globalThis.queueGlobal = queue;
 
 export const queueEvents = new QueueEvents("queries", {
-  connection: redisConnection,
+  connection: connection,
 });

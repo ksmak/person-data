@@ -282,7 +282,7 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
                                 </select>
                             </div>
                             <label htmlFor="uploadFile1"
-                                className='mt-5 w-fit flex items-center gap-3 rounded-lg p-2 text-xs  text-white uppercase bg-gradient-to-t from-emerald-500 to-emerald-400 hover:shadow-lg hover:shadow-emerald-200 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 active:bg-emerald-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50'
+                                className='mt-5 w-fit flex items-center gap-3 rounded-lg p-2 text-xs  text-white uppercase bg-gradient-to-t from-emerald500 to-emerald400 hover:shadow-lg hover:shadow-emerald200 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald500 active:bg-emerald600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50'
                             >
                                 {uploading ? "Загрузка файла..." : "Выбрать файл"}
                                 {uploading ? <Spinner className="h-5 w-5" /> : <HiOutlineUpload className="h-5 w-5" />}

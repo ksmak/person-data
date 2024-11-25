@@ -194,17 +194,17 @@ export default function UserForm({
           <div className='flex items-center flex-wrap gap-5'>
             {subs.map((sub: Subscription) => (
               <div className="relative mt-2 pl-1 rounded-md place-self-start" key={sub.id}>
-                <SubscriptionCard sub={sub} />
                 <div className="relative">
                   <input
+                    className='h-5 w-5 bg-primary checked:bg-primary checked:border-none'
                     type='radio'
                     name='subsId'
                     color='green'
-
                     defaultValue={sub.id}
                     defaultChecked={user?.subsId === sub.id}
                   />
                 </div>
+                <SubscriptionCard sub={sub} />
               </div>
             ))}
             <div id="subsId-error" aria-live="polite" aria-atomic="true">

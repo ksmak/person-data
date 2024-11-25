@@ -54,7 +54,7 @@ export default async function UserQueriesPanel({
     return (
         <div className="w-full h-full">
             <div className="text-lg text-gray-900">{user.lastName} {user.firstName} {user.middleName}</div>
-            <Tbl tableHeads={tableHeads} tableRows={queries} url={`/monitoring/${userId}`} />
+            <Tbl tableHeads={tableHeads} tableRows={queries} url={`/dashboard/monitoring/${userId}`} />
             <div className="mt-5 flex w-full justify-center">
                 <Pagination totalPages={totalPages} />
             </div>

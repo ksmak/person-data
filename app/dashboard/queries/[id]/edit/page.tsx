@@ -1,14 +1,25 @@
-import { fetchQueryById } from "@/app/lib/data";
+import { fetchQueryById, fetchUserByEmail } from "@/app/lib/data";
 import { formatQueryCondition } from "@/app/lib/utils";
 import { SecondaryBtn } from "@/app/ui/buttons";
 import Breadcrumbs from "@/app/ui/queries/breadcrumbs";
 import { PersonCard } from "@/app/ui/queries/cards";
+import { auth } from "@/auth";
 import { Person } from "@prisma/client";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HiOutlinePrinter, HiOutlineX } from "react-icons/hi";
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
+    const session = await auth();
+
+    const email = session?.user?.email;
+
+    if (!email) return null;
+
+    const user = await fetchUserByEmail(email);
+
+    if (!user?.subs?.accessQueries) return null;
+
     const params = await props.params;
     const id = params.id;
     const query = await fetchQueryById(id);

@@ -3,8 +3,9 @@ import Search from '@/app/ui/search';
 import WrapTable from '@/app/ui/monitoring/wrap_table';
 import { UsersQueriesTableSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
-import { fetchUsersQueriesPages } from '@/app/lib/data';
+import { fetchUserByEmail, fetchUsersQueriesPages } from '@/app/lib/data';
 import { Metadata } from 'next';
+import { auth } from '@/auth';
 
 export const metadata: Metadata = {
     title: 'Monitoring',
@@ -18,6 +19,16 @@ export default async function Page(props: {
         sort?: string;
     }>;
 }) {
+    const session = await auth();
+
+    const email = session?.user?.email;
+
+    if (!email) return null;
+
+    const user = await fetchUserByEmail(email);
+
+    if (!user?.subs?.accessMonitoring) return null;
+
     const searchParams = await props.searchParams;
     const query = searchParams?.query || '';
     const currentPage = Number(searchParams?.page) || 1;

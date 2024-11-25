@@ -187,7 +187,7 @@ export default function SubscriptionForm({
         <div className="mb-4">
           <div className="flex gap-4 items-center place-self-start">
             <input
-              className="bg-primary checked:bg-primary checked:border-none"
+              className="peer w-5 h-5 bg-primary checked:bg-primary checked:border-none"
               id="accessMonitoring"
               name="accessMonitoring"
               type="checkbox"
@@ -202,7 +202,7 @@ export default function SubscriptionForm({
         <div className="mb-4">
           <div className="flex gap-4 items-center place-self-start">
             <input
-              className="peeh-5 bg-primary checked:bg-primary checked:border-none"
+              className="peer w-5 h-5 bg-primary checked:bg-primary checked:border-none"
               id="accessUsers"
               name="accessUsers"
               type="checkbox"

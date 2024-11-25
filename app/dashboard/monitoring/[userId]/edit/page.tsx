@@ -24,7 +24,7 @@ export default async function Page(props: {
                 breadcrumbs={
                     [
                         {
-                            label: 'Мониторинг запросов', href: '/monitoring'
+                            label: 'Мониторинг запросов', href: '/dashboard/monitoring'
                         },
                         {
                             label: 'Запросы пользователя',

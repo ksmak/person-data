@@ -216,7 +216,8 @@ export async function fetchFilteredUsersQueries(
       cast(date_part('month', "Query"."createdAt") as int),
       cast(date_part('day', "Query"."createdAt") as int)
     ) = current_date) as queries_day,
-    (select count(*) from "Query" where "Query"."userId" = "User".id) as queries_month,
+    (select count(*) from "Query" where "Query"."userId" = "User".id 
+    and cast(date_part('month', "Query"."createdAt") as int) = cast(date_part('month', current_date) as int)) as queries_month,
     (select count(*) from "Query" where "Query"."userId" = "User".id) as queries_total
     from "User"
     where "User"."firstName" ilike '%${query}%' or "User"."lastName" ilike '%${query}%' or "User"."middleName" ilike '%${query}%'
@@ -235,13 +236,21 @@ export async function fetchUsersQueriesPages() {
   return totalPages;
 }
 
+export async function fetchUserByEmail(email: string) {
+  return await prisma.user.findFirst({
+    include: {
+      subs: true,
+    },
+    where: {
+      email: email
+    },
+  });
+}
+
 export async function fetchUserByEmailAndPassword(email: string | unknown, password: string | unknown) {
   if (typeof email !== 'string' || typeof password !== 'string') return null;
 
   const user = await prisma.user.findFirst({
-    include: {
-      subs: true,
-    },
     where: {
       email: email
     },

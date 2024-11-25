@@ -42,7 +42,7 @@ export default function QueriesTable({ userId, tableHeads, queries, url
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
         <SearchPanel id={userId} setData={setData} />
       </div>
-      <Tbl tableHeads={tableHeads} tableRows={data} url='/queries' />
+      <Tbl tableHeads={tableHeads} tableRows={data} url='/dashboard/queries' />
     </>
   );
 }

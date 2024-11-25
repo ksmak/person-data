@@ -5,9 +5,9 @@ import NavLinks from '@/app/ui/nav-links';
 import Logo from '@/app/ui/logo';
 import { HiArrowRightOnRectangle } from "react-icons/hi2";
 import { logout } from '@/app/lib/actions';
-import { Session } from 'next-auth';
+import { User } from '@prisma/client';
 
-export default function SideNav({ session }: { session: Session | null }) {
+export default function SideNav({ user }: { user: User | null }) {
     return (
         <div className="flex h-full flex-col px-3 py-4 md:px-2">
             <Link
@@ -19,11 +19,11 @@ export default function SideNav({ session }: { session: Session | null }) {
                 </div>
             </Link>
             <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
-                <NavLinks session={session} />
+                <NavLinks user={user} />
                 <div className="hidden h-auto w-full grow rounded-md bg-secondary md:block"></div>
-                {session?.user &&
+                {user &&
                     <div className='px-3 flex justify-between items-center gap-4 flex-wrap text-xs bg-secondary border border-gray-200 rounded-md'>
-                        <div className='font-bold'>{session?.user?.email}</div>
+                        <div className='font-bold'>{user?.email}</div>
                         <form
                             action={async () => {
                                 await logout();

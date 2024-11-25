@@ -112,7 +112,7 @@ export function SearchPanel({ id, setData }: { id: string, setData: Dispatch<Set
                                             <input
                                                 className="font-medium block w-full rounded-md border border-gray-200 py-2 pl-2 text-sm outline-2"
                                                 type="text"
-                                                value={person[`${fld.name}` as keyof typeof person] ? String(person[`${fld.name}` as keyof typeof person]) : undefined}
+                                                // value={person[`${fld.name}` as keyof typeof person] ? String(person[`${fld.name}` as keyof typeof person]) : undefined}
                                                 onChange={(e) => setPerson({ ...person, [`${fld.name}` as keyof typeof person]: e.target.value })}
                                             />
                                         </div>

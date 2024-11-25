@@ -191,8 +191,8 @@ export async function createUser(prevState: State, formData: FormData) {
     };
   }
 
-  revalidatePath("/users");
-  redirect("/users");
+  revalidatePath("/dashboard/users");
+  redirect("/dashboard/users");
 }
 
 export async function updateUser(
@@ -263,8 +263,8 @@ export async function updateUser(
     };
   }
 
-  revalidatePath("/users");
-  redirect("/users");
+  revalidatePath("/dashboard/users");
+  redirect("/dashboard/users");
 }
 
 export async function deleteUser(id: string) {
@@ -274,8 +274,8 @@ export async function deleteUser(id: string) {
     },
   });
 
-  revalidatePath("/users");
-  redirect("/users");
+  revalidatePath("/dashboard/users");
+  redirect("/dashboard/users");
 }
 
 export async function createSubscription(prevState: State, formData: FormData) {
@@ -326,8 +326,8 @@ export async function createSubscription(prevState: State, formData: FormData) {
       message: "Ошибка в базе данных! Подписка не добавлена!",
     };
   }
-  revalidatePath("/subscriptions");
-  redirect("/subscriptions");
+  revalidatePath("/dashboard/subscriptions");
+  redirect("/dashboard/subscriptions");
 }
 
 export async function updateSubscription(
@@ -385,8 +385,8 @@ export async function updateSubscription(
       message: "Ошибка в базе данных! Подписка не обновлена!",
     };
   }
-  revalidatePath("/subscriptions");
-  redirect("/subscriptions");
+  revalidatePath("/dashboard/subscriptions");
+  redirect("/dashboard/subscriptions");
 }
 
 export async function deleteSubscription(id: string) {
@@ -396,8 +396,8 @@ export async function deleteSubscription(id: string) {
     },
   });
 
-  revalidatePath("/subscriptions");
-  redirect("/subscriptions");
+  revalidatePath("/dashboard/subscriptions");
+  redirect("/dashboard/subscriptions");
 }
 
 export async function createQuery(

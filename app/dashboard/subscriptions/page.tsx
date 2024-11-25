@@ -4,8 +4,9 @@ import WrapTable from '@/app/ui/subscriptions/wrap_table';
 import { CreateSubscription } from '@/app/ui/subscriptions/buttons';
 import { SubsTableSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
-import { fetchSubscriptionsPages } from '@/app/lib/data';
+import { fetchSubscriptionsPages, fetchUserByEmail } from '@/app/lib/data';
 import { Metadata } from 'next';
+import { auth } from '@/auth';
 
 export const metadata: Metadata = {
     title: 'Subscriptions',
@@ -19,6 +20,16 @@ export default async function Page(props: {
         sort?: string;
     }>;
 }) {
+    const session = await auth();
+
+    const email = session?.user?.email;
+
+    if (!email) return null;
+
+    const user = await fetchUserByEmail(email);
+
+    if (!user?.subs?.accessSubscriptions) return null;
+
     const searchParams = await props.searchParams;
     const query = searchParams?.query || '';
     const currentPage = Number(searchParams?.page) || 1;

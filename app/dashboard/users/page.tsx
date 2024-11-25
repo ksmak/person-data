@@ -4,7 +4,7 @@ import WrapTable from '@/app/ui/users/wrap_table';
 import { CreateUser } from '@/app/ui/users/buttons';
 import { UsersTableSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
-import { fetchUsersPages } from '@/app/lib/data';
+import { fetchUserByEmail, fetchUsersPages } from '@/app/lib/data';
 import { Metadata } from 'next';
 import { auth } from '@/auth'
 
@@ -20,6 +20,16 @@ export default async function Page(props: {
         sort?: string;
     }>;
 }) {
+    const session = await auth();
+
+    const email = session?.user?.email;
+
+    if (!email) return null;
+
+    const currentUser = await fetchUserByEmail(email);
+
+    if (!currentUser?.subs?.accessUsers) return null;
+
     const searchParams = await props.searchParams;
     const query = searchParams?.query || '';
     const currentPage = Number(searchParams?.page) || 1;

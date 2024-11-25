@@ -33,7 +33,7 @@ export default async function UsersTable({
     },
     {
       title: "Максим. кол-во запросов",
-      name: "maxQueries",
+      name: "maxQueriesTotal",
       fieldType: "string",
     },
   ]

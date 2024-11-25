@@ -1,19 +1,18 @@
 const { Worker } = require("bullmq");
-import Redis from "ioredis";
+const IORedis = require("ioredis");
 const { PrismaClient } = require("@prisma/client");
 const { io } = require("socket.io-client");
 
-const redisConnection = new Redis({
+const connection = new IORedis({
+  // host: "redis",
   host: process.env.REDIS_URL,
   port: 6379,
-  username: "default",
-  password: "e6423dba74e4493a88a5a0f090cf8453",
-  family: 6,
+  maxRetriesPerRequest: null,
 });
 
 const prisma = new PrismaClient();
 
-const socket = io("http://localhost:3001");
+const socket = io(process.env.WS_URL);
 
 socket.on('connect', () => {
   console.log('Connected to WebSocket server');
@@ -29,7 +28,7 @@ const worker = new Worker(
     }
   },
   {
-    connection: redisConnection,
+    connection: connection,
   }
 );
 

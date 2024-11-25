@@ -9,9 +9,21 @@ const salt = bcrypt.genSaltSync(10);
 async function main() {
   await prisma.subscription.deleteMany({});
 
-  const sub = await prisma.subscription.create({
+  await prisma.subscription.create({
     data: {
-      title: "Basic",
+      title: "Ограниченная",
+      maxQueriesDay: 0,
+      maxQueriesMonth: 0,
+      maxQueriesTotal: 1000,
+      usageTimeLimit: 3,
+      accessImportData: false,
+      accessUsers: false,
+      accessMonitoring: false,
+    },
+  });
+  const sub_base = await prisma.subscription.create({
+    data: {
+      title: "Базовая",
       maxQueriesDay: 100,
       maxQueriesMonth: 1000,
       maxQueriesTotal: 5000,
@@ -21,13 +33,33 @@ async function main() {
       accessMonitoring: false,
     },
   });
+  const sub_admin = await prisma.subscription.create({
+    data: {
+      title: "Максимальная",
+      maxQueriesDay: 0,
+      maxQueriesMonth: 0,
+      maxQueriesTotal: 0,
+      usageTimeLimit: 3,
+      accessImportData: false,
+      accessUsers: false,
+      accessMonitoring: false,
+    },
+  });
 
   await prisma.user.deleteMany({});
 
-  // let iin = [];
-  // for(let i=0; i <= 12; i++) {
-  //   iin.push([String(Math.random * 9)]);
-  // }
+  await prisma.user.create({
+    data: {
+      isActive: true,
+      email: `admin@mail.ru`,
+      password: bcrypt.hashSync('12345', salt),
+      firstName: 'admin',
+      lastName: 'admin',
+      middleName: 'admin',
+      expiredPwd: new Date(1, 1, 2025),
+      subsId: sub_admin.id,
+    },
+  });
 
   for (let i = 0; i <= 10; i++) {
     const first = random.first();
@@ -40,7 +72,7 @@ async function main() {
         lastName: random.last(),
         middleName: random.middle(),
         expiredPwd: new Date(1, 1, 2025),
-        subsId: sub.id,
+        subsId: sub_base.id,
       },
     });
   };

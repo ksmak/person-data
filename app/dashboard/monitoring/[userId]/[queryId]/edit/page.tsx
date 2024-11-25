@@ -50,7 +50,7 @@ export default async function Page(props: {
                         {query.result && <SecondaryBtn className='md:w-28 justify-center '>
                             <Link
                                 className='flex items-center gap-1'
-                                href={`/queries/${queryId}/print`}
+                                href={`/dashboard/queries/${queryId}/print`}
                             >
                                 <span className="hidden md:block">Печать</span>{' '}
                                 <HiOutlinePrinter className='h-5 w-5' />
@@ -59,7 +59,7 @@ export default async function Page(props: {
                         <SecondaryBtn className='md:w-28 justify-center'>
                             <Link
                                 className='flex items-center gap-1'
-                                href={`/monitoring/${userId}/edit`}
+                                href={`/dashboard/monitoring/${userId}/edit`}
                             >
                                 <span className="hidden md:block">Закрыть</span>{' '}
                                 <HiOutlineX className='h-5 w-5' />
