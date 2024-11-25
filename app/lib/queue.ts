@@ -1,9 +1,12 @@
 import { Queue, QueueEvents } from "bullmq";
 import Redis from "ioredis";
 
-const redisConnection = new Redis("redis://redis:6379", {
-  enableReadyCheck: false,
-  maxRetriesPerRequest: null,
+const redisConnection = new Redis({
+  host: process.env.REDIS_URL,
+  port: 6379,
+  username: "default",
+  password: "e6423dba74e4493a88a5a0f090cf8453",
+  family: 6,
 });
 
 const queueSingleton = () => {
@@ -11,12 +14,17 @@ const queueSingleton = () => {
     connection: redisConnection,
   });
 
-  queue.upsertJobScheduler('repeat-every-10s', {
-    every: 10000
-  }, {
-    name: 'process-queries'
-  })
-    .then(() => console.log('Sheduler job started.'));
+  queue
+    .upsertJobScheduler(
+      "repeat-every-10s",
+      {
+        every: 10000,
+      },
+      {
+        name: "process-queries",
+      }
+    )
+    .then(() => console.log("Sheduler job started."));
 
   return queue;
 };

@@ -131,7 +131,7 @@ export default function UsersTable({
                     {user.middleName}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
-                    {user.login}
+                    {user.email}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
                     {user.expiredPwd && moment(user.expiredPwd).format('DD.MM.YYYY')}

@@ -5,7 +5,6 @@ import { FormEvent, useState } from 'react';
 import { Subscription, User } from '@prisma/client';
 import { ModalDeleteUser } from '@/app/ui/users/modal';
 import { EditButtonsGroup } from '@/app/ui/buttons';
-import { Checkbox, Radio } from "@material-tailwind/react";
 import { SubscriptionCard } from '@/app/ui/users/cards';
 
 export default function UserForm({
@@ -45,7 +44,7 @@ export default function UserForm({
         {/* isActive */}
         <div className="mb-4">
           <div className="flex gap-4 items-center place-self-start">
-            <Checkbox
+            <input
               className="peer block w-5 h-5 bg-primary checked:bg-primary checked:border-none"
               id="isActive"
               name="isActive"
@@ -195,13 +194,13 @@ export default function UserForm({
           <div className='flex items-center flex-wrap gap-5'>
             {subs.map((sub: Subscription) => (
               <div className="relative mt-2 pl-1 rounded-md place-self-start" key={sub.id}>
+                <SubscriptionCard sub={sub} />
                 <div className="relative">
-                  <Radio
+                  <input
+                    type='radio'
                     name='subsId'
                     color='green'
-                    label={
-                      <SubscriptionCard sub={sub} />
-                    }
+
                     defaultValue={sub.id}
                     defaultChecked={user?.subsId === sub.id}
                   />

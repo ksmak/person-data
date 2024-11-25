@@ -1,12 +1,14 @@
 const { Worker } = require("bullmq");
-const Redis = require("ioredis");
+import Redis from "ioredis";
 const { PrismaClient } = require("@prisma/client");
 const { io } = require("socket.io-client");
-const { select } = require("@material-tailwind/react");
 
-const redisConnection = new Redis("redis://redis:6379", {
-  enableReadyCheck: false,
-  maxRetriesPerRequest: null,
+const redisConnection = new Redis({
+  host: process.env.REDIS_URL,
+  port: 6379,
+  username: "default",
+  password: "e6423dba74e4493a88a5a0f090cf8453",
+  family: 6,
 });
 
 const prisma = new PrismaClient();

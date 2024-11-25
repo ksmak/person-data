@@ -46,28 +46,28 @@ export default function NavLinks({ session }: { session: Session | null }) {
     <>
       {links.map((link) => {
         let access: boolean = true;
-        switch (link.name) {
-          case 'accessQueries': {
-            access = session?.user?.subs?.accessQueries ? session?.user?.subs?.accessQueries : true;
-            break;
-          }
-          case 'accessImportData': {
-            access = session?.user?.subs?.accessImportData ? session?.user?.subs?.accessImportData : true;
-            break;
-          }
-          case 'accessMonitoring': {
-            access = session?.user?.subs?.accessMonitoring ? session?.user?.subs?.accessMonitoring : true;
-            break;
-          }
-          case 'accessUsers': {
-            access = session?.user?.subs?.accessUsers ? session?.user?.subs?.accessUsers : true;
-            break;
-          }
-          case 'accessSubscriptions': {
-            access = session?.user?.subs?.accessSubscriptions ? session?.user?.subs?.accessSubscriptions : true;
-            break;
-          }
-        }
+        // switch (link.name) {
+        //   case 'accessQueries': {
+        //     access = session?.user?.subs?.accessQueries ? session?.user?.subs?.accessQueries : true;
+        //     break;
+        //   }
+        //   case 'accessImportData': {
+        //     access = session?.user?.subs?.accessImportData ? session?.user?.subs?.accessImportData : true;
+        //     break;
+        //   }
+        //   case 'accessMonitoring': {
+        //     access = session?.user?.subs?.accessMonitoring ? session?.user?.subs?.accessMonitoring : true;
+        //     break;
+        //   }
+        //   case 'accessUsers': {
+        //     access = session?.user?.subs?.accessUsers ? session?.user?.subs?.accessUsers : true;
+        //     break;
+        //   }
+        //   case 'accessSubscriptions': {
+        //     access = session?.user?.subs?.accessSubscriptions ? session?.user?.subs?.accessSubscriptions : true;
+        //     break;
+        //   }
+        // }
         const LinkIcon = link.icon;
 
         if (!access) return (

@@ -59,7 +59,7 @@ export function PersonCard({ person }: { person: Person }) {
             <div className="mt-2 p-1 italic">Дополнительная информация:</div>
             <div className="p-1">Наименование БД{': '}
                 <span className=" font-mono font-medium text-md hover:select-all hover:cursor-pointer">
-                    {person.Db?.name}
+                    {person.dbId}
                 </span>
             </div>
             {!!person.extendedPersonData && Object.keys(person.extendedPersonData).map((key: string) => (

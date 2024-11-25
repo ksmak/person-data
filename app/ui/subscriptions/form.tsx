@@ -5,7 +5,6 @@ import { FormEvent, useState } from 'react';
 import { Subscription } from '@prisma/client';
 import { ModalDeleteUser } from '@/app/ui/subscriptions/modal';
 import { EditButtonsGroup } from '@/app/ui/buttons';
-import { Checkbox } from '@material-tailwind/react';
 
 export default function SubscriptionForm({
   sub
@@ -172,7 +171,7 @@ export default function SubscriptionForm({
         {/* accessImportData */}
         <div className="mb-4">
           <div className="flex gap-4 items-center place-self-start">
-            <Checkbox
+            <input
               className="peer w-5 h-5 bg-primary checked:bg-primary checked:border-none"
               id="accessImportData"
               name="accessImportData"
@@ -187,7 +186,7 @@ export default function SubscriptionForm({
         {/* accessMonitoring */}
         <div className="mb-4">
           <div className="flex gap-4 items-center place-self-start">
-            <Checkbox
+            <input
               className="bg-primary checked:bg-primary checked:border-none"
               id="accessMonitoring"
               name="accessMonitoring"
@@ -202,7 +201,7 @@ export default function SubscriptionForm({
         {/* accessUsers */}
         <div className="mb-4">
           <div className="flex gap-4 items-center place-self-start">
-            <Checkbox
+            <input
               className="peeh-5 bg-primary checked:bg-primary checked:border-none"
               id="accessUsers"
               name="accessUsers"

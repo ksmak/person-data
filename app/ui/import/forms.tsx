@@ -116,13 +116,25 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
                 if (val) {
                     let existFlag = false;
                     conf.forEach((conf: PersonField) => {
-                        if (key === conf.name) {
+                        if (key === conf.name && conf.value) {
                             existFlag = true;
                             const formatVal = (conf.name === 'phone')
                                 ? formatPhone(val)
                                 : formatStr(val);
-                            if (conf.value) {
-                                person[`${conf.value}` as keyof typeof person] = formatVal;
+                            if (formatVal) {
+                                switch (conf.value) {
+                                    case 'lastName': person.lastName = formatVal; break;
+                                    case 'firstName': person.firstName = formatVal; break;
+                                    case 'middleName': person.middleName = formatVal; break;
+                                    case 'iin': person.iin = formatVal; break;
+                                    case 'phone': person.phone = formatVal; break;
+                                    case 'region': person.region = formatVal; break;
+                                    case 'district': person.district = formatVal; break;
+                                    case 'locality': person.locality = formatVal; break;
+                                    case 'street': person.street = formatVal; break;
+                                    case 'building': person.building = formatVal; break;
+                                    case 'apartment': person.apartment = formatVal; break;
+                                }
                             }
                         }
                     });

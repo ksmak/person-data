@@ -3,7 +3,8 @@ import { QueriesTableSkeleton } from "@/app/ui/skeletons";
 import { Suspense } from "react";
 import Pagination from "@/app/ui/pagination";
 import WrapTable from '@/app/ui/queries/wrap_table';
-import { fetchQueriesPages, getFirstUserId } from "@/app/lib/data";
+import { fetchQueriesPages } from "@/app/lib/data";
+import { auth } from "@/auth";
 
 export const metadata: Metadata = {
     title: 'Search',
@@ -16,10 +17,13 @@ export default async function Page(props: {
         sort?: string;
     }>;
 }) {
-    const userId = await getFirstUserId(); //for test!!!
+    const session = await auth();
+
+    if (!session?.user) return null;
+
     const searchParams = await props.searchParams;
     const currentPage = Number(searchParams?.page) || 1;
-    const totalPages = await fetchQueriesPages(userId);
+    const totalPages = session?.user.id ? await fetchQueriesPages(session.user.id) : 0;
     const orderBy = searchParams?.orderBy || 'createdAt';
     const sort = searchParams?.sort || 'desc';
 
@@ -29,7 +33,7 @@ export default async function Page(props: {
                 <h1 className="text-2xl">Поиск информации</h1>
             </div>
             <Suspense key={currentPage} fallback={<QueriesTableSkeleton />}>
-                <WrapTable userId={userId} currentPage={currentPage} orderBy={orderBy} sort={sort} />
+                <WrapTable userId={session?.user.id || ''} currentPage={currentPage} orderBy={orderBy} sort={sort} />
             </Suspense>
             <div className="mt-5 flex w-full justify-center">
                 <Pagination totalPages={totalPages} />
