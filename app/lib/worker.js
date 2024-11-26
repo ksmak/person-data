@@ -182,8 +182,10 @@ async function loadData(data) {
 
 //Job proccess-query
 async function processQuery() {
+  let queries;
+
   try {
-    const queries = await prisma.query.findMany({
+    queries = await prisma.query.findMany({
       where: {
         state: "WAITING",
       },

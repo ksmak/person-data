@@ -19,7 +19,7 @@ export default async function Page() {
     return (
         <div className="w-full">
             <h1 className="text-2xl text-center pb-5">Загрузка данных</h1>
-            <ImportForm url={process.env.WS || "http://localhost:3001"} db={db} />
+            <ImportForm url={process.env.WS_URL || "http://localhost"} db={db} />
         </div>
     )
 }

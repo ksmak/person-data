@@ -18,5 +18,5 @@ io.on('connection', (socket) => {
     })
 });
 
-httpServer.listen(Number(process.env.PORT));
-console.log(`listening port ${process.env.PORT}...`);
+console.log(`listening port ${process.env.WS_PORT}...`);
+httpServer.listen(Number(process.env.WS_PORT));
