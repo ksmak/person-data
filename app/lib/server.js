@@ -3,10 +3,10 @@ const { Server } = require('socket.io');
 
 let httpServer = createServer()
 const io = new Server(httpServer, {
-    cors: {
-        origin: [process.env.NEXTJS_URL, process.env.WORKER_URL],
-        methods: ["GET", "POST"],
-    }
+    // cors: {
+    //     origin: [process.env.NEXTJS_URL, process.env.WORKER_URL],
+    //     methods: ["GET", "POST"],
+    // }
 })
 
 io.on('connection', (socket) => {
