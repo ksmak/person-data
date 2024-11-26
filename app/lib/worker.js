@@ -188,54 +188,40 @@ async function processQuery() {
         state: "WAITING",
       },
     });
-    for (query of queries) {
-      let persons;
-      let state;
-      try {
-        persons = await prisma.person.findMany({
-          where: {
-            AND: [...JSON.parse(query.body)],
-          },
-          include: {
-            Db: true,
-          }
-        })
-        state = 'SUCCESS';
-      } catch (e) {
-        console.log(e);
-        state = 'ERROR';
-      }
-      try {
-        const updatedQuery = await prisma.query.update({
-          where: {
-            id: query.id,
-          },
-          data: {
-            count: persons.length,
-            result:
-              persons.length > 100
-                ? "[]"
-                : JSON.stringify(persons),
-            state: state,
-          },
-        });
-        socket.emit('query-completed', {
-          query: updatedQuery,
-        })
-      } catch (e) {
-        console.log(e);
-      }
-    };
   } catch (e) {
+    console.log(e);
+    return;
+  }
+
+  for (query of queries) {
+    let persons;
+    let state;
+    try {
+      persons = await prisma.person.findMany({
+        where: {
+          AND: [...JSON.parse(query.body)],
+        },
+        include: {
+          Db: true,
+        }
+      })
+      state = 'SUCCESS';
+    } catch (e) {
+      console.log(e);
+      state = 'ERROR';
+    }
     try {
       const updatedQuery = await prisma.query.update({
         where: {
           id: query.id,
         },
         data: {
-          count: 0,
-          result: "[]",
-          state: "ERROR",
+          count: persons.length,
+          result:
+            persons.length > 100
+              ? "[]"
+              : JSON.stringify(persons),
+          state: state,
         },
       });
       socket.emit('query-completed', {
@@ -244,5 +230,5 @@ async function processQuery() {
     } catch (e) {
       console.log(e);
     }
-  }
+  };
 };
