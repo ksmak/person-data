@@ -7,7 +7,7 @@ import prisma from "./db";
 import { Person } from "./definitions";
 import queue from "./queue";
 import { saltAndHashPassword } from "./utils";
-import { signIn, signOut } from "@/auth";
+import { auth, signIn, signOut } from "@/auth";
 import { AuthError, User } from "next-auth";
 import { CurrentUserType } from "@/authProvider";
 import { fetchUserByEmail } from "./data";
@@ -490,4 +490,12 @@ export async function login(formData: FormData) {
 export async function logout() {
   await signOut();
   redirect("/dashboard");
+}
+
+export async function updateUserInfo() {
+  const session = await auth();
+
+  if (session?.user?.email) {
+    return await fetchUserByEmail(session.user.email) || undefined;
+  }
 }

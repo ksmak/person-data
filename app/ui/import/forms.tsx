@@ -13,8 +13,6 @@ import { formatPhone, formatStr } from "@/app/lib/utils";
 import { Db } from "@prisma/client";
 import { LogModal } from "@/app/ui/import/modals";
 
-const LIMIT_ROW_COUNT = 100
-
 export function ImportForm({ url, db }: { url: string, db: Db[] }) {
     const [activeStep, setActiveStep] = useState(0);
     const [isLastStep, setIsLastStep] = useState(false);
@@ -36,6 +34,8 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
     const [openPreviewLog, setOpenPreviewLog] = useState(false);
     const [openLoadLog, setOpenLoadLog] = useState(false);
     const [config, setConfig] = useState<PersonField[]>([]);
+    const [limit, setLimit] = useState<number>(1000);
+    const [skip, setSkip] = useState<number>(1);
 
     const refForm = useRef<HTMLFormElement>(null);
 
@@ -60,18 +60,19 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
             let data: any[] = []
             let cols: string[] = [];
             let count = 0;
-            const limitRows = LIMIT_ROW_COUNT;
             setUploadLogs(prev => prev.concat(['[']));
             Papa.parse<any>(file, {
                 header: true,
                 dynamicTyping: true,
+                skipEmptyLines: true,
                 step: (results, parser) => {
                     count++;
-                    cols = results.meta.fields ? results.meta.fields : [];
-                    data.push(results.data);
-                    setUploadLogs(prev => prev.concat(`${[JSON.stringify(results.data, null, 2)]},`));
-                    //limit rows
-                    if (limitRows === count) {
+                    if (count >= skip) {
+                        cols = results.meta.fields ? results.meta.fields : [];
+                        data.push(results.data);
+                        setUploadLogs(prev => prev.concat(`${[JSON.stringify(results.data, null, 2)]},`));
+                    }
+                    if (limit === count) {
                         parser.abort();
                     }
                 },
@@ -79,19 +80,23 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
                     setUploadLogs(prev => prev.concat([']']));
                     setCols(cols);
                     setData(data);
+                    setUploading(false);
                 },
             });
         }
-        setUploading(false);
     };
 
     const handlePreviewData = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        const formData = new FormData(event.currentTarget);
         setPreviewing(true);
+        setTimeout(() => previewData(formData), 1000);
+    }
+
+    const previewData = (formData: FormData) => {
         setPreviewError('');
         setPreviewLogs([]);
         setPersons([]);
-        const formData = new FormData(event.currentTarget);
         //get select cols
         let conf: PersonField[] = [];
         cols.forEach((item: string) => {
@@ -111,7 +116,7 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
                 dbId: dbId,
                 extendedPersonData: {},
             };
-            Object.keys(item).map((key: string) => {
+            Object.keys(item).forEach((key: string) => {
                 const val = item[key];
                 if (val) {
                     let existFlag = false;
@@ -145,12 +150,13 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
             })
             setPersons(prev => prev.concat([person]));
             setPreviewLogs(prev => prev.concat([JSON.stringify(person, null, 2)]));
-        })
+        });
         setPreviewing(false);
-    }
+    };
 
     const handleLoadData = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        // console.log('start load data...');
         setLoading(true);
         setLoadState({});
         try {
@@ -186,7 +192,6 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
             <div className="w-full px-24 py-2">
                 <Stepper
                     activeStep={activeStep}
-                    className=""
                     lineClassName="bg-gray-100"
                     activeLineClassName="bg-primary"
                     isLastStep={(value) => setIsLastStep(value)}
@@ -276,10 +281,24 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
                         <div className="w-full flex flex-col justify-center items-center">
                             <div className="w-full md:w-96">
                                 <label htmlFor="db" className="text-sm font-medium">Наименование БД:</label>
-                                <select id="db" className="text-sm p-2 border rounded w-full outline-none "
+                                <select id="db" className="text-sm p-2 border rounded w-full outline-none"
                                     value={dbId} onChange={e => setDbId(e.target.value)}>
                                     {db && db.length > 0 && db?.map((it: Db) => (<option key={it.id} value={it.id}>{it.name}</option>))}
                                 </select>
+                            </div>
+                            <div className="w-full md:w-96">
+                                <label htmlFor="skip" className="text-sm font-medium">Начинать со строки:</label>
+                                <input id="skip" className="text-sm p-2 border rounded w-full outline-none"
+                                    type="number" min={1} step={1} onChange={e => setSkip(Number(e.target.value))}
+                                    value={skip}
+                                />
+                            </div>
+                            <div className="w-full md:w-96">
+                                <label htmlFor="limit" className="text-sm font-medium">Кол-во обрабатываемых строк:</label>
+                                <input id="limit" className="text-sm p-2 border rounded w-full outline-none"
+                                    type="number" min={100} step={1} onChange={e => setLimit(Number(e.target.value))}
+                                    value={limit}
+                                />
                             </div>
                             <label htmlFor="uploadFile1"
                                 className='mt-5 w-fit flex items-center gap-3 rounded-lg p-2 text-xs  text-white uppercase bg-gradient-to-t from-emerald500 to-emerald400 hover:shadow-lg hover:shadow-emerald200 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald500 active:bg-emerald600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50'
@@ -292,6 +311,7 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
                                     type="file"
                                     name="file"
                                     onChange={handleSelectFile}
+                                    disabled={uploading}
                                 />
                             </label>
                             {file && <span className="self-center text-sm mt-4 italic text-gray-600">Выбран файл: {file.name}</span>}
@@ -308,12 +328,13 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
                         </div>
                     </form>}
                 {
-                    activeStep === 1 && <form id="previewForm" onSubmit={handlePreviewData}>
+                    activeStep === 1 && <form id="previewForm" onSubmit={async (e) => { setPreviewing(true); await handlePreviewData(e); }}>
                         <div className="w-full flex flex-col justify-center items-center">
                             <div className="flex flex-col">
                                 {file && <Btn
                                     type="submit"
                                     className="flex gap-4 items-center"
+                                    disabled={previewing}
                                 >
                                     {previewing ? "Обработка данных..." : "Подготовить данные"}
                                     {previewing ? <Spinner className="h-5 w-5" /> : <HiOutlineCog className="h-5 w-5" />}
@@ -346,6 +367,7 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
                                 {persons.length > 0 && <Btn
                                     type="submit"
                                     className="flex gap-4 items-center"
+                                    disabled={loading}
                                 >
                                     {loading ? "Загрузка данных..." : "Загрузить данные"}
                                     {loading ? <Spinner className="h-5 w-5" /> : <HiOutlineDatabase className="h-5 w-5" />}
