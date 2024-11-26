@@ -26,6 +26,10 @@ const queueSingleton = () => {
   });
 
   queue
+    .drain()
+    .then(() => console.log("Queue drained."));
+
+  queue
     .upsertJobScheduler(
       "repeat-every",
       {
