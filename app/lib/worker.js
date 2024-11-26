@@ -3,12 +3,24 @@ const IORedis = require("ioredis");
 const { PrismaClient } = require("@prisma/client");
 const { io } = require("socket.io-client");
 
-const connection = new IORedis({
-  // host: "redis",
-  host: process.env.REDIS_URL,
-  port: 6379,
-  maxRetriesPerRequest: null,
-});
+let connection;
+
+if (process.env.REDIS_PASSWORD) {
+  connection = new IORedis({
+    host: process.env.REDIS_URL,
+    port: process.env.REDIS_PORT,
+    username: process.env.REDIS_USER,
+    password: process.env.REDIS_PASSWORD,
+    family: 6,
+    maxRetriesPerRequest: null,
+  });
+} else {
+  connection = new IORedis({
+    host: process.env.REDIS_URL,
+    port: process.env.REDIS_PORT,
+    maxRetriesPerRequest: null,
+  });
+}
 
 const prisma = new PrismaClient();
 
@@ -44,6 +56,7 @@ worker.on('completed', (job) => {
 async function loadData(data) {
   let logs = [];
   let error = false;
+  let tr = [];
 
   logs.push(`Начат процесс загрузки данных...`);
 
@@ -58,7 +71,7 @@ async function loadData(data) {
         });
         if (findPersonByIin) {
           try {
-            const p = await prisma.person.update({
+            tr.push(prisma.person.update({
               data: {
                 firstName: person.firstName,
                 lastName: person.lastName,
@@ -73,8 +86,8 @@ async function loadData(data) {
               where: {
                 id: findPersonByIin.id,
               },
-            });
-            logs.push(`Обновление: ${JSON.stringify(p)}`);
+            }));
+            // logs.push(`Обновление: ${JSON.stringify(p)}`);
           } catch (e) {
             error = true;
             logs.push(`Ошибка при обновлении! (${person.iin})! ${e}`);
@@ -98,7 +111,7 @@ async function loadData(data) {
         });
         if (findPersonByFIO) {
           try {
-            const p = await prisma.person.update({
+            tr.push(prisma.person.update({
               data: {
                 iin: String(person.iin),
                 phone: person.phone,
@@ -111,8 +124,8 @@ async function loadData(data) {
               where: {
                 id: findPersonByFIO.id,
               },
-            });
-            logs.push(`Обновление: ${JSON.stringify(p)}`);
+            }));
+            // logs.push(`Обновление: ${JSON.stringify(p)}`);
           } catch (e) {
             error = true;
             logs.push(
@@ -129,7 +142,7 @@ async function loadData(data) {
       }
     };
     try {
-      const p = await prisma.person.create({
+      tr.push(prisma.person.create({
         data: {
           dbId: person.dbId,
           firstName: person.firstName,
@@ -143,13 +156,14 @@ async function loadData(data) {
           apartment: person.apartment,
           extendedPersonData: person.extendedPersonData,
         },
-      });
+      }));
       logs.push(`Вставка: ${JSON.stringify(p)}`);
     } catch (e) {
       error = true;
       logs.push(`Ошибка при вставке! (${JSON.stringify(person)})! ${e}`);
     }
   };
+  await prisma.$transaction(tr);
   logs.push(`Загрузка данных завершена.`);
   if (error) {
     socket.emit('dataload-completed', {

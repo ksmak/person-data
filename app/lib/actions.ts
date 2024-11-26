@@ -9,11 +9,13 @@ import queue from "./queue";
 import { saltAndHashPassword } from "./utils";
 import { signIn, signOut } from "@/auth";
 import { AuthError, User } from "next-auth";
+import { CurrentUserType } from "@/authProvider";
+import { fetchUserByEmail } from "./data";
 
 const EXPIRED_PASSWORD_DAYS = 30;
 
 export type LoginState = {
-  user?: User;
+  user?: CurrentUserType;
   errors?: {
     email?: string;
     password?: string;
@@ -464,7 +466,8 @@ export async function login(formData: FormData) {
       password: password,
       redirect: false,
     });
-    return {};
+    const user = await fetchUserByEmail(email);
+    return { user: user };
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {

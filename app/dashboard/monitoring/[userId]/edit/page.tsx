@@ -1,6 +1,9 @@
+import { fetchUserByEmail } from "@/app/lib/data";
 import { SecondaryBtn } from "@/app/ui/buttons";
+import { ErrorAccess } from "@/app/ui/error-access";
 import UserQueriesPanel from "@/app/ui/monitoring/panels";
 import Breadcrumbs from "@/app/ui/queries/breadcrumbs";
+import { auth } from "@/auth";
 import Link from "next/link";
 import { HiOutlineX } from "react-icons/hi";
 
@@ -12,6 +15,16 @@ export default async function Page(props: {
         sort?: string;
     }>
 }) {
+    const session = await auth();
+
+    const email = session?.user?.email;
+
+    if (!email) return <ErrorAccess />;
+
+    const user = await fetchUserByEmail(email);
+
+    if (!user?.subs?.accessMonitoring) return <ErrorAccess />;
+
     const params = await props.params;
     const userId = params.userId;
     const currentPage = Number(params?.page) || 1;

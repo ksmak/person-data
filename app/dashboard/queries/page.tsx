@@ -5,6 +5,7 @@ import Pagination from "@/app/ui/pagination";
 import WrapTable from '@/app/ui/queries/wrap_table';
 import { fetchQueriesPages, fetchUserByEmail } from "@/app/lib/data";
 import { auth } from "@/auth";
+import { ErrorAccess } from "@/app/ui/error-access";
 
 export const metadata: Metadata = {
     title: 'Search',
@@ -21,11 +22,11 @@ export default async function Page(props: {
 
     const email = session?.user?.email;
 
-    if (!email) return null;
+    if (!email) return <ErrorAccess />;
 
     const user = await fetchUserByEmail(email);
 
-    if (!user?.subs?.accessQueries) return null;
+    if (!user?.subs?.accessQueries) return <ErrorAccess />;
 
     const searchParams = await props.searchParams;
     const currentPage = Number(searchParams?.page) || 1;

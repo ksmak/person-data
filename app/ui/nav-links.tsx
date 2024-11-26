@@ -4,7 +4,7 @@ import { HiOutlineSearch, HiOutlineChartBar, HiOutlineUser, HiOutlineKey, HiOutl
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
-import { User } from "@prisma/client";
+import { useAuth } from "@/authProvider";
 
 const links = [
   {
@@ -39,7 +39,9 @@ const links = [
   },
 ];
 
-export default function NavLinks({ user }: { user: User | null }) {
+export default function NavLinks() {
+  const { currentUser } = useAuth();
+
   const pathname = usePathname();
 
   return (
@@ -48,23 +50,23 @@ export default function NavLinks({ user }: { user: User | null }) {
         let access: boolean = true;
         switch (link.name) {
           case 'accessQueries': {
-            access = user?.subs?.accessQueries ? user?.subs?.accessQueries : true;
+            access = !!currentUser?.subs?.accessQueries;
             break;
           }
           case 'accessImportData': {
-            access = user?.subs?.accessImportData ? user?.subs?.accessImportData : true;
+            access = !!currentUser?.subs?.accessImportData;
             break;
           }
           case 'accessMonitoring': {
-            access = user?.subs?.accessMonitoring ? user?.subs?.accessMonitoring : true;
+            access = !!currentUser?.subs?.accessMonitoring;
             break;
           }
           case 'accessUsers': {
-            access = user?.subs?.accessUsers ? user?.subs?.accessUsers : true;
+            access = !!currentUser?.subs?.accessUsers;
             break;
           }
           case 'accessSubscriptions': {
-            access = user?.subs?.accessSubscriptions ? user?.subs?.accessSubscriptions : true;
+            access = !!currentUser?.subs?.accessSubscriptions;
             break;
           }
         }

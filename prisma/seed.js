@@ -16,9 +16,11 @@ async function main() {
       maxQueriesMonth: 0,
       maxQueriesTotal: 1000,
       usageTimeLimit: 3,
+      accessQueries: true,
+      accessMonitoring: false,
       accessImportData: false,
       accessUsers: false,
-      accessMonitoring: false,
+      accessSubscriptions: false,
     },
   });
   const sub_base = await prisma.subscription.create({
@@ -28,9 +30,11 @@ async function main() {
       maxQueriesMonth: 1000,
       maxQueriesTotal: 5000,
       usageTimeLimit: 3,
+      accessQueries: true,
       accessImportData: false,
-      accessUsers: false,
       accessMonitoring: false,
+      accessUsers: false,
+      accessSubscriptions: false,
     },
   });
   const sub_admin = await prisma.subscription.create({
@@ -39,10 +43,12 @@ async function main() {
       maxQueriesDay: 0,
       maxQueriesMonth: 0,
       maxQueriesTotal: 0,
-      usageTimeLimit: 3,
-      accessImportData: false,
-      accessUsers: false,
-      accessMonitoring: false,
+      usageTimeLimit: 0,
+      accessQueries: true,
+      accessImportData: true,
+      accessMonitoring: true,
+      accessUsers: true,
+      accessSubscriptions: true,
     },
   });
 

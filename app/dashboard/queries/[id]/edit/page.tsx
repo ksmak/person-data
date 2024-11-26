@@ -1,6 +1,7 @@
 import { fetchQueryById, fetchUserByEmail } from "@/app/lib/data";
 import { formatQueryCondition } from "@/app/lib/utils";
 import { SecondaryBtn } from "@/app/ui/buttons";
+import { ErrorAccess } from "@/app/ui/error-access";
 import Breadcrumbs from "@/app/ui/queries/breadcrumbs";
 import { PersonCard } from "@/app/ui/queries/cards";
 import { auth } from "@/auth";
@@ -14,11 +15,11 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
 
     const email = session?.user?.email;
 
-    if (!email) return null;
+    if (!email) return <ErrorAccess />;
 
     const user = await fetchUserByEmail(email);
 
-    if (!user?.subs?.accessQueries) return null;
+    if (!user?.subs?.accessQueries) return <ErrorAccess />;
 
     const params = await props.params;
     const id = params.id;

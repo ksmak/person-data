@@ -242,17 +242,20 @@ export async function fetchUserByEmail(email: string) {
       subs: true,
     },
     where: {
-      email: email
+      email: email,
     },
   });
 }
 
-export async function fetchUserByEmailAndPassword(email: string | unknown, password: string | unknown) {
-  if (typeof email !== 'string' || typeof password !== 'string') return null;
+export async function fetchUserByEmailAndPassword(
+  email: string | unknown,
+  password: string | unknown
+) {
+  if (typeof email !== "string" || typeof password !== "string") return null;
 
   const user = await prisma.user.findFirst({
     where: {
-      email: email
+      email: email,
     },
   });
 
@@ -265,15 +268,4 @@ export async function fetchUserByEmailAndPassword(email: string | unknown, passw
   }
 
   return user;
-}
-
-export async function fetchUserWithSubs(id: string) {
-  return await prisma.user.findFirst({
-    where: {
-      id: id
-    },
-    include: {
-      subs: true,
-    }
-  })
 }

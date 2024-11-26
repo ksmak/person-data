@@ -5,17 +5,23 @@ import { FormEvent, useState } from 'react';
 import { HiArrowSmRight, HiCash, HiExclamationCircle, HiKey } from 'react-icons/hi';
 import { login, LoginState } from '@/app/lib/actions';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/authProvider';
 
 export default function LoginForm() {
-  const router = useRouter();
   const [state, setState] = useState<LoginState>({});
+  const router = useRouter();
+  const { setCurrentUser } = useAuth();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const state: LoginState = await login(formData) as LoginState;
     setState(state);
-    if (!state?.message) router.push("/dashboard");
+    if (!!state.user) {
+      console.log(setCurrentUser);
+      if (setCurrentUser) setCurrentUser(state.user);
+      router.push("/dashboard");
+    }
   }
 
   return (

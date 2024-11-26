@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for person-data-summer-sunset-2163 on 2024-11-25T04:20:18+05:00
+# fly.toml app configuration file generated for person-data on 2024-11-26T05:22:37+05:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'person-data-summer-sunset-2163'
+app = 'person-data'
 primary_region = 'waw'
 
 [build]
@@ -20,7 +20,3 @@ primary_region = 'waw'
   memory = '1gb'
   cpu_kind = 'shared'
   cpus = 1
-
-[env]
-  REDIS_URL = 'redis://fly-dawn-fire-3556.upstash.io'
-

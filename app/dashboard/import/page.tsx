@@ -1,5 +1,6 @@
 import { ImportForm } from "@/app//ui/import/forms";
 import { fetchDb, fetchUserByEmail } from "@/app/lib/data";
+import { ErrorAccess } from "@/app/ui/error-access";
 import { auth } from "@/auth";
 
 export default async function Page() {
@@ -7,11 +8,11 @@ export default async function Page() {
 
     const email = session?.user?.email;
 
-    if (!email) return null;
+    if (!email) return <ErrorAccess />;
 
     const user = await fetchUserByEmail(email);
 
-    if (!user?.subs?.accessImportData) return null;
+    if (!user?.subs?.accessImportData) return <ErrorAccess />;
 
     const db = await fetchDb();
 

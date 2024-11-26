@@ -7,6 +7,7 @@ import { Suspense } from 'react';
 import { fetchSubscriptionsPages, fetchUserByEmail } from '@/app/lib/data';
 import { Metadata } from 'next';
 import { auth } from '@/auth';
+import { ErrorAccess } from '@/app/ui/error-access';
 
 export const metadata: Metadata = {
     title: 'Subscriptions',
@@ -24,11 +25,11 @@ export default async function Page(props: {
 
     const email = session?.user?.email;
 
-    if (!email) return null;
+    if (!email) return <ErrorAccess />;
 
     const user = await fetchUserByEmail(email);
 
-    if (!user?.subs?.accessSubscriptions) return null;
+    if (!user?.subs?.accessSubscriptions) return <ErrorAccess />;
 
     const searchParams = await props.searchParams;
     const query = searchParams?.query || '';

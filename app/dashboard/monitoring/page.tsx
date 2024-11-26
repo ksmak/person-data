@@ -6,6 +6,7 @@ import { Suspense } from 'react';
 import { fetchUserByEmail, fetchUsersQueriesPages } from '@/app/lib/data';
 import { Metadata } from 'next';
 import { auth } from '@/auth';
+import { ErrorAccess } from '@/app/ui/error-access';
 
 export const metadata: Metadata = {
     title: 'Monitoring',
@@ -23,11 +24,11 @@ export default async function Page(props: {
 
     const email = session?.user?.email;
 
-    if (!email) return null;
+    if (!email) return <ErrorAccess />;
 
     const user = await fetchUserByEmail(email);
 
-    if (!user?.subs?.accessMonitoring) return null;
+    if (!user?.subs?.accessMonitoring) return <ErrorAccess />;
 
     const searchParams = await props.searchParams;
     const query = searchParams?.query || '';

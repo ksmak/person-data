@@ -3,17 +3,18 @@ import Breadcrumbs from '@/app/ui/subscriptions/breadcrumbs';
 import { fetchSubscriptionById, fetchUserByEmail } from '@/app/lib/data';
 import { notFound } from 'next/navigation';
 import { auth } from '@/auth';
+import { ErrorAccess } from '@/app/ui/error-access';
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
     const session = await auth();
 
     const email = session?.user?.email;
 
-    if (!email) return null;
+    if (!email) return <ErrorAccess />;
 
     const user = await fetchUserByEmail(email);
 
-    if (!user?.subs?.accessSubscriptions) return null;
+    if (!user?.subs?.accessSubscriptions) return <ErrorAccess />;
 
     const params = await props.params;
     const id = params.id;
