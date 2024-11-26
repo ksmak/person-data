@@ -205,7 +205,6 @@ async function processQuery() {
         console.log(e);
         state = 'ERROR';
       }
-      console.log(persons)
       try {
         const updatedQuery = await prisma.query.update({
           where: {

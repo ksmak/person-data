@@ -27,9 +27,9 @@ const queueSingleton = () => {
 
   queue
     .upsertJobScheduler(
-      "repeat-every-10s",
+      "repeat-every",
       {
-        every: 10000,
+        every: Number(process.env.JOB_SHEDULER),
       },
       {
         name: "process-queries",
