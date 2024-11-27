@@ -19,7 +19,7 @@ export function ConfigTable({
                         <tr>
                             <th
                                 scope="col"
-                                className="w-96 px-4 py-5 font-medium hover:cursor-pointer"
+                                className="md:w-96 px-4 py-5 font-medium hover:cursor-pointer"
                             >
                                 <div className="flex gap-3 items-center">
                                     <span>Наименование столбца</span>

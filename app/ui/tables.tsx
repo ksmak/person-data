@@ -31,12 +31,12 @@ export function Tbl({ tableHeads, tableRows, url
                 <thead>
                     <tr>
                         {tableHeads.map((head, index) => {
-                            const classes = index === 0 ? "rounded-tl-xl" : index === tableHeads.length - 1 ? "rounded-tr-xl" : "";
+                            const classes = index === 0 ? "rounded-tl-lg" : index === tableHeads.length - 1 ? "rounded-tr-lg" : "";
 
                             return (
                                 <th
                                     key={index}
-                                    className={clsx("border-b border-blue-gray-100 bg-select p-4 hover:cursor-pointer", classes)}
+                                    className={clsx("border-b border-borderlight bg-select p-4 hover:cursor-pointer", classes)}
                                     onClick={() => head.fieldType !== 'nested' && handleOrder(head.name)}
                                 >
                                     <Typography
@@ -56,7 +56,7 @@ export function Tbl({ tableHeads, tableRows, url
                 <tbody>
                     {tableRows.map((row: any, index) => {
                         const isLast = index === tableRows.length - 1;
-                        const classes = isLast ? "p-4" : "p-4 border-b border-gray-200";
+                        const classes = isLast ? "p-4" : "p-4 border-b borderlight";
 
                         return (
                             <tr key={index}

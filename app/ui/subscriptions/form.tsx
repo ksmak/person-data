@@ -36,7 +36,7 @@ export default function SubscriptionForm({
       <div className="mb-3 flex justify-end gap-4">
         <EditButtonsGroup item={sub} handleOpen={handleOpen} url='/dashboard/subscriptions' />
       </div>
-      <div className="rounded-md bg-secondary p-4 md:p-6">
+      <div className="rounded-lg bg-secondary border borderlight p-4 md:p-6">
         <p className="mt-2 text-sm text-red-500 text-center mb-2">{state.message}</p>
         {/* title */}
         <div className="mb-4">
@@ -46,7 +46,7 @@ export default function SubscriptionForm({
           <div className="relative mt-2 rounded-md">
             <div className="relative">
               <input
-                className="peer block w-full rounded-md border border-gray-200 py-2 pl-2 text-sm outline-2 placeholder:text-gray-500"
+                className="peer block w-full rounded-md border border-borderlight py-2 pl-2 text-sm outline-2 placeholder:text-gray-500"
                 id="title"
                 name="title"
                 type="text"
@@ -72,7 +72,7 @@ export default function SubscriptionForm({
           <div className="relative mt-2 rounded-md">
             <div className="relative">
               <input
-                className="peer block w-full rounded-md border border-gray-200 py-2 pl-2 text-sm outline-2 placeholder:text-gray-500"
+                className="peer block w-full md:w-28 rounded-md border border-borderlight py-2 pl-2 text-sm outline-2 placeholder:text-gray-500"
                 id="maxQueriesDay"
                 name="maxQueriesDay"
                 type="number"
@@ -98,7 +98,7 @@ export default function SubscriptionForm({
           <div className="relative mt-2 rounded-md">
             <div className="relative">
               <input
-                className="peer block w-full rounded-md border border-gray-200 py-2 pl-2 text-sm outline-2 placeholder:text-gray-500"
+                className="peer block w-full md:w-28 rounded-md border border-borderlight py-2 pl-2 text-sm outline-2 placeholder:text-gray-500"
                 id="maxQueriesMonth"
                 name="maxQueriesMonth"
                 type="number"
@@ -124,7 +124,7 @@ export default function SubscriptionForm({
           <div className="relative mt-2 rounded-md">
             <div className="relative">
               <input
-                className="peer block w-full rounded-md border border-gray-200 py-2 pl-2 text-sm outline-2 placeholder:text-gray-500"
+                className="peer block w-full md:w-28 rounded-md border border-borderlight py-2 pl-2 text-sm outline-2 placeholder:text-gray-500"
                 id="maxQueriesTotal"
                 name="maxQueriesTotal"
                 type="number"
@@ -150,7 +150,7 @@ export default function SubscriptionForm({
           <div className="relative mt-2 rounded-md">
             <div className="relative">
               <input
-                className="peer block w-full rounded-md border border-gray-200 py-2 pl-2 text-sm outline-2 placeholder:text-gray-500"
+                className="peer block w-full md:w-28 rounded-md border border-borderlight py-2 pl-2 text-sm outline-2 placeholder:text-gray-500"
                 id="usageTimeLimit"
                 name="usageTimeLimit"
                 type="number"
@@ -210,6 +210,21 @@ export default function SubscriptionForm({
             />
             <div className="text-sm font-medium">
               Доступ к подсистеме &quot;Пользователи&quot;
+            </div>
+          </div>
+        </div>
+        {/* accessSubscriptions */}
+        <div className="mb-4">
+          <div className="flex gap-4 items-center place-self-start">
+            <input
+              className="peer w-5 h-5 bg-primary checked:bg-primary checked:border-none"
+              id="accessSubscriptions"
+              name="accessSubscriptions"
+              type="checkbox"
+              defaultChecked={sub ? sub.accessSubscriptions : false}
+            />
+            <div className="text-sm font-medium">
+              Доступ к подсистеме &quot;Подписки&quot;
             </div>
           </div>
         </div>

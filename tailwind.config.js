@@ -15,6 +15,8 @@ module.exports = withMT({
         emerald500: "#10b981",
         emerald400: "#34d399",
         emerald200: "#a7f3d0",
+        borderlight: "#EAEEEF",
+        borderdark: "#F6E8DA",
 
       },
       fontFamily: {

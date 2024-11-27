@@ -5,7 +5,7 @@ import { ErrorAccess } from "@/app/ui/error-access";
 import Breadcrumbs from "@/app/ui/queries/breadcrumbs";
 import { PersonCard } from "@/app/ui/queries/cards";
 import { auth } from "@/auth";
-import { Person } from "@prisma/client";
+import { Db, Person } from "@prisma/client";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HiOutlinePrinter, HiOutlineX } from "react-icons/hi";
@@ -78,8 +78,8 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                 ? <div className="mt-5 font-medium border-b border-primary italic">Запрос в процессе обработки</div>
                 : <div className="mt-5 font-medium border-b border-primary italic">Запрос обработан. Количество совпадений: <span className="text-gray-950">{query.count}</span></div>
             }
-            <div className="max-h-[600px] overflow-y-auto">
-                {query.result && JSON.parse(query.result).map((item: Person) => (<PersonCard key={item.id} person={item} />))}
+            <div className="">
+                {query.result && JSON.parse(query.result).map((item: {db: Db | null;} & Person) => (<PersonCard key={item.id} person={item} />))}
             </div>
         </main>
     )

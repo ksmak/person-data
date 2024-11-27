@@ -9,8 +9,8 @@ import {
     Alert
 } from "@material-tailwind/react";
 import { Dispatch, SetStateAction, useState } from "react";
-import { HiOutlineSearch } from "react-icons/hi";
-import { Btn } from "@/app/ui/buttons";
+import { HiOutlineSearch, HiOutlineX } from "react-icons/hi";
+import { Btn, SecondaryBtn } from "@/app/ui/buttons";
 import { Person, PersonField } from "@/app/lib/definitions";
 import { Query } from "@prisma/client";
 
@@ -87,20 +87,29 @@ export function SearchPanel({ id, setData }: { id: string, setData: Dispatch<Set
                 <HiOutlineSearch className="w-5 h-5" />
             </Btn>
             <Dialog open={open} handler={() => { setOpen(false); }}>
-                <Alert
-                    className="absolute top-5 rounded-none border-l-4 border-primary bg-select font-medium text-primarytxt"
-                    open={!!message}
-                    onClose={() => setMessage('')}
+            <Alert
+                className="z-10 absolute top-5 rounded-none border-l-4 border-primary bg-select font-medium text-primarytxt"
+                open={!!message}
+                onClose={() => setMessage('')}
+            >
+                {message}
+            </Alert>
+            <DialogHeader className="grid grid-cols-3 bg-primary text-white rounded-t-lg">
+                <div className="col-start-2 justify-self-center uppercase font-semibold">Новый запрос</div>
+                <SecondaryBtn
+                    className='justify-center justify-self-end'
+                    onClick={() => { setOpen(false); }}
                 >
-                    {message}
-                </Alert>
-                <DialogHeader className="m-0 p-0">
-                    <div className="w-full mt-20 mb-0 text-2xl text-center text-primarytxt">
+                    <HiOutlineX className='h-5 w-5' />
+                </SecondaryBtn>
+            </DialogHeader>
+                {/* <DialogHeader className="m-0 p-0">
+                    <div className="w-full mt-5 mb-0 text-xl text-center text-primarytxt">
                         Новый запрос
                     </div>
-                </DialogHeader>
+                </DialogHeader> */}
                 <DialogBody className="overflow-y-scroll h-[35rem]">
-                    <div className="rounded-2xl bg-secondary p-4 md:p-6">
+                    <div className="rounded-lg bg-secondary border border-borderlight p-4 md:p-6">
                         <form>
                             {fields.map((fld: PersonField, index: number) => (
                                 <div className="mb-4" key={index}>

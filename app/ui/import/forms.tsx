@@ -189,10 +189,10 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
             <LogModal open={openUploadLog} setOpen={setOpenUploadLog} logs={uploadLogs} />
             <LogModal open={openPreviewLog} setOpen={setOpenPreviewLog} logs={previewLogs} />
             <LogModal open={openLoadLog} setOpen={setOpenLoadLog} logs={loadState.logs || []} />
-            <div className="w-full px-24 py-2">
+            <div className="w-full md:px-24 py-4">
                 <Stepper
                     activeStep={activeStep}
-                    lineClassName="bg-gray-100"
+                    lineClassName="bg-borderlight"
                     activeLineClassName="bg-primary"
                     isLastStep={(value) => setIsLastStep(value)}
                     isFirstStep={(value) => setIsFirstStep(value)}
@@ -281,21 +281,21 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
                         <div className="w-full flex flex-col justify-center items-center">
                             <div className="w-full md:w-96">
                                 <label htmlFor="db" className="text-sm font-medium">Наименование БД:</label>
-                                <select id="db" className="text-sm p-2 border rounded w-full outline-none"
+                                <select id="db" className="text-sm p-2 border borderlight rounded w-full outline-none"
                                     value={dbId} onChange={e => setDbId(e.target.value)}>
                                     {db && db.length > 0 && db?.map((it: Db) => (<option key={it.id} value={it.id}>{it.name}</option>))}
                                 </select>
                             </div>
                             <div className="w-full md:w-96">
                                 <label htmlFor="skip" className="text-sm font-medium">Начинать со строки:</label>
-                                <input id="skip" className="text-sm p-2 border rounded w-full outline-none"
+                                <input id="skip" className="text-sm p-2 border borderlight rounded w-full outline-none"
                                     type="number" min={1} step={1} onChange={e => setSkip(Number(e.target.value))}
                                     value={skip}
                                 />
                             </div>
                             <div className="w-full md:w-96">
                                 <label htmlFor="limit" className="text-sm font-medium">Кол-во обрабатываемых строк:</label>
-                                <input id="limit" className="text-sm p-2 border rounded w-full outline-none"
+                                <input id="limit" className="text-sm p-2 border borderlight rounded w-full outline-none"
                                     type="number" min={100} step={1} onChange={e => setLimit(Number(e.target.value))}
                                     value={limit}
                                 />

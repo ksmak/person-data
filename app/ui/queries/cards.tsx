@@ -1,10 +1,10 @@
 'use client'
 
-import { Person } from "@prisma/client";
+import { Db, Person } from "@prisma/client";
 import Image from "next/image";
 import { useRef } from "react";
 
-export function PersonCard({ person }: { person: Person }) {
+export function PersonCard({ person }: { person: {db: Db | null;} & Person }) {
     const refIin = useRef<HTMLSpanElement>(null)
     const handleClick = async () => {
         const selection = window.getSelection();
@@ -14,30 +14,32 @@ export function PersonCard({ person }: { person: Person }) {
         }
     }
     return (
-        <div className=" bg-secondary rounded my-3 p-4 border border-gray-100">
+        <div className=" bg-secondary rounded my-3 p-2 border border-borderlight text-sm">
             <div className="w-full flex justify-between gap-4 flex-wrap">
-                <Image className="grow-0"
+                <div className="border border-borderlight w-[250px] h-[300px]">
+                {person.photo && <Image className="grow-0"
                     src={person.photo ? `/images/${person.photo}` : "/default.jpg"}
                     width={300}
-                    height={200}
+                    height={250}
                     alt="photo"
-                />
+                />}
+                </div>
                 <div className="grow">
                     <div
-                        className="font-bold text-md hover:select-all hover:cursor-pointer"
+                        className="font-bold hover:select-all hover:cursor-pointer"
                         onClick={handleClick}>
                         {person.lastName} {person.firstName} {person.middleName}
                     </div>
-                    <div className="text-sm">
-                        <div className="p-1">ИИН{': '}
+                    <div className="">
+                        <div className="">ИИН{': '}
                             <span
-                                className=" font-mono font-medium text-md hover:select-all hover:cursor-pointer"
+                                className=" font-mono font-medium hover:select-all hover:cursor-pointer"
                                 onClick={handleClick} ref={refIin}
                             >
                                 {person.iin}
                             </span>
                         </div>
-                        <div className="p-1">Номер телефона{': '}
+                        <div className="">Номер телефона{': '}
                             <span
                                 className=" font-mono font-medium hover:select-all hover:cursor-pointer"
                                 onClick={handleClick}
@@ -45,25 +47,25 @@ export function PersonCard({ person }: { person: Person }) {
                                 {person.phone}
                             </span>
                         </div>
-                        <div className="mt-2 p-1 italic">Адрес проживания:</div>
+                        <div className="mt-2  italic">Адрес проживания:</div>
                         <div>
-                            <div className="p-1">Область: <span className=" font-mono font-medium">{person.region}</span></div>
-                            <div className="p-1">Район: <span className=" font-mono font-medium">{person.district}</span></div>
-                            <div className="p-1">Нас.пункт: <span className=" font-mono font-medium">{person.locality}</span></div>
-                            <div className="p-1">Дом: <span className=" font-mono font-medium">{person.building}</span></div>
-                            <div className="p-1">Квартира: <span className=" font-mono font-medium">{person.apartment}</span></div>
+                            <div className="">Область: <span className=" font-mono font-medium">{person.region}</span></div>
+                            <div className="">Район: <span className=" font-mono font-medium">{person.district}</span></div>
+                            <div className="">Нас.пункт: <span className=" font-mono font-medium">{person.locality}</span></div>
+                            <div className="">Дом: <span className=" font-mono font-medium">{person.building}</span></div>
+                            <div className="">Квартира: <span className=" font-mono font-medium">{person.apartment}</span></div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className="mt-2 p-1 italic">Дополнительная информация:</div>
-            <div className="p-1">Наименование БД{': '}
-                <span className=" font-mono font-medium text-md hover:select-all hover:cursor-pointer">
-                    {person.dbId}
+            <div className="mt-2  italic">Дополнительная информация:</div>
+            <div className="">Наименование БД{': '}
+                <span className=" font-mono font-medium hover:select-all hover:cursor-pointer">
+                    {person.db?.name}
                 </span>
             </div>
             {!!person.extendedPersonData && Object.keys(person.extendedPersonData).map((key: string) => (
-                <div className="p-1" key={key}>{key}{':  '}
+                <div className="" key={key}>{key}{':  '}
                     <span className=" font-mono font-medium">
                         {person.extendedPersonData
                             && person.extendedPersonData[`${key}` as keyof typeof person.extendedPersonData]}

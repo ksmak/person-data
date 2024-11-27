@@ -35,11 +35,11 @@ export default function UserForm({
   }
 
   return (
-    <form onSubmit={onSubmit}>
+    <form onSubmit={onSubmit} className='w-full'>
       <div className="mb-3 flex justify-end gap-4">
         <EditButtonsGroup item={user} handleOpen={handleOpen} url='/dashboard/users' />
       </div>
-      <div className="rounded-md bg-secondary p-4 md:p-6">
+      <div className="rounded-md bg-secondary border border-borderlight p-4 md:p-6">
         <p className="mt-2 text-sm text-red-500 text-center mb-2">{state.message}</p>
         {/* isActive */}
         <div className="mb-4">
@@ -193,15 +193,18 @@ export default function UserForm({
           </label>
           <div className='flex items-center flex-wrap gap-5'>
             {subs.map((sub: Subscription) => (
-              <div className="relative mt-2 pl-1 rounded-md place-self-start" key={sub.id}>
-                <div className="relative">
+              <div className="relative pl-1 rounded-md place-self-start" key={sub.id}>
+                <div className="grid place-items-center mb-2">
                   <input
-                    className='h-5 w-5 bg-primary checked:bg-primary checked:border-none'
+                    className='peer h-4 w-4 col-start-1 row-start-1 appearance-none shrink-0 border-2 border-primary rounded-full'
                     type='radio'
                     name='subsId'
                     color='green'
                     defaultValue={sub.id}
                     defaultChecked={user?.subsId === sub.id}
+                  />
+                  <div
+                    className="pointer-events-none absolute w-2 h-2 col-start-1 row-start-1 rounded-full peer-checked:bg-primary"
                   />
                 </div>
                 <SubscriptionCard sub={sub} />
