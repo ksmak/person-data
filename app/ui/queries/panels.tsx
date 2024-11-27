@@ -99,7 +99,7 @@ export function SearchPanel({ id, setData }: { id: string, setData: Dispatch<Set
                         Новый запрос
                     </div>
                 </DialogHeader>
-                <DialogBody className="overflow-y-scroll h-[40rem]">
+                <DialogBody className="overflow-y-scroll h-[35rem]">
                     <div className="rounded-2xl bg-secondary p-4 md:p-6">
                         <form>
                             {fields.map((fld: PersonField, index: number) => (

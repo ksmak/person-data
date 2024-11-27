@@ -23,14 +23,14 @@ export default function SideNav() {
             <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
                 <NavLinks />
                 <div className="hidden h-auto w-full grow rounded-md bg-secondary md:block"></div>
-                <div className='px-3 flex justify-between items-center gap-4 flex-wrap text-xs bg-secondary border border-gray-200 rounded-md'>
-                    <div className='font-bold'>{currentUser?.email}</div>
+                <div className='flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-secondary p-3 text-sm font-medium hover:bg-select hover:text-primarytxt md:flex-none md:justify-start md:p-2 md:px-3'>
+                    <div className='font-bold hidden md:block'>{currentUser?.email}</div>
                     <form
                         action={async () => {
                             await logout();
                         }}
                     >
-                        <button className="flex grow items-center justify-center gap-2 rounded-md bg-secondary p-3 text-sm font-medium hover:bg-sky-100 hover:text-primary md:flex-none md:justify-start md:p-2 md:px-3">
+                        <button className="w-6">
                             <HiArrowRightOnRectangle className="h-4 w-4" />
                             <div className="hidden">Sign Out</div>
                         </button>
