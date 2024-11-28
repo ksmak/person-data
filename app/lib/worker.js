@@ -36,7 +36,7 @@ const worker = new Worker(
   async (job) => {
     switch (job.name) {
       case "load-data": loadData(job.data); break;
-      case "process-queries": processQuery(); break;
+      case "process-queries": processQuery(job.data); break;
     }
   },
   {
@@ -70,7 +70,6 @@ async function loadData(data) {
           },
         });
         if (findPersonByIin) {
-          // try {
           tr.push(prisma.person.update({
             data: {
               firstName: person.firstName,
@@ -87,11 +86,6 @@ async function loadData(data) {
               id: findPersonByIin.id,
             },
           }));
-          // logs.push(`Обновление: ${JSON.stringify(p)}`);
-          // } catch (e) {
-          // error = true;
-          // logs.push(`Ошибка при обновлении! (${person.iin})! ${e}`);
-          // }
           continue;
         }
       } catch (e) {
@@ -125,13 +119,6 @@ async function loadData(data) {
               id: findPersonByFIO.id,
             },
           }));
-          // logs.push(`Обновление: ${JSON.stringify(p)}`);
-          // } catch (e) {
-          // error = true;
-          // logs.push(
-          // `Ошибка при обновлении! (${person.lastName} ${person.firstName} ${person.middleName})! ${e}`
-          // );
-          // }
           continue;
         }
       } catch (e) {
@@ -141,7 +128,6 @@ async function loadData(data) {
         );
       }
     };
-    // try {
     tr.push(prisma.person.create({
       data: {
         dbId: person.dbId,
@@ -157,11 +143,6 @@ async function loadData(data) {
         extendedPersonData: person.extendedPersonData,
       },
     }));
-    // logs.push(`Вставка: ${JSON.stringify(p)}`);
-    // } catch (e) {
-    // error = true;
-    // logs.push(`Ошибка при вставке! (${JSON.stringify(person)})! ${e}`);
-    // }
   };
   try {
     await prisma.$transaction(tr);
@@ -181,12 +162,11 @@ async function loadData(data) {
 };
 
 //Job proccess-query
-async function processQuery() {
-  let queries;
-
+async function processQuery(data) {
   try {
-    queries = await prisma.query.findMany({
+    query = await prisma.query.findUnique({
       where: {
+        id: data.queryId,
         state: "WAITING",
       },
     });
@@ -195,42 +175,42 @@ async function processQuery() {
     return;
   }
 
-  for (query of queries) {
-    let persons;
-    let state;
-    try {
-      persons = await prisma.person.findMany({
-        where: {
-          AND: [...JSON.parse(query.body)],
-        },
-        include: {
-          Db: true,
-        }
-      })
-      state = 'SUCCESS';
-    } catch (e) {
-      console.log(e);
-      state = 'ERROR';
-    }
-    try {
-      const updatedQuery = await prisma.query.update({
-        where: {
-          id: query.id,
-        },
-        data: {
-          count: persons.length,
-          result:
-            persons.length > 100
-              ? "[]"
-              : JSON.stringify(persons),
-          state: state,
-        },
-      });
-      socket.emit('query-completed', {
-        query: updatedQuery,
-      })
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  let persons;
+  let state;
+  let limit = Number(process.env.LIMIT_RESULT_COUNT);
+
+  try {
+    persons = await prisma.person.findMany({
+      where: {
+        AND: [...JSON.parse(query.body)],
+      },
+      include: {
+        Db: true,
+      }
+    })
+    state = 'SUCCESS';
+  } catch (e) {
+    console.log(e);
+    state = 'ERROR';
+  }
+  try {
+    const updatedQuery = await prisma.query.update({
+      where: {
+        id: query.id,
+      },
+      data: {
+        count: persons.length > limit ? limit : persons.length,
+        result:
+          persons.length > limit
+            ? "[]"
+            : JSON.stringify(persons),
+        state: state,
+      },
+    });
+    socket.emit('query-completed', {
+      query: updatedQuery,
+    })
+  } catch (e) {
+    console.log(e);
+  }
 };

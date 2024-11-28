@@ -21,27 +21,9 @@ if (process.env.REDIS_PASSWORD) {
 }
 
 const queueSingleton = () => {
-  const queue = new Queue("queries", {
+  return new Queue("queries", {
     connection: connection,
   });
-
-  queue
-    .drain()
-    .then(() => console.log("Queue drained."));
-
-  queue
-    .upsertJobScheduler(
-      "repeat-every",
-      {
-        every: Number(process.env.JOB_SHEDULER),
-      },
-      {
-        name: "process-queries",
-      }
-    )
-    .then(() => console.log("Sheduler job started."));
-
-  return queue;
 };
 
 declare const globalThis: {

@@ -434,6 +434,10 @@ export async function createQuery(
     throw error;
   }
 
+  await queue.add("process-queries", {
+    queryId: query.id,
+  });
+
   return {
     query: query,
   };
