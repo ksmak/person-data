@@ -4,7 +4,7 @@ import { Db, Person } from "@prisma/client";
 import Image from "next/image";
 import { useRef } from "react";
 
-export function PersonCard({ person }: { person: {db: Db | null;} & Person }) {
+export function PersonCard({ person }: { person: {Db: Db | null;} & Person }) {
     const refIin = useRef<HTMLSpanElement>(null)
     const handleClick = async () => {
         const selection = window.getSelection();
@@ -61,7 +61,7 @@ export function PersonCard({ person }: { person: {db: Db | null;} & Person }) {
             <div className="mt-2  italic">Дополнительная информация:</div>
             <div className="">Наименование БД{': '}
                 <span className=" font-mono font-medium hover:select-all hover:cursor-pointer">
-                    {person.db?.name}
+                    {person.Db?.name}
                 </span>
             </div>
             {!!person.extendedPersonData && Object.keys(person.extendedPersonData).map((key: string) => (

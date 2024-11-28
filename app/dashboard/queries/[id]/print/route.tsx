@@ -1,7 +1,7 @@
 import * as fs from "fs";
-import { AlignmentType, Document, FileChild, HeadingLevel, ImageRun, Packer, Paragraph, ShadingType, TextRun } from "docx";
-import { fetchQueryById } from "@/app/lib/data";
-import { Person } from "@prisma/client";
+import { AlignmentType, Document, FileChild, Header, HeadingLevel, ImageRun, Packer, Paragraph, ShadingType, TextRun } from "docx";
+import { fetchQueryById, fetchUserById } from "@/app/lib/data";
+import { Db, Person } from "@prisma/client";
 
 export const dynamic = 'force-static'
 
@@ -12,6 +12,8 @@ export async function GET(request: Request,
 
     const query = await fetchQueryById(id);
 
+    const user = query?.userId ? await fetchUserById(query.userId) : null;
+
 
     let items: FileChild[] = [];
 
@@ -19,7 +21,7 @@ export async function GET(request: Request,
         try {
             const data = JSON.parse(query.result);
             if (data && data.length) {
-                data.map((item: Person) => {
+                data.map((item: { Db: Db | null; } & Person) => {
                     const image = new ImageRun({
                         type: 'jpg',
                         data:
@@ -136,6 +138,13 @@ export async function GET(request: Request,
                                 }),
                             ]
                         }));
+                        items.push(new Paragraph({
+                            children: [
+                                new TextRun({
+                                    text: `Наименование БД: ${item.Db?.name ? item.Db.name : ""}`,
+                                }),
+                            ]
+                        }));
                         Object.keys(extend).map((key) => {
                             items.push(new Paragraph({
                                 children: [
@@ -169,15 +178,31 @@ export async function GET(request: Request,
     }
 
     const doc = new Document({
-        title: "Результаты запроса",
+        title: "Person Data: results",
         description: "Person Data: results",
         sections: [
             {
+                headers: {
+                    default: new Header({
+                        children: [
+                            new Paragraph({
+                                text: "PERSON DATA",
+                                heading: HeadingLevel.HEADING_6,
+                                alignment: AlignmentType.RIGHT,
+                            }),
+                            new Paragraph({
+                                text: `Пользователь: ${user?.lastName} ${user?.firstName} ${user?.middleName}`,
+                                heading: HeadingLevel.HEADING_6,
+                                alignment: AlignmentType.RIGHT,
+                            }),
+                        ],
+                    }),
+                },
                 properties: {},
                 children: [
                     new Paragraph({
                         text: "Результаты запроса",
-                        heading: HeadingLevel.TITLE,
+                        heading: HeadingLevel.HEADING_1,
                         alignment: AlignmentType.CENTER,
                         shading: {
                             type: ShadingType.REVERSE_DIAGONAL_STRIPE,
