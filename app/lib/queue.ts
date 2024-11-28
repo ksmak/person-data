@@ -21,9 +21,17 @@ if (process.env.REDIS_PASSWORD) {
 }
 
 const queueSingleton = () => {
-  return new Queue("queries", {
+  const queue = new Queue("queries", {
     connection: connection,
   });
+
+  queue
+    .drain()
+    .then(() => console.log("Queue drained."));
+
+  queue.removeJobScheduler('repeat-every');
+
+  return queue;
 };
 
 declare const globalThis: {
