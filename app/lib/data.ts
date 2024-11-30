@@ -247,6 +247,14 @@ export async function fetchUserByEmail(email: string) {
   });
 }
 
+export async function fetchUserByEmailOnly(email: string) {
+  return await prisma.user.findFirst({
+    where: {
+      email: email,
+    },
+  });
+}
+
 export async function fetchUserByEmailAndPassword(
   email: string | unknown,
   password: string | unknown
@@ -268,4 +276,12 @@ export async function fetchUserByEmailAndPassword(
   }
 
   return user;
+}
+
+export async function fetchAPIToken(token: string) {
+  return await prisma.aPI_Token.findUnique({
+    where: {
+      token: token,
+    }
+  })
 }

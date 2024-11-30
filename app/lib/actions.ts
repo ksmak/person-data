@@ -6,9 +6,9 @@ import { redirect } from "next/navigation";
 import prisma from "./db";
 import { Person } from "./definitions";
 import queue from "./queue";
-import { saltAndHashPassword } from "./utils";
+import { getCondition, saltAndHashPassword } from "./utils";
 import { auth, signIn, signOut } from "@/auth";
-import { AuthError, User } from "next-auth";
+import { AuthError } from "next-auth";
 import { CurrentUserType } from "@/authProvider";
 import { fetchUserByEmail } from "./data";
 
@@ -403,31 +403,16 @@ export async function deleteSubscription(id: string) {
 }
 
 export async function createQuery(
-  id: string,
-  prevState: string | undefined,
-  person: Person
+  userId: string,
+  body: string
 ) {
-  let body: any[] = [];
-  for (const key of Object.keys(person)) {
-    const val = person[`${key}` as keyof typeof person];
-    if (val) {
-      const condition = {
-        [`${key}`]: {
-          startsWith: val,
-          mode: "insensitive",
-        },
-      };
-      body.push(condition);
-    }
-  }
-
   let query;
+
   try {
     query = await prisma.query.create({
       data: {
-        userId: id,
-        body: JSON.stringify(body),
-        count: 0,
+        userId: userId,
+        body: body,
       },
     });
   } catch (error) {
@@ -436,7 +421,7 @@ export async function createQuery(
 
   await queue.add("process-queries", {
     queryId: query.id,
-  });
+  }, { delay: 2000 });
 
   return {
     query: query,
@@ -465,12 +450,12 @@ export async function login(formData: FormData) {
   const { email, password } = validatedFields.data;
 
   try {
-    await signIn("credentials", {
+    const user = await signIn("credentials", {
       email: email,
       password: password,
       redirect: false,
     });
-    const user = await fetchUserByEmail(email);
+
     return { user: user };
   } catch (error) {
     if (error instanceof AuthError) {

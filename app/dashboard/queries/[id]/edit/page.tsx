@@ -3,7 +3,7 @@ import { formatQueryCondition } from "@/app/lib/utils";
 import { SecondaryBtn } from "@/app/ui/buttons";
 import { ErrorAccess } from "@/app/ui/error-access";
 import Breadcrumbs from "@/app/ui/queries/breadcrumbs";
-import { PersonCard } from "@/app/ui/queries/cards";
+import { PersonCard } from "@/app/ui/queries/result_card";
 import { auth } from "@/auth";
 import { Db, Person } from "@prisma/client";
 import Link from "next/link";

@@ -25,13 +25,35 @@ export const formatQueryCondition = (query: any) => {
       Object.keys(item).map((key: string) => {
         for (const fld of personFields) {
           if (fld.name === key) {
-            if (Object.keys(item[key])[0] === "startsWith") {
-              result.push(
-                `${fld.title} начинается с "${item[key]["startsWith"]}"`
-              );
-            }
-          }
-        }
+            if (Object.keys(item[key]).length > 0) {
+              switch (Object.keys(item[key])[0]) {
+                case "contains": {
+                  result.push(
+                    `${fld.title} содержит "${item[key]["contains"]}"`
+                  );
+                  break;
+                };
+                case "startsWith": {
+                  result.push(
+                    `${fld.title} начинается с "${item[key]["startsWith"]}"`
+                  );
+                  break;
+                };
+                case "endsWith": {
+                  result.push(
+                    `${fld.title} оканчивается на "${item[key]["endsWith"]}"`
+                  );
+                  break;
+                };
+                default: {
+                  result.push(
+                    `${fld.title} равно "${item[key]}"`
+                  );
+                };
+              };
+            };
+          };
+        };
       });
     });
   } catch (e) {
@@ -117,3 +139,47 @@ export function saltAndHashPassword(password: string) {
 export function comparePasswords(pwd1: string, pwd2: string) {
   return bcrypt.compareSync(pwd1, pwd2);
 }
+
+export function getCondition(key: string, val: string) {
+  const replaceVal = val.replaceAll('*', '%').replaceAll('?', '_').toUpperCase();
+
+  if (replaceVal.startsWith('%') && replaceVal.endsWith('%')) {
+    const formattedVal = replaceVal.substring(1, val.length - 1);
+    return {
+      [`${key}`]: {
+        contains: formattedVal,
+        mode: "insensitive",
+      },
+    };
+
+  } else if (replaceVal.startsWith('%')) {
+    const formattedVal = replaceVal.substring(1);
+    return {
+      [`${key}`]: {
+        endsWith: formattedVal,
+        mode: "insensitive",
+      },
+    };
+
+  } else if (replaceVal.endsWith('%')) {
+    const formattedVal = replaceVal.substring(0, val.length - 1);
+    return {
+      [`${key}`]: {
+        startsWith: formattedVal,
+        mode: "insensitive",
+      },
+    };
+  } else if (replaceVal.includes('%') || replaceVal.includes('_')) {
+    return {
+      [`${key}`]: {
+        contains: replaceVal,
+        mode: "insensitive",
+      },
+    };
+  }
+
+  //default
+  return {
+    [`${key}`]: replaceVal,
+  };
+};

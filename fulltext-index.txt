@@ -1,0 +1,13 @@
+CREATE INDEX persons_fts_idx ON "Person" USING gin(to_tsvector( 
+    COALESCE("Person"."iin", '') || ' ' || 
+    COALESCE("Person"."phone", '') || ' ' || 
+    COALESCE("Person"."lastName", '') || ' ' || 
+    COALESCE("Person"."firstName", '') || ' ' || 
+    COALESCE("Person"."middleName", '') || ' ' || 
+    COALESCE("Person"."region", '') || ' ' || 
+    COALESCE("Person"."district", '') || ' ' || 
+    COALESCE("Person"."street", '') || ' ' || 
+    COALESCE("Person"."locality", '') || ' ' || 
+    COALESCE("Person"."building", '') || ' ' || 
+    COALESCE("Person"."apartment", '')
+));

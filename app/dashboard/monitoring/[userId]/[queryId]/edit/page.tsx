@@ -3,7 +3,7 @@ import { formatQueryCondition } from "@/app/lib/utils";
 import { SecondaryBtn } from "@/app/ui/buttons";
 import { ErrorAccess } from "@/app/ui/error-access";
 import Breadcrumbs from "@/app/ui/monitoring/breadcrumbs";
-import { PersonCard } from "@/app/ui/queries/cards";
+import { PersonCard } from "@/app/ui/queries/result_card";
 import { auth } from "@/auth";
 import { Db, Person } from "@prisma/client";
 import Link from "next/link";
@@ -101,7 +101,7 @@ export default async function Page(props: {
                 : <div className="mt-5 font-medium border-b border-primary italic">Запрос обработан. Количество совпадений: <span className="text-gray-950">{query.count}</span></div>
             }
             <div className="max-h-[600px] overflow-y-auto">
-            {results.map((item: { Db: Db | null; } & Person) => (<PersonCard key={item.id} person={item} />))}
+                {results.map((item: { Db: Db | null; } & Person) => (<PersonCard key={item.id} person={item} />))}
             </div>
         </main>
     );

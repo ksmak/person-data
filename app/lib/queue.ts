@@ -30,14 +30,8 @@ const queueSingleton = () => {
     .drain()
     .then(() => console.log("Queue drained."));
 
-  queue.getJobSchedulers()
-    .then((schedulers) => {
-      schedulers.map((sheduler) => {
-        if (sheduler.id) {
-          queue.removeJobScheduler(sheduler.id);
-        };
-      });
-    });
+  queue.removeJobScheduler('repeat-every')
+    .then(() => console.log('Job sheduler removed.'))
 
 
   return queue;

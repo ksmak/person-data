@@ -54,7 +54,7 @@ async function main() {
 
   await prisma.user.deleteMany({});
 
-  await prisma.user.create({
+  const admin_user = await prisma.user.create({
     data: {
       isActive: true,
       email: `admin@mail.ru`,
@@ -64,7 +64,16 @@ async function main() {
       middleName: 'admin',
       expiredPwd: new Date(1, 1, 2025),
       subsId: sub_admin.id,
+      isAdmin: true,
     },
+  });
+
+  await prisma.aPI_Token.deleteMany({});
+
+  await prisma.aPI_Token.create({
+    data: {
+      token: "h+dwB5hszdIJjxvqt8ogmqKjeFFqxZF4rLSXgLDkVAs=",
+    }
   });
 
   for (let i = 0; i <= 10; i++) {

@@ -17,17 +17,20 @@ export default function LoginForm() {
     const formData = new FormData(event.currentTarget);
     const state: LoginState = await login(formData) as LoginState;
     setState(state);
-    if (!!state.user) {
-      console.log(setCurrentUser);
+    if (state.user) {
       if (setCurrentUser) setCurrentUser(state.user);
-      router.push("/dashboard");
+      if (state.user.isAdmin) {
+        router.push("/dashboard");
+      } else {
+        router.push("/dashboard/queries")
+      }
     }
   }
 
   return (
     <form className="space-y-3" onSubmit={handleSubmit}>
       <div className="flex-1 rounded-lg bg-secondary border border-borderlight px-6 pb-4 pt-8">
-        <h1 className={`mb-3 text-md text-center`}>
+        <h1 className={`mb-3 text-sm text-center italic`}>
           Для продолжения введите свой логин и пароль.
         </h1>
         <div className="w-full">

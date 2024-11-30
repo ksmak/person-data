@@ -1,50 +1,52 @@
 import { Metadata } from "next";
-import { QueriesTableSkeleton } from "@/app/ui/skeletons";
-import { Suspense } from "react";
-import Pagination from "@/app/ui/pagination";
-import WrapTable from '@/app/ui/queries/wrap_table';
-import { fetchQueriesPages, fetchUserByEmail } from "@/app/lib/data";
 import { auth } from "@/auth";
 import { ErrorAccess } from "@/app/ui/error-access";
+import ResultList from "@/app/ui/queries/result_list";
+import { createQuery } from "@/app/lib/actions";
+import { fetchUserByEmailOnly } from "@/app/lib/data";
+import Search from "@/app/ui/queries/search";
+import { z, ZodError } from "zod";
 
 export const metadata: Metadata = {
     title: 'Search',
 };
 
+const searchSchema = z.string().min(4);
+
 export default async function Page(props: {
     searchParams?: Promise<{
-        page?: string;
-        orderBy?: string;
-        sort?: string;
+        body?: string;
     }>;
 }) {
     const session = await auth();
-
     const email = session?.user?.email;
-
     if (!email) return <ErrorAccess />;
 
-    const user = await fetchUserByEmail(email);
-
-    if (!user?.subs?.accessQueries) return <ErrorAccess />;
+    const user = await fetchUserByEmailOnly(email);
+    if (!user) return <ErrorAccess />;
 
     const searchParams = await props.searchParams;
-    const currentPage = Number(searchParams?.page) || 1;
-    const totalPages = await fetchQueriesPages(user.id);
-    const orderBy = searchParams?.orderBy || 'createdAt';
-    const sort = searchParams?.sort || 'desc';
+    const body = searchParams?.body || '';
+
+    let error = '';
+    let queryId = '';
+    if (body) {
+        try {
+            searchSchema.parse(body);
+            await createQuery(user.id, body);
+        } catch (e) {
+            if (e instanceof ZodError) {
+                error = "Для поиска необходимо хотя бы 4 символа";
+            }
+        }
+    }
 
     return (
-        <div className="w-full">
-            <div className="flex w-full items-center justify-between">
-                <h1 className="text-2xl">Поиск информации</h1>
+        <div className="w-full flex flex-col">
+            <Search error={error} />
+            <div className="mt-3">
+                <ResultList url={process.env.WS_URL || "http://localhost:3001"} queryId={queryId} />
             </div>
-            <Suspense key={currentPage} fallback={<QueriesTableSkeleton />}>
-                <WrapTable userId={user.id} currentPage={currentPage} orderBy={orderBy} sort={sort} />
-            </Suspense>
-            <div className="mt-5 flex w-full justify-center">
-                <Pagination totalPages={totalPages} />
-            </div>
-        </div>
+        </div >
     );
 }

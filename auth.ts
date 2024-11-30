@@ -1,12 +1,17 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { fetchUserByEmailAndPassword } from "@/app/lib/data";
+import prisma from "@/client";
+import { PrismaAdapter } from "@auth/prisma-adapter"
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  adapter: PrismaAdapter(prisma),
+  session: {
+    strategy: 'jwt',
+  },
   pages: {
     signIn: "/login",
   },
-
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       if (!!auth?.user) {
@@ -40,7 +45,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         user = await fetchUserByEmailAndPassword(email, password);
 
         if (!user) {
-          throw new Error("Invalid credentials.");
+          return null;
         }
 
         return user;

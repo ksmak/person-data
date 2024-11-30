@@ -163,6 +163,9 @@ async function loadData(data) {
 
 //Job proccess-query
 async function processQuery(data) {
+  console.log("Data: ", data);
+  let limit = Number(process.env.LIMIT_RESULT_COUNT);
+
   try {
     query = await prisma.query.findUnique({
       where: {
@@ -175,42 +178,109 @@ async function processQuery(data) {
     return;
   }
 
-  let persons;
-  let state;
-  let limit = Number(process.env.LIMIT_RESULT_COUNT);
+  socket.emit('query-started', { queryId: query.id });
+
+  await Promise.all([
+    getPersons(query.body, limit),
+    getUsersBoxAPI(query.body),
+  ])
+
 
   try {
-    persons = await prisma.person.findMany({
-      where: {
-        AND: [...JSON.parse(query.body)],
-      },
-      include: {
-        Db: true,
-      }
-    })
-    state = 'SUCCESS';
-  } catch (e) {
-    console.log(e);
-    state = 'ERROR';
-  }
-  try {
-    const updatedQuery = await prisma.query.update({
+    await prisma.query.update({
       where: {
         id: query.id,
       },
       data: {
-        count: persons.length > limit ? limit : persons.length,
-        result:
-          persons.length > limit
-            ? "[]"
-            : JSON.stringify(persons),
-        state: state,
+        state: "COMPLETED",
       },
     });
-    socket.emit('query-completed', {
-      query: updatedQuery,
-    })
+  } catch (e) {
+    console.log(e);
+  }
+
+  socket.emit('query-completed', { queryId: query.id });
+};
+
+async function getPersons(body, limit) {
+  try {
+    let formattedBody = body.trim().toUpperCase().split(' ').join('&');
+    console.log(formattedBody);
+    let response = await fetch(`${process.env.AUTH_URL}/api/persons`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'api-token': process.env.PERSONS_API_TOKEN,
+      },
+      body: JSON.stringify({ body: formattedBody })
+    });
+
+    let persons = await response.json();
+
+    console.log(persons);
+
+    if (persons.error) {
+      socket.emit('query-data', {
+        error: persons.error,
+        service: 'Person Data'
+      });
+      return;
+    }
+
+    if (persons.length > limit) {
+      socket.emit('query-data', {
+        error: 'Слишком много данных. Уточните свой запрос.',
+        service: 'Person Data'
+      });
+      return;
+    }
+
+    persons.map(person => {
+      socket.emit('query-data', {
+        data: person,
+        service: 'Person Data'
+      });
+    });
+
   } catch (e) {
     console.log(e);
   }
 };
+
+async function getUsersBoxAPI(body) {
+  const url = `${process.env.USERSBOX_URL}/getMe`;
+
+
+  try {
+    let response = await fetch("https://api.usersbox.ru/v1/getMe", {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': process.env.USERSBOX_API_TOKEN,
+        'Origin': '*',
+      },
+    });
+    let data = await response.json();
+    console.log(data);
+
+    if (data.status === 'success' && data.data?.items) {
+      data.items.map(item => {
+        socket.emit('query-data', {
+          data: item,
+          service: 'UsersBox API',
+        });
+      })
+    } else {
+      socket.emit('query-data', {
+        data: data.data,
+        service: 'UsersBox API',
+      });
+    }
+
+  } catch (e) {
+    socket.emit('query-data', {
+      error: `Ошибка! ${e}`,
+      service: 'UsersBox API'
+    });
+  }
+}

@@ -1,5 +1,33 @@
 import { JsonObject } from "@prisma/client/runtime/library";
 
+export const PERSONS_FIELDS_LIST = `
+    "Person"."iin",
+    "Person"."phone",
+    "Person"."lastName",
+    "Person"."firstName",
+    "Person"."middleName",
+    "Person"."region",
+    "Person"."district",
+    "Person"."street",
+    "Person"."locality",
+    "Person"."building",
+    "Person"."apartment",
+    "Person"."extendedPersonData"
+`;
+export const PERSONS_FULLTEXT_EXP = `
+    COALESCE("Person"."iin", '') || ' ' || 
+    COALESCE("Person"."phone", '') || ' ' || 
+    COALESCE("Person"."lastName", '') || ' ' || 
+    COALESCE("Person"."firstName", '') || ' ' || 
+    COALESCE("Person"."middleName", '') || ' ' || 
+    COALESCE("Person"."region", '') || ' ' || 
+    COALESCE("Person"."district", '') || ' ' || 
+    COALESCE("Person"."street", '') || ' ' || 
+    COALESCE("Person"."locality", '') || ' ' || 
+    COALESCE("Person"."building", '') || ' ' || 
+    COALESCE("Person"."apartment", '')
+`;
+
 export type Person = {
   db?: { id: string; name: string } | null;
   dbId?: string | null;
@@ -65,3 +93,14 @@ export type UsersQueries = {
   queries_month: number;
   queries_total: number;
 };
+
+export type MessageChat = {
+  role: string;
+  content: string;
+}
+
+export type Result = {
+  data: any,
+  service: 'Person Data' | 'UsersBox API',
+  error?: string,
+}
