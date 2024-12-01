@@ -276,13 +276,13 @@ export async function createSubscription(prevState: State, formData: FormData) {
   const { title, queriesCount, price } = validatedFields.data;
 
   try {
-    // await prisma.subscription.create({
-    //   data: {
-    //     title: title,
-    //     queriesCount: queriesCount,
-    //     price: price,
-    //   },
-    // });
+    await prisma.subscription.create({
+      data: {
+        title: title,
+        queriesCount: queriesCount,
+        price: price,
+      },
+    });
   } catch {
     return {
       message: "Ошибка в базе данных! Подписка не добавлена!",
@@ -313,16 +313,16 @@ export async function updateSubscription(
   const { title, queriesCount, price } = validatedFields.data;
 
   try {
-    // await prisma.subscription.update({
-    //   where: {
-    //     id: id,
-    //   },
-    //   data: {
-    //     title: title,
-    //     queriesCount: queriesCount,
-    //     price: price,
-    //   },
-    // });
+    await prisma.subscription.update({
+      where: {
+        id: id,
+      },
+      data: {
+        title: title,
+        queriesCount: queriesCount,
+        price: price,
+      },
+    });
   } catch {
     return {
       message: "Ошибка в базе данных! Подписка не обновлена!",
