@@ -9,46 +9,46 @@ const salt = bcrypt.genSaltSync(10);
 async function main() {
   await prisma.subscription.deleteMany({});
 
+  prisma.subscription.create({
+    data: {
+      title: "100 queries",
+      queriesCount: 100,
+      price: 500,
+    },
+  });
   await prisma.subscription.create({
     data: {
-      title: "Ограниченная",
-      maxQueriesDay: 0,
-      maxQueriesMonth: 0,
-      maxQueriesTotal: 1000,
-      usageTimeLimit: 3,
-      accessQueries: true,
-      accessMonitoring: false,
-      accessImportData: false,
-      accessUsers: false,
-      accessSubscriptions: false,
+      title: "500 queries",
+      queriesCount: 500,
+      price: 2000,
     },
   });
-  const sub_base = await prisma.subscription.create({
+  await prisma.subscription.create({
     data: {
-      title: "Базовая",
-      maxQueriesDay: 100,
-      maxQueriesMonth: 1000,
-      maxQueriesTotal: 5000,
-      usageTimeLimit: 3,
-      accessQueries: true,
-      accessImportData: false,
-      accessMonitoring: false,
-      accessUsers: false,
-      accessSubscriptions: false,
+      title: "1000 queries",
+      queriesCount: 1000,
+      price: 3500,
     },
   });
-  const sub_admin = await prisma.subscription.create({
+  await prisma.subscription.create({
     data: {
-      title: "Максимальная",
-      maxQueriesDay: 0,
-      maxQueriesMonth: 0,
-      maxQueriesTotal: 0,
-      usageTimeLimit: 0,
-      accessQueries: true,
-      accessImportData: true,
-      accessMonitoring: true,
-      accessUsers: true,
-      accessSubscriptions: true,
+      title: "5000 queries",
+      queriesCount: 5000,
+      price: 5000,
+    },
+  });
+  await prisma.subscription.create({
+    data: {
+      title: "10000 queries",
+      queriesCount: 10000,
+      price: 9000,
+    },
+  });
+  await prisma.subscription.create({
+    data: {
+      title: "unlimit",
+      queriesCount: 0,
+      price: 50000,
     },
   });
 
@@ -57,14 +57,13 @@ async function main() {
   const admin_user = await prisma.user.create({
     data: {
       isActive: true,
-      email: `admin@mail.ru`,
-      password: bcrypt.hashSync('12345', salt),
-      firstName: 'admin',
-      lastName: 'admin',
-      middleName: 'admin',
-      expiredPwd: new Date(1, 1, 2025),
-      subsId: sub_admin.id,
       isAdmin: true,
+      email: `admin@mail.ru`,
+      password: bcrypt.hashSync("12345", salt),
+      firstName: "admin",
+      lastName: "admin",
+      middleName: "admin",
+      balance: 1000,
     },
   });
 
@@ -72,8 +71,9 @@ async function main() {
 
   await prisma.aPI_Token.create({
     data: {
+      userId: admin_user.id,
       token: "h+dwB5hszdIJjxvqt8ogmqKjeFFqxZF4rLSXgLDkVAs=",
-    }
+    },
   });
 
   for (let i = 0; i <= 10; i++) {
@@ -82,21 +82,21 @@ async function main() {
       data: {
         isActive: true,
         email: `user${i + 1}@mail.ru`,
-        password: bcrypt.hashSync('12345', salt),
+        password: bcrypt.hashSync("12345", salt),
         firstName: first,
         lastName: random.last(),
         middleName: random.middle(),
-        expiredPwd: new Date(1, 1, 2025),
-        subsId: sub_base.id,
+        balance: 100,
       },
     });
-  };
+  }
 
   await prisma.db.deleteMany({});
+
   await prisma.db.create({
     data: {
       name: "Test DB",
-    }
+    },
   });
 }
 

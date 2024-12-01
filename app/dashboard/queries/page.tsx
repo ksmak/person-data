@@ -3,7 +3,7 @@ import { auth } from "@/auth";
 import { ErrorAccess } from "@/app/ui/error-access";
 import ResultList from "@/app/ui/queries/result_list";
 import { createQuery } from "@/app/lib/actions";
-import { fetchUserByEmailOnly } from "@/app/lib/data";
+import { fetchUserByEmail } from "@/app/lib/data";
 import Search from "@/app/ui/queries/search";
 import { z, ZodError } from "zod";
 
@@ -22,7 +22,7 @@ export default async function Page(props: {
     const email = session?.user?.email;
     if (!email) return <ErrorAccess />;
 
-    const user = await fetchUserByEmailOnly(email);
+    const user = await fetchUserByEmail(email);
     if (!user) return <ErrorAccess />;
 
     const searchParams = await props.searchParams;

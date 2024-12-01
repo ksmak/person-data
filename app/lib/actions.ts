@@ -88,13 +88,8 @@ const SubscriptionFormSchema = z.object({
   title: z.string().refine((data) => data.trim() !== "", {
     message: "Поле ввода не заполнено",
   }),
-  maxQueriesDay: z.coerce.number(),
-  maxQueriesMonth: z.coerce.number(),
-  maxQueriesTotal: z.coerce.number(),
-  usageTimeLimit: z.coerce.number(),
-  accessImportData: z.coerce.boolean(),
-  accessUsers: z.coerce.boolean(),
-  accessMonitoring: z.coerce.boolean(),
+  queriesCount: z.number(),
+  price: z.number(),
 });
 
 export type State = {
@@ -107,7 +102,6 @@ export type State = {
     firstName?: string[];
     middleName?: string[];
     expiredPwd?: string[];
-    subsId?: string[];
   };
   message?: string | null;
 };
@@ -116,13 +110,8 @@ export type SubscriptionState = {
   errors?: {
     id?: string[];
     title?: string[];
-    maxQueriesDay?: string[];
-    maxQueriesMonth?: string[];
-    maxQueriesTotal?: string[];
-    usageTimeLimit?: string[];
-    accessImportData?: string[];
-    accessUsers?: string[];
-    accessMonitoring?: string[];
+    queriesCount?: string[];
+    price?: string[];
   };
   message?: string | null;
 };
@@ -184,7 +173,6 @@ export async function createUser(prevState: State, formData: FormData) {
         firstName: firstName,
         middleName: middleName,
         expiredPwd: expiredPwd,
-        subsId: subsId,
       },
     });
   } catch {
@@ -240,7 +228,6 @@ export async function updateUser(
           firstName: firstName,
           middleName: middleName,
           expiredPwd: expiredPwd,
-          subsId: subsId,
         },
       });
     } else {
@@ -255,7 +242,6 @@ export async function updateUser(
           firstName: firstName,
           middleName: middleName,
           expiredPwd: expiredPwd,
-          subsId: subsId,
         },
       });
     }
@@ -283,13 +269,8 @@ export async function deleteUser(id: string) {
 export async function createSubscription(prevState: State, formData: FormData) {
   const validatedFields = CreateSubscription.safeParse({
     title: formData.get("title"),
-    maxQueriesDay: formData.get("maxQueriesDay"),
-    maxQueriesMonth: formData.get("maxQueriesMonth"),
-    maxQueriesTotal: formData.get("maxQueriesTotal"),
-    usageTimeLimit: formData.get("usageTimeLimit"),
-    accessImportData: formData.get("accessImportData"),
-    accessUsers: formData.get("accessUsers"),
-    accessMonitoring: formData.get("accessMonitoring"),
+    queriesCount: formData.get("queriesCount"),
+    price: formData.get("price"),
   });
 
   if (!validatedFields.success) {
@@ -299,28 +280,14 @@ export async function createSubscription(prevState: State, formData: FormData) {
     };
   }
 
-  const {
-    title,
-    maxQueriesDay,
-    maxQueriesMonth,
-    maxQueriesTotal,
-    usageTimeLimit,
-    accessImportData,
-    accessMonitoring,
-    accessUsers,
-  } = validatedFields.data;
+  const { title, queriesCount, price } = validatedFields.data;
 
   try {
     await prisma.subscription.create({
       data: {
         title: title,
-        maxQueriesDay: maxQueriesDay,
-        maxQueriesMonth: maxQueriesMonth,
-        maxQueriesTotal: maxQueriesTotal,
-        usageTimeLimit: usageTimeLimit,
-        accessImportData: accessImportData,
-        accessUsers: accessUsers,
-        accessMonitoring: accessMonitoring,
+        queriesCount: queriesCount,
+        price: price,
       },
     });
   } catch {
@@ -339,13 +306,8 @@ export async function updateSubscription(
 ) {
   const validatedFields = UpdateSubscription.safeParse({
     title: formData.get("title"),
-    maxQueriesDay: formData.get("maxQueriesDay"),
-    maxQueriesMonth: formData.get("maxQueriesMonth"),
-    maxQueriesTotal: formData.get("maxQueriesTotal"),
-    usageTimeLimit: formData.get("usageTimeLimit"),
-    accessImportData: formData.get("accessImportData"),
-    accessUsers: formData.get("accessUsers"),
-    accessMonitoring: formData.get("accessMonitoring"),
+    queriesCount: formData.get("queriesCount"),
+    price: formData.get("price"),
   });
 
   if (!validatedFields.success) {
@@ -355,16 +317,7 @@ export async function updateSubscription(
     };
   }
 
-  const {
-    title,
-    maxQueriesDay,
-    maxQueriesMonth,
-    maxQueriesTotal,
-    usageTimeLimit,
-    accessImportData,
-    accessMonitoring,
-    accessUsers,
-  } = validatedFields.data;
+  const { title, queriesCount, price } = validatedFields.data;
 
   try {
     await prisma.subscription.update({
@@ -373,13 +326,8 @@ export async function updateSubscription(
       },
       data: {
         title: title,
-        maxQueriesDay: maxQueriesDay,
-        maxQueriesMonth: maxQueriesMonth,
-        maxQueriesTotal: maxQueriesTotal,
-        usageTimeLimit: usageTimeLimit,
-        accessImportData: accessImportData,
-        accessUsers: accessUsers,
-        accessMonitoring: accessMonitoring,
+        queriesCount: queriesCount,
+        price: price,
       },
     });
   } catch {

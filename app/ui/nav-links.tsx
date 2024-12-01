@@ -1,94 +1,63 @@
 'use client';
 
-import { HiOutlineSearch, HiOutlineChartBar, HiOutlineUser, HiOutlineKey, HiOutlineDatabase } from "react-icons/hi";
+import { HiOutlineSearch, HiOutlineKey, HiOutlineDatabase, HiOutlineUserCircle } from "react-icons/hi";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
-import { useAuth } from "@/authProvider";
+import { User } from "@prisma/client";
 
 const links = [
   {
     title: 'Поиск информации',
-    name: 'accessQueries',
     href: '/dashboard/queries',
     icon: HiOutlineSearch,
-  },
-  {
-    title: 'Загрузка данных',
-    name: 'accessImportData',
-    href: '/dashboard/import',
-    icon: HiOutlineDatabase,
-  },
-  {
-    title: 'Мониторинг запросов',
-    name: 'accessMonitoring',
-    href: '/dashboard/monitoring',
-    icon: HiOutlineChartBar,
-  },
-  {
-    title: 'Пользователи',
-    name: 'accessUsers',
-    href: '/dashboard/users',
-    icon: HiOutlineUser,
+    forAdmin: false,
   },
   {
     title: 'Подписки',
-    name: 'accessSubscriptions',
     href: '/dashboard/subscriptions',
     icon: HiOutlineKey,
+    forAdmin: false,
+  },
+  {
+    title: 'Контакты',
+    href: '/dashboard/contacts',
+    icon: HiOutlineUserCircle,
+    forAdmin: false,
+  },
+  {
+    title: 'Администрирование',
+    href: '/dashboard/admin',
+    icon: HiOutlineDatabase,
+    forAdmin: true,
   },
 ];
 
-export default function NavLinks() {
-  const { currentUser } = useAuth();
-
+export default function NavLinks({ user }: { user: User | null }) {
   const pathname = usePathname();
 
   return (
     <>
-      {links.map((link) => {
-        let access: boolean = true;
-        switch (link.name) {
-          case 'accessQueries': {
-            access = !!currentUser?.subs?.accessQueries;
-            break;
-          }
-          case 'accessImportData': {
-            access = !!currentUser?.subs?.accessImportData;
-            break;
-          }
-          case 'accessMonitoring': {
-            access = !!currentUser?.subs?.accessMonitoring;
-            break;
-          }
-          case 'accessUsers': {
-            access = !!currentUser?.subs?.accessUsers;
-            break;
-          }
-          case 'accessSubscriptions': {
-            access = !!currentUser?.subs?.accessSubscriptions;
-            break;
-          }
-        }
+      {links.map((link, index) => {
         const LinkIcon = link.icon;
 
-        if (!access) return (
-          <div key={link.name} className="hidden"></div>
+        if (link.forAdmin && !user?.isAdmin) return (
+          <div key={index} className="hidden"></div>
         );
 
         return (
           <Link
-            key={link.name}
+            key={index}
             href={link.href}
             className={clsx(
-              'flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-secondary border border-borderlight p-3 text-sm font-medium hover:bg-select hover:text-primarytxt md:flex-none md:justify-start md:p-2 md:px-3',
+              'flex items-center gap-2 rounded-md bg-secondary border border-borderlight text-sm font-medium hover:bg-select hover:text-primarytxt hover:underline p-3 px-3',
               {
                 'bg-select text-primarytxt': pathname === link.href,
               },
             )}
           >
-            <LinkIcon/>
-            <p className="hidden md:block">{link.title}</p>
+            <LinkIcon />
+            <p className="md:block">{link.title}</p>
           </Link>
         );
       })}

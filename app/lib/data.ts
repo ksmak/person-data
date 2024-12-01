@@ -25,11 +25,6 @@ export async function fetchFilteredUsers(
       middleName: true,
       email: true,
       expiredPwd: true,
-      subs: {
-        select: {
-          title: true,
-        },
-      },
     },
     where: {
       OR: [
@@ -238,17 +233,6 @@ export async function fetchUsersQueriesPages() {
 
 export async function fetchUserByEmail(email: string) {
   return await prisma.user.findFirst({
-    include: {
-      subs: true,
-    },
-    where: {
-      email: email,
-    },
-  });
-}
-
-export async function fetchUserByEmailOnly(email: string) {
-  return await prisma.user.findFirst({
     where: {
       email: email,
     },
@@ -282,6 +266,6 @@ export async function fetchAPIToken(token: string) {
   return await prisma.aPI_Token.findUnique({
     where: {
       token: token,
-    }
-  })
+    },
+  });
 }
