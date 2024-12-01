@@ -4,7 +4,7 @@ import { createUser, updateUser, State } from '@/app/lib/actions';
 import { FormEvent, useState } from 'react';
 import { Subscription, User } from '@prisma/client';
 import { ModalDeleteUser } from '@/app/ui/admin/users/modal';
-import { EditButtonsGroup } from '@/app/ui/admin/buttons';
+import { EditButtonsGroup } from '@/app/ui/buttons';
 
 export default function UserForm({
   user,
