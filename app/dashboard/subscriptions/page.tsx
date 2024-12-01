@@ -23,7 +23,7 @@ export default async function Page() {
             <div className="">
                 <h1 className="text-2xl text-center w-full mb-5">Подписки</h1>
             </div>
-            {subs.map((item) => <SubscriptionCard sub={item} />)}
+            {subs.map((item) => <SubscriptionCard key={item.id} sub={item} />)}
         </div >
     );
 }
