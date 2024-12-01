@@ -2,7 +2,7 @@ import { fetchUserByEmail } from "@/app/lib/data";
 import { SecondaryBtn } from "@/app/ui/buttons";
 import { ErrorAccess } from "@/app/ui/error-access";
 import UserQueriesPanel from "@/app/ui/monitoring/panels";
-import Breadcrumbs from "@/app/ui/queries/breadcrumbs";
+import Breadcrumbs from "@/app/ui/users/breadcrumbs";
 import { auth } from "@/auth";
 import Link from "next/link";
 import { HiOutlineX } from "react-icons/hi";
