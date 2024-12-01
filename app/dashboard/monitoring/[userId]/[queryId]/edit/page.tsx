@@ -49,7 +49,7 @@ export default async function Page(props: {
 
     return (
         <main>
-            <Breadcrumbs
+            {/*<Breadcrumbs
                 breadcrumbs={
                     [
                         {
@@ -67,10 +67,10 @@ export default async function Page(props: {
                     ]}
             />
             <div>
-                <div className="grid grid-cols-3">
+                 <div className="grid grid-cols-3">
                     <div className="col-start-2 justify-self-center font-medium mt-5 italic">Параметры поиска:</div>
                     <div className="justify-self-end flex items-center gap-2">
-                        {/* {query.result && <SecondaryBtn className='md:w-28 justify-center '>
+                        {query.result && <SecondaryBtn className='md:w-28 justify-center '>
                             <Link
                                 className='flex items-center gap-1'
                                 href={`/dashboard/queries/${queryId}/print`}
@@ -78,7 +78,7 @@ export default async function Page(props: {
                                 <span className="hidden md:block">Печать</span>{' '}
                                 <HiOutlinePrinter className='h-5 w-5' />
                             </Link>
-                        </SecondaryBtn>} */}
+                        </SecondaryBtn>}
                         <SecondaryBtn className='md:w-28 justify-center'>
                             <Link
                                 className='flex items-center gap-1'
@@ -101,8 +101,8 @@ export default async function Page(props: {
                 : <div className="mt-5 font-medium border-b border-primary italic">Запрос обработан. Количество совпадений: <span className="text-gray-950">{query.count}</span></div>
             }
             <div className="max-h-[600px] overflow-y-auto">
-                {/* {results.map((item: { Db: Db | null; } & Person) => (<PersonCard key={item.id} person={item} />))} */}
-            </div>
+                {results.map((item: { Db: Db | null; } & Person) => (<PersonCard key={item.id} person={item} />))}
+            </div> */}
         </main>
     );
 };
