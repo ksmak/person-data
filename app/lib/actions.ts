@@ -101,7 +101,6 @@ export type State = {
     lastName?: string[];
     firstName?: string[];
     middleName?: string[];
-    expiredPwd?: string[];
   };
   message?: string | null;
 };
@@ -127,15 +126,17 @@ export type ImportState = {
 const CreateUser = CreateUserSchema.omit({
   id: true,
   isActive: true,
-  expiredPwd: true,
 });
 const UpdateUser = UpdateUserSchema.omit({
   id: true,
   isActive: true,
-  expiredPwd: true,
 });
-const CreateSubscription = SubscriptionFormSchema.omit({ id: true });
-const UpdateSubscription = SubscriptionFormSchema.omit({ id: true });
+const CreateSubscription = SubscriptionFormSchema.omit({
+  id: true,
+});
+const UpdateSubscription = SubscriptionFormSchema.omit({
+  id: true,
+});
 
 export async function createUser(prevState: State, formData: FormData) {
   const validatedFields = CreateUser.safeParse({
@@ -145,7 +146,6 @@ export async function createUser(prevState: State, formData: FormData) {
     lastName: formData.get("lastName"),
     firstName: formData.get("firstName"),
     middleName: formData.get("middleName"),
-    subsId: formData.get("subsId"),
   });
 
   if (!validatedFields.success) {
@@ -172,7 +172,6 @@ export async function createUser(prevState: State, formData: FormData) {
         lastName: lastName,
         firstName: firstName,
         middleName: middleName,
-        expiredPwd: expiredPwd,
       },
     });
   } catch {
@@ -196,7 +195,6 @@ export async function updateUser(
     lastName: formData.get("lastName"),
     firstName: formData.get("firstName"),
     middleName: formData.get("middleName"),
-    subsId: formData.get("subsId"),
   });
 
   if (!validatedFields.success) {
@@ -206,12 +204,9 @@ export async function updateUser(
     };
   }
 
-  const { email, password, lastName, firstName, middleName, subsId } =
+  const { email, password, lastName, firstName, middleName } =
     validatedFields.data;
-  const now = new Date();
-  const expiredPwd = new Date(
-    now.setDate(now.getDate() + EXPIRED_PASSWORD_DAYS)
-  );
+
   const isActive = !!formData.get("isActive");
 
   try {
@@ -227,7 +222,6 @@ export async function updateUser(
           lastName: lastName,
           firstName: firstName,
           middleName: middleName,
-          expiredPwd: expiredPwd,
         },
       });
     } else {
@@ -241,7 +235,6 @@ export async function updateUser(
           lastName: lastName,
           firstName: firstName,
           middleName: middleName,
-          expiredPwd: expiredPwd,
         },
       });
     }
@@ -283,13 +276,13 @@ export async function createSubscription(prevState: State, formData: FormData) {
   const { title, queriesCount, price } = validatedFields.data;
 
   try {
-    await prisma.subscription.create({
-      data: {
-        title: title,
-        queriesCount: queriesCount,
-        price: price,
-      },
-    });
+    // await prisma.subscription.create({
+    //   data: {
+    //     title: title,
+    //     queriesCount: queriesCount,
+    //     price: price,
+    //   },
+    // });
   } catch {
     return {
       message: "Ошибка в базе данных! Подписка не добавлена!",
@@ -320,16 +313,16 @@ export async function updateSubscription(
   const { title, queriesCount, price } = validatedFields.data;
 
   try {
-    await prisma.subscription.update({
-      where: {
-        id: id,
-      },
-      data: {
-        title: title,
-        queriesCount: queriesCount,
-        price: price,
-      },
-    });
+    // await prisma.subscription.update({
+    //   where: {
+    //     id: id,
+    //   },
+    //   data: {
+    //     title: title,
+    //     queriesCount: queriesCount,
+    //     price: price,
+    //   },
+    // });
   } catch {
     return {
       message: "Ошибка в базе данных! Подписка не обновлена!",
