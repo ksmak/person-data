@@ -1,4 +1,5 @@
 import { fetchQueryById, fetchUserByEmail } from "@/app/lib/data";
+import { PersonResult } from "@/app/lib/definitions";
 import { formatQueryCondition } from "@/app/lib/utils";
 import { SecondaryBtn } from "@/app/ui/buttons";
 import { ErrorAccess } from "@/app/ui/error-access";
@@ -35,10 +36,10 @@ export default async function Page(props: {
         notFound();
     }
 
-    const results: ({ Db: Db | null; } & Person)[] = [];
+    const results: PersonResult[] = [];
     if (query.result) {
         try {
-            JSON.parse(query.result).map((item: { Db: Db | null; } & Person) => {
+            JSON.parse(query.result).map((item: PersonResult) => {
                 results.push(item);
             })
         } catch (e) {
