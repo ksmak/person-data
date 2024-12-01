@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { AuthProvider } from "@/authProvider";
 
 export const metadata: Metadata = {
   title: "Qarau",
@@ -15,9 +14,7 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        {children}
       </body>
     </html>
   );

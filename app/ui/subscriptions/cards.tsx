@@ -1,5 +1,5 @@
 import { Subscription } from "@prisma/client";
-import { Btn } from "../buttons";
+import { Btn } from "@/app/ui/buttons";
 
 export function SubscriptionCard({
     sub

@@ -1,7 +1,7 @@
 import Pagination from '@/app/ui/pagination';
 import Search from '@/app/ui/search';
-import WrapTable from '@/app/ui/users/wrap_table';
-import { CreateUser } from '@/app/ui/users/buttons';
+import WrapTable from '@/app/ui/admin/users/wrap_table';
+import { CreateUser } from '@/app/ui/admin/users/buttons';
 import { UsersTableSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
 import { fetchUserByEmail, fetchUsersPages } from '@/app/lib/data';
@@ -29,7 +29,7 @@ export default async function Page(props: {
 
     const user = await fetchUserByEmail(email);
 
-    if (!user?.subs?.accessSubscriptions) return <ErrorAccess />;
+    if (!user?.isAdmin) return <ErrorAccess />;
 
     const searchParams = await props.searchParams;
     const query = searchParams?.query || '';
