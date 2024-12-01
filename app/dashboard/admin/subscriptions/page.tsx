@@ -1,7 +1,7 @@
 import Pagination from '@/app/ui/pagination';
 import Search from '@/app/ui/search';
-import WrapTable from '@/app/ui/subscriptions/wrap_table';
-import { CreateSubscription } from '@/app/ui/subscriptions/buttons';
+import WrapTable from '@/app/ui/admin/subscriptions/wrap_table';
+import { CreateSubscription } from '@/app/ui/admin/subscriptions/buttons';
 import { SubsTableSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
 import { fetchSubscriptionsPages, fetchUserByEmail } from '@/app/lib/data';

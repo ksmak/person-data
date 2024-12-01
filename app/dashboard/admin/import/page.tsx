@@ -1,4 +1,4 @@
-import { ImportForm } from "@/app//ui/import/forms";
+import { ImportForm } from "@/app/ui/admin/import/forms";
 import { fetchDb, fetchUserByEmail } from "@/app/lib/data";
 import { ErrorAccess } from "@/app/ui/error-access";
 import { auth } from "@/auth";

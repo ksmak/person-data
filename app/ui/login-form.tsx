@@ -5,12 +5,10 @@ import { FormEvent, useState } from 'react';
 import { HiArrowSmRight, HiCash, HiExclamationCircle, HiKey } from 'react-icons/hi';
 import { login, LoginState } from '@/app/lib/actions';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/authProvider';
 
 export default function LoginForm() {
   const [state, setState] = useState<LoginState>({});
   const router = useRouter();
-  const { setCurrentUser } = useAuth();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -18,7 +16,6 @@ export default function LoginForm() {
     const state: LoginState = await login(formData) as LoginState;
     setState(state);
     if (state.user) {
-      if (setCurrentUser) setCurrentUser(state.user);
       if (state.user.isAdmin) {
         router.push("/dashboard");
       } else {
