@@ -9,13 +9,13 @@ import queue from "./queue";
 import { saltAndHashPassword } from "./utils";
 import { auth, signIn, signOut } from "@/auth";
 import { AuthError } from "next-auth";
-import { CurrentUserType } from "@/authProvider";
 import { fetchUserByEmail } from "./data";
+import { User } from "@prisma/client";
 
 const EXPIRED_PASSWORD_DAYS = 30;
 
 export type LoginState = {
-  user?: CurrentUserType;
+  user?: User;
   errors?: {
     email?: string;
     password?: string;
