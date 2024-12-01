@@ -29,7 +29,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
         notFound();
     }
 
-    let results: ({ Db: Db | null; } & Person)[] = [];
+    const results: ({ Db: Db | null; } & Person)[] = [];
     if (query.result) {
         try {
             JSON.parse(query.result).map((item: { Db: Db | null; } & Person) => {

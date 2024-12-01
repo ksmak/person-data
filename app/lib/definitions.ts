@@ -28,6 +28,22 @@ export const PERSONS_FULLTEXT_EXP = `
     COALESCE("Person"."apartment", '')
 `;
 
+export type PersonResult = {
+  lastName: string | null;
+  firstName: string | null;
+  middleName: string | null;
+  iin: string | null;
+  phone: string | null;
+  region: string | null;
+  district: string | null;
+  locality: string | null;
+  street: string | null;
+  building: string | null;
+  apartment: string | null;
+  extendedPersonData: string | null;
+  db_name: string | null;
+};
+
 export type Person = {
   db?: { id: string; name: string } | null;
   dbId?: string | null;
@@ -75,14 +91,14 @@ export type TableHead = {
   title: string;
   name: string;
   fieldType:
-  | "string"
-  | "boolean"
-  | "date"
-  | "datetime"
-  | "active"
-  | "nested"
-  | "queryBody"
-  | "queryState";
+    | "string"
+    | "boolean"
+    | "date"
+    | "datetime"
+    | "active"
+    | "nested"
+    | "queryBody"
+    | "queryState";
   nestedName?: string;
 };
 
@@ -97,10 +113,10 @@ export type UsersQueries = {
 export type MessageChat = {
   role: string;
   content: string;
-}
+};
 
 export type Result = {
-  data: any,
-  service: 'Person Data' | 'UsersBox API',
-  error?: string,
-}
+  data: any;
+  service: "Qarau API" | "UsersBox API";
+  error?: string;
+};

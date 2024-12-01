@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import prisma from "./db";
 import { Person } from "./definitions";
 import queue from "./queue";
-import { getCondition, saltAndHashPassword } from "./utils";
+import { saltAndHashPassword } from "./utils";
 import { auth, signIn, signOut } from "@/auth";
 import { AuthError } from "next-auth";
 import { CurrentUserType } from "@/authProvider";
@@ -402,30 +402,23 @@ export async function deleteSubscription(id: string) {
   redirect("/dashboard/subscriptions");
 }
 
-export async function createQuery(
-  userId: string,
-  body: string
-) {
-  let query;
+export async function createQuery(userId: string, body: string) {
+  const query = await prisma.query.create({
+    data: {
+      userId: userId,
+      body: body,
+    },
+  });
 
-  try {
-    query = await prisma.query.create({
-      data: {
-        userId: userId,
-        body: body,
-      },
-    });
-  } catch (error) {
-    throw error;
-  }
+  await queue.add(
+    "process-queries",
+    {
+      queryId: query.id,
+    },
+    { delay: 3000 }
+  );
 
-  await queue.add("process-queries", {
-    queryId: query.id,
-  }, { delay: 2000 });
-
-  return {
-    query: query,
-  };
+  return query;
 }
 
 export async function loadData(persons: Person[]) {
@@ -485,6 +478,6 @@ export async function updateUserInfo() {
   const session = await auth();
 
   if (session?.user?.email) {
-    return await fetchUserByEmail(session.user.email) || undefined;
+    return (await fetchUserByEmail(session.user.email)) || undefined;
   }
 }

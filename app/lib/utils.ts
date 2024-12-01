@@ -18,7 +18,7 @@ export const formatDateToLocal = (
 };
 
 export const formatQueryCondition = (query: any) => {
-  let result: string[] = [];
+  const result: string[] = [];
   try {
     const arrFields = JSON.parse(query);
     arrFields.map((item: any) => {
@@ -32,28 +32,26 @@ export const formatQueryCondition = (query: any) => {
                     `${fld.title} содержит "${item[key]["contains"]}"`
                   );
                   break;
-                };
+                }
                 case "startsWith": {
                   result.push(
                     `${fld.title} начинается с "${item[key]["startsWith"]}"`
                   );
                   break;
-                };
+                }
                 case "endsWith": {
                   result.push(
                     `${fld.title} оканчивается на "${item[key]["endsWith"]}"`
                   );
                   break;
-                };
+                }
                 default: {
-                  result.push(
-                    `${fld.title} равно "${item[key]}"`
-                  );
-                };
-              };
-            };
-          };
-        };
+                  result.push(`${fld.title} равно "${item[key]}"`);
+                }
+              }
+            }
+          }
+        }
       });
     });
   } catch (e) {
@@ -141,9 +139,12 @@ export function comparePasswords(pwd1: string, pwd2: string) {
 }
 
 export function getCondition(key: string, val: string) {
-  const replaceVal = val.replaceAll('*', '%').replaceAll('?', '_').toUpperCase();
+  const replaceVal = val
+    .replaceAll("*", "%")
+    .replaceAll("?", "_")
+    .toUpperCase();
 
-  if (replaceVal.startsWith('%') && replaceVal.endsWith('%')) {
+  if (replaceVal.startsWith("%") && replaceVal.endsWith("%")) {
     const formattedVal = replaceVal.substring(1, val.length - 1);
     return {
       [`${key}`]: {
@@ -151,8 +152,7 @@ export function getCondition(key: string, val: string) {
         mode: "insensitive",
       },
     };
-
-  } else if (replaceVal.startsWith('%')) {
+  } else if (replaceVal.startsWith("%")) {
     const formattedVal = replaceVal.substring(1);
     return {
       [`${key}`]: {
@@ -160,8 +160,7 @@ export function getCondition(key: string, val: string) {
         mode: "insensitive",
       },
     };
-
-  } else if (replaceVal.endsWith('%')) {
+  } else if (replaceVal.endsWith("%")) {
     const formattedVal = replaceVal.substring(0, val.length - 1);
     return {
       [`${key}`]: {
@@ -169,7 +168,7 @@ export function getCondition(key: string, val: string) {
         mode: "insensitive",
       },
     };
-  } else if (replaceVal.includes('%') || replaceVal.includes('_')) {
+  } else if (replaceVal.includes("%") || replaceVal.includes("_")) {
     return {
       [`${key}`]: {
         contains: replaceVal,
@@ -182,4 +181,4 @@ export function getCondition(key: string, val: string) {
   return {
     [`${key}`]: replaceVal,
   };
-};
+}

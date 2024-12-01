@@ -30,10 +30,12 @@ export default async function Page(props: {
 
     let error = '';
     let queryId = '';
+
     if (body) {
         try {
             searchSchema.parse(body);
-            await createQuery(user.id, body);
+            const query = await createQuery(user.id, body);
+            queryId = query.id;
         } catch (e) {
             if (e instanceof ZodError) {
                 error = "Для поиска необходимо хотя бы 4 символа";

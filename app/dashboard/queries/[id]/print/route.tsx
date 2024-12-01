@@ -15,7 +15,7 @@ export async function GET(request: Request,
     const user = query?.userId ? await fetchUserById(query.userId) : null;
 
 
-    let items: FileChild[] = [];
+    const items: FileChild[] = [];
 
     if (query?.result) {
         try {

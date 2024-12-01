@@ -1,6 +1,5 @@
-import { JobScheduler, JobSchedulerJson, Queue, QueueEvents, RepeatableJob } from "bullmq";
+import { Queue, QueueEvents } from "bullmq";
 import IORedis from "ioredis";
-import { scheduler } from "timers/promises";
 
 let connection;
 
@@ -26,13 +25,17 @@ const queueSingleton = () => {
     connection: connection,
   });
 
+  queue.drain().then(() => console.log("Queue drained."));
+
   queue
-    .drain()
-    .then(() => console.log("Queue drained."));
-
-  queue.removeJobScheduler('repeat-every')
-    .then(() => console.log('Job sheduler removed.'))
-
+    .removeJobScheduler("repeat-every")
+    .then(() => console.log("Job sheduler removed."));
+  queue
+    .removeJobScheduler("repeat-every-10s")
+    .then(() => console.log("Job sheduler removed."));
+  queue
+    .removeJobScheduler("repeat-every-30s")
+    .then(() => console.log("Job sheduler removed."));
 
   return queue;
 };

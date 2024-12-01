@@ -57,7 +57,7 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
                 setUploading(false);
                 return;
             }
-            let data: any[] = []
+            const data: any[] = []
             let cols: string[] = [];
             let count = 0;
             setUploadLogs(prev => prev.concat(['[']));
@@ -98,7 +98,7 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
         setPreviewLogs([]);
         setPersons([]);
         //get select cols
-        let conf: PersonField[] = [];
+        const conf: PersonField[] = [];
         cols.forEach((item: string) => {
             const field = formData.get(item);
             if (field) {
@@ -112,7 +112,7 @@ export function ImportForm({ url, db }: { url: string, db: Db[] }) {
         setConfig(conf);
         //load data into persons
         data.map((item: any) => {
-            let person: Person = {
+            const person: Person = {
                 dbId: dbId,
                 extendedPersonData: {},
             };
