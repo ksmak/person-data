@@ -65,7 +65,7 @@ export default function SubscriptionForm({
           </div>
         </div>
         {/* queriesCount */}
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <label htmlFor="maxQueriesDay" className="pl-2 mb-2 block text-sm font-medium">
             Количество запросов
           </label>
@@ -89,9 +89,9 @@ export default function SubscriptionForm({
                 ))}
             </div>
           </div>
-        </div>
+        </div> */}
         {/* price */}
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <label htmlFor="maxQueriesDay" className="pl-2 mb-2 block text-sm font-medium">
             Цена
           </label>
@@ -115,7 +115,7 @@ export default function SubscriptionForm({
                 ))}
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
       {sub?.id && <ModalDeleteSubscription id={sub.id} open={open} handleOpen={handleOpen} />}
     </form >
