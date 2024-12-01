@@ -70,7 +70,7 @@ export default async function Page(props: {
                 <div className="grid grid-cols-3">
                     <div className="col-start-2 justify-self-center font-medium mt-5 italic">Параметры поиска:</div>
                     <div className="justify-self-end flex items-center gap-2">
-                        {query.result && <SecondaryBtn className='md:w-28 justify-center '>
+                        {/* {query.result && <SecondaryBtn className='md:w-28 justify-center '>
                             <Link
                                 className='flex items-center gap-1'
                                 href={`/dashboard/queries/${queryId}/print`}
@@ -78,7 +78,7 @@ export default async function Page(props: {
                                 <span className="hidden md:block">Печать</span>{' '}
                                 <HiOutlinePrinter className='h-5 w-5' />
                             </Link>
-                        </SecondaryBtn>}
+                        </SecondaryBtn>} */}
                         <SecondaryBtn className='md:w-28 justify-center'>
                             <Link
                                 className='flex items-center gap-1'
