@@ -36,16 +36,16 @@ export default async function Page(props: {
         notFound();
     }
 
-    const results: PersonResult[] = [];
-    if (query.result) {
-        try {
-            JSON.parse(query.result).map((item: PersonResult) => {
-                results.push(item);
-            })
-        } catch (e) {
-            console.log(e);
-        }
-    }
+    // const results: PersonResult[] = [];
+    // if (query.result) {
+    //     try {
+    //         JSON.parse(query.result).map((item: PersonResult) => {
+    //             results.push(item);
+    //         })
+    //     } catch (e) {
+    //         console.log(e);
+    //     }
+    // }
 
     return (
         <main>
