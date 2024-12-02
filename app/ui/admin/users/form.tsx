@@ -1,6 +1,7 @@
 'use client';
 
-import { createUser, updateUser, State } from '@/app/lib/actions';
+import { State } from '@/app/lib/definitions';
+import { createUser, updateUser } from '@/app/lib/actions';
 import { FormEvent, useState } from 'react';
 import { Subscription, User } from '@prisma/client';
 import { ModalDeleteUser } from '@/app/ui/admin/users/modal';
@@ -36,7 +37,7 @@ export default function UserForm({
   return (
     <form onSubmit={onSubmit} className='w-full'>
       <div className="mb-3 flex justify-end gap-4">
-        <EditButtonsGroup item={user} handleOpen={handleOpen} url='/dashboard/users' />
+        <EditButtonsGroup item={user} handleOpen={handleOpen} url='/dashboard/admin/users' />
       </div>
       <div className="rounded-md bg-secondary border border-borderlight p-4 md:p-6">
         <p className="mt-2 text-sm text-red-500 text-center mb-2">{state.message}</p>

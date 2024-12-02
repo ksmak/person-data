@@ -41,21 +41,10 @@ export default async function UsersTable({
       name: "email",
       fieldType: 'string',
     },
-    {
-      title: "Срок действия пароля",
-      name: "expiredPwd",
-      fieldType: 'date',
-    },
-    {
-      title: "Подписка",
-      name: "subs",
-      fieldType: 'nested',
-      nestedName: 'title',
-    },
   ]
   return (
     <>
-      <Tbl tableHeads={tableHeads} tableRows={users} url='/dashboard/users' />
+      <Tbl tableHeads={tableHeads} tableRows={users} url='/dashboard/admin/users' />
     </>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
-import { SubscriptionState, updateSubscription, createSubscription } from '@/app/lib/actions';
+import { SubscriptionState } from '@/app/lib/definitions';
+import { updateSubscription, createSubscription } from '@/app/lib/actions';
 import { FormEvent, useState } from 'react';
 import { Subscription } from '@prisma/client';
 import { ModalDeleteSubscription } from '@/app/ui/admin/subscriptions/modal';
@@ -34,7 +35,7 @@ export default function SubscriptionForm({
   return (
     <form onSubmit={onSubmit}>
       <div className="mb-3 flex justify-end gap-4">
-        <EditButtonsGroup item={sub} handleOpen={handleOpen} url='/dashboard/subscriptions' />
+        <EditButtonsGroup item={sub} handleOpen={handleOpen} url='/dashboard/admin/subscriptions' />
       </div>
       <div className="rounded-lg bg-secondary border borderlight p-4 md:p-6">
         <p className="mt-2 text-sm text-red-500 text-center mb-2">{state.message}</p>
@@ -65,7 +66,7 @@ export default function SubscriptionForm({
           </div>
         </div>
         {/* queriesCount */}
-        {/* <div className="mb-4">
+        <div className="mb-4">
           <label htmlFor="maxQueriesDay" className="pl-2 mb-2 block text-sm font-medium">
             Количество запросов
           </label>
@@ -89,9 +90,9 @@ export default function SubscriptionForm({
                 ))}
             </div>
           </div>
-        </div> */}
+        </div>
         {/* price */}
-        {/* <div className="mb-4">
+        <div className="mb-4">
           <label htmlFor="maxQueriesDay" className="pl-2 mb-2 block text-sm font-medium">
             Цена
           </label>
@@ -115,7 +116,7 @@ export default function SubscriptionForm({
                 ))}
             </div>
           </div>
-        </div> */}
+        </div>
       </div>
       {sub?.id && <ModalDeleteSubscription id={sub.id} open={open} handleOpen={handleOpen} />}
     </form >

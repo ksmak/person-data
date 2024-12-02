@@ -23,7 +23,9 @@ export default async function Page() {
             <div className="">
                 <h1 className="text-2xl text-center w-full mb-5">Подписки</h1>
             </div>
-            {subs.map((item) => <SubscriptionCard key={item.id} sub={item} />)}
+            <div className="w-full flex flex-col gap-10 md:grid md:grid-cols-3 md:gap-20">
+                {subs.map((item) => <SubscriptionCard key={item.id} sub={item} />)}
+            </div>
         </div >
     );
 }

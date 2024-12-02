@@ -22,25 +22,20 @@ export default async function UsersTable({
       fieldType: "string",
     },
     {
-      title: "Максим. кол-во запросов в день",
-      name: "maxQueriesDay",
+      title: "Количество запросов",
+      name: "queriesCount",
       fieldType: "string",
     },
     {
-      title: "Максим. кол-во запросов в месяц",
-      name: "maxQueriesMonth",
-      fieldType: "string",
-    },
-    {
-      title: "Максим. кол-во запросов",
-      name: "maxQueriesTotal",
+      title: "Цена",
+      name: "price",
       fieldType: "string",
     },
   ]
 
   return (
     <>
-      <Tbl tableHeads={tableHeads} tableRows={subs} url="/dashboard/subscriptions" />
+      <Tbl tableHeads={tableHeads} tableRows={subs} url="/dashboard/admin/subscriptions" />
     </>
   );
 }

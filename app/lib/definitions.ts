@@ -1,4 +1,134 @@
+import { User } from "@prisma/client";
 import { JsonObject } from "@prisma/client/runtime/library";
+import { z } from "zod";
+
+export const EXPIRED_PASSWORD_DAYS = 30;
+export const ITEMS_PER_PAGE = 8;
+
+export type LoginState = {
+  user?: User;
+  errors?: {
+    email?: string;
+    password?: string;
+  };
+  message?: string;
+};
+
+export const signInSchema = z.object({
+  email: z
+    .string()
+    .min(1, {
+      message: "Поле должно быть заполнено.",
+    })
+    .email("Некорректный почтовый ящик."),
+  password: z.string().min(5, "Длина пароля не должен быть меньше 5 символов."),
+});
+
+export const loginUser = signInSchema.omit({});
+
+export const CreateUserSchema = z.object({
+  id: z.string(),
+  isActive: z.boolean(),
+  email: z
+    .string()
+    .min(1, {
+      message: "Поле должно быть заполнено.",
+    })
+    .email("Некорректный почтовый ящик"),
+  password: z.string().min(5, {
+    message: "Пароль должен состоять из не менее 5 символов.",
+  }),
+  lastName: z.string().refine((data) => data.trim() !== "", {
+    message: "Поле не заполнено",
+  }),
+  firstName: z.string().refine((data) => data.trim() !== "", {
+    message: "Поле не заполнено",
+  }),
+  middleName: z.string(),
+  expiredPwd: z.date(),
+  subsId: z.string().refine((data) => data.trim() !== "", {
+    message: "Поле не заполнено",
+  }),
+});
+
+export const UpdateUserSchema = z.object({
+  id: z.string(),
+  isActive: z.boolean(),
+  email: z
+    .string()
+    .min(1, {
+      message: "Поле должно быть заполнено",
+    })
+    .email("Некорректный почтовый ящик"),
+  password: z.string(),
+  lastName: z.string().refine((data) => data.trim() !== "", {
+    message: "Поле не заполнено",
+  }),
+  firstName: z.string().refine((data) => data.trim() !== "", {
+    message: "Поле не заполнено",
+  }),
+  middleName: z.string(),
+  expiredPwd: z.date(),
+  subsId: z.string().refine((data) => data.trim() !== "", {
+    message: "Поле не заполнено",
+  }),
+});
+
+export const SubscriptionFormSchema = z.object({
+  id: z.string(),
+  title: z.string().refine((data) => data.trim() !== "", {
+    message: "Поле ввода не заполнено",
+  }),
+  queriesCount: z.number(),
+  price: z.number(),
+});
+
+export type State = {
+  errors?: {
+    id?: string[];
+    isActive?: string[];
+    email?: string[];
+    password?: string[];
+    lastName?: string[];
+    firstName?: string[];
+    middleName?: string[];
+  };
+  message?: string | null;
+};
+
+export type SubscriptionState = {
+  errors?: {
+    id?: string[];
+    title?: string[];
+    queriesCount?: string[];
+    price?: string[];
+  };
+  message?: string | null;
+};
+
+export type ImportState = {
+  file?: string;
+  cols?: string[];
+  persons?: Person[];
+  error?: string | null;
+  logs?: string[];
+};
+
+export const CreateUser = CreateUserSchema.omit({
+  id: true,
+  isActive: true,
+});
+export const UpdateUser = UpdateUserSchema.omit({
+  id: true,
+  isActive: true,
+});
+export const CreateSubscription = SubscriptionFormSchema.omit({
+  id: true,
+});
+export const UpdateSubscription = SubscriptionFormSchema.omit({
+  id: true,
+});
+
 
 export const PERSONS_FIELDS_LIST = `
     "Person"."iin",
@@ -91,14 +221,14 @@ export type TableHead = {
   title: string;
   name: string;
   fieldType:
-    | "string"
-    | "boolean"
-    | "date"
-    | "datetime"
-    | "active"
-    | "nested"
-    | "queryBody"
-    | "queryState";
+  | "string"
+  | "boolean"
+  | "date"
+  | "datetime"
+  | "active"
+  | "nested"
+  | "queryBody"
+  | "queryState";
   nestedName?: string;
 };
 

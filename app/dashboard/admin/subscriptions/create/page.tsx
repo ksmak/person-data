@@ -19,10 +19,10 @@ export default async function Page() {
         <main>
             <Breadcrumbs
                 breadcrumbs={[
-                    { label: 'Подписки', href: '/dashboard/subscriptions' },
+                    { label: 'Подписки', href: '/dashboard/admin/subscriptions' },
                     {
                         label: 'Добавление подписки',
-                        href: '/dashboard/subscriptions/create',
+                        href: '/dashboard/admin/subscriptions/create',
                         active: true,
                     },
                 ]}

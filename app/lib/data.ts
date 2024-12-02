@@ -1,8 +1,6 @@
-import prisma from "./db";
-import { UsersQueries } from "./definitions";
-import { comparePasswords } from "./utils";
-
-const ITEMS_PER_PAGE = 8;
+import prisma from "@/app/lib/db";
+import { ITEMS_PER_PAGE, UsersQueries } from "@/app/lib/definitions";
+import { comparePasswords } from "@/app/lib/utils";
 
 export async function fetchSubscriptions() {
   return await prisma.subscription.findMany();
@@ -24,7 +22,6 @@ export async function fetchFilteredUsers(
       firstName: true,
       middleName: true,
       email: true,
-      expiredPwd: true,
     },
     where: {
       OR: [

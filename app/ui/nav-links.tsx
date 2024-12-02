@@ -1,6 +1,13 @@
 'use client';
 
-import { HiOutlineSearch, HiOutlineKey, HiOutlineDatabase, HiOutlineUserCircle } from "react-icons/hi";
+import {
+  HiOutlineSearch,
+  HiOutlineDatabase,
+  HiOutlineUserCircle,
+  HiOutlineUser,
+  HiOutlineShieldCheck,
+  HiOutlineChartBar
+} from "react-icons/hi";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
@@ -12,24 +19,56 @@ const links = [
     href: '/dashboard/queries',
     icon: HiOutlineSearch,
     forAdmin: false,
+    subMenu: false,
   },
   {
     title: 'Подписки',
     href: '/dashboard/subscriptions',
-    icon: HiOutlineKey,
+    icon: HiOutlineShieldCheck,
     forAdmin: false,
+    subMenu: false,
   },
   {
     title: 'Контакты',
     href: '/dashboard/contacts',
     icon: HiOutlineUserCircle,
     forAdmin: false,
+    subMenu: false,
   },
   {
     title: 'Администрирование',
     href: '/dashboard/admin',
     icon: HiOutlineDatabase,
     forAdmin: true,
+    subMenu: false,
+  },
+  {
+    title: 'Пользователи',
+    href: '/dashboard/admin/users',
+    icon: HiOutlineUser,
+    forAdmin: true,
+    subMenu: true,
+  },
+  {
+    title: 'Подписки',
+    href: '/dashboard/admin/subscriptions',
+    icon: HiOutlineShieldCheck,
+    forAdmin: true,
+    subMenu: true,
+  },
+  {
+    title: 'Мониторинг запросов',
+    href: '/dashboard/admin/monitoring',
+    icon: HiOutlineChartBar,
+    forAdmin: true,
+    subMenu: true,
+  },
+  {
+    title: 'Загрузка данных',
+    href: '/dashboard/admin/import',
+    icon: HiOutlineDatabase,
+    forAdmin: true,
+    subMenu: true,
   },
 ];
 
@@ -50,9 +89,10 @@ export default function NavLinks({ user }: { user: User | null }) {
             key={index}
             href={link.href}
             className={clsx(
-              'flex items-center gap-2 rounded-md bg-secondary border border-borderlight text-sm font-medium hover:bg-select hover:text-primarytxt hover:underline p-3 px-3',
+              'flex items-center gap-2 rounded-md bg-secondary border border-borderlight text-sm font-medium hover:bg-select hover:text-primarytxt p-3 px-3',
               {
                 'bg-select text-primarytxt': pathname === link.href,
+                'pl-10': link.subMenu,
               },
             )}
           >
