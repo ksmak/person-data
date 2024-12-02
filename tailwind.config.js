@@ -7,14 +7,14 @@ module.exports = withMT({
   theme: {
     extend: {
       colors: {
-        primary: "#10b981",
-        secondary: "#f0fdf4",
-        select: "#a7f3d0",
+        primary: "#6f96c3",
+        secondary: "#edf2f7",
+        select: "#dbe5f0",
         primarytxt: "#022c22",
-        emerald600: "#059669",
-        emerald500: "#10b981",
-        emerald400: "#34d399",
-        emerald200: "#a7f3d0",
+        emerald600: "#3c6390",
+        emerald500: "#4470a2",
+        emerald400: "#4b7cb4",
+        emerald200: "#6f96c3",
         borderlight: "#EAEEEF",
         borderdark: "#F6E8DA",
 

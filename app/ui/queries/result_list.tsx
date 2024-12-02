@@ -4,6 +4,7 @@ import io from 'socket.io-client';
 import { Result } from "@/app/lib/definitions";
 import { useEffect, useState } from "react";
 import ResultCard from './result_card';
+import { Spinner } from '@material-tailwind/react';
 
 export default function ResultList({ url, queryId }: { url: string, queryId: string }) {
   const [results, setResults] = useState<Result[]>([]);
@@ -49,8 +50,10 @@ export default function ResultList({ url, queryId }: { url: string, queryId: str
     <div>
       <div className='text-sm italic'>
         {typeof loading === 'undefined'
-          ? <div><span className='underline'>Подсказка:</span> Для поиска информации вводите Ф.И.О., номер телефона, адрес и т.д.</div>
-          : loading ? <div>Идет поиск данных...</div> : <div>Поиск завершен. Найдено: {results.filter(item => !item.error).length}</div>}
+          ? null
+          : loading
+            ? <div>Идет поиск данных... <Spinner className="inline ml-2 h-4 w-4 text-primary/50" /></div>
+            : <div>Поиск завершен. Найдено: {results.filter(item => !item.error).length}</div>}
       </div>
       {results.map((item: Result, index: number) =>
         item.error

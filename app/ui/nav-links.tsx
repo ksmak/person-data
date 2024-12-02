@@ -22,20 +22,6 @@ const links = [
     subMenu: false,
   },
   {
-    title: 'Подписки',
-    href: '/dashboard/subscriptions',
-    icon: HiOutlineShieldCheck,
-    forAdmin: false,
-    subMenu: false,
-  },
-  {
-    title: 'Контакты',
-    href: '/dashboard/contacts',
-    icon: HiOutlineUserCircle,
-    forAdmin: false,
-    subMenu: false,
-  },
-  {
     title: 'Администрирование',
     href: '/dashboard/admin',
     icon: HiOutlineDatabase,
