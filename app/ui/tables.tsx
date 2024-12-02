@@ -148,7 +148,7 @@ export function Tbl({ tableHeads, tableRows, url
                                                     >
                                                         {row[`${head.name}` as keyof typeof row] === 'WAITING'
                                                             ? <span className="text-orange-600 border border-orange-600 p-1 text-center text-xs">в процессе</span>
-                                                            : row[`${head.name}` as keyof typeof row] === "SUCCESS"
+                                                            : row[`${head.name}` as keyof typeof row] === "COMPLETED"
                                                                 ? <span className="text-green-600 border border-green-600 p-1 text-center text-xs">выполнен</span>
                                                                 : <span className="text-red-600 border border-red-600 p-1 text-center text-xs">ошибка</span>
                                                         }

@@ -63,6 +63,7 @@ model Query {
   userId    String
   body      String
   state     QueryStateType @default(WAITING)
+  count     Int            @default(0)
   createdAt DateTime?      @default(now())
 }
 

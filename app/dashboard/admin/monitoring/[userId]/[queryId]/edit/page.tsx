@@ -59,7 +59,7 @@ export default async function Page(props: {
                         <SecondaryBtn className='md:w-28 justify-center'>
                             <Link
                                 className='flex items-center gap-1'
-                                href={`/dashboard/monitoring/${userId}/edit`}
+                                href={`/dashboard/admin/monitoring/${userId}/edit`}
                             >
                                 <span className="hidden md:block">Закрыть</span>{' '}
                                 <HiOutlineX className='h-5 w-5' />
@@ -73,7 +73,7 @@ export default async function Page(props: {
             </div>
             {query.state === 'WAITING'
                 ? <div className="mt-5 font-medium border-b border-primary italic">Запрос в процессе обработки</div>
-                : <div className="mt-5 font-medium border-b border-primary italic">Запрос обработан.</div>
+                : <div className="mt-5 font-medium border-b border-primary italic">Запрос обработан. Количество совпадений:  {query.count}</div>
             }
         </main>
     );

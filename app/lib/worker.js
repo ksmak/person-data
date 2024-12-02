@@ -173,7 +173,10 @@ async function loadData(data) {
 
 //Job proccess-query
 async function processQuery(data) {
-  if (!data.queryId) return;
+  if (!data.queryId) {
+    console.log(`Id: ${data.queryId} not exist.`);
+    return 0;
+  }
 
   try {
     query = await prisma.query.findUnique({
@@ -183,9 +186,14 @@ async function processQuery(data) {
       },
     });
 
+    if (!query) {
+      console.log(`Query: ${queryId} not found.`);
+      return 0;
+    }
+
     socket.emit("query-started", { queryId: query.id });
 
-    await Promise.all([getPersonsDataAPI(query), getUsersBoxAPI(query)]);
+    const result = await Promise.all([getPersonsDataAPI(query), getUsersBoxAPI(query)]);
 
     await prisma.query.update({
       where: {
@@ -193,6 +201,7 @@ async function processQuery(data) {
       },
       data: {
         state: "COMPLETED",
+        count: result.reduce((acc, v) => acc + v, 0),
       },
     });
 
@@ -229,7 +238,7 @@ async function getPersonsDataAPI(query) {
 
         socket.emit("query-data", rs);
       });
-      return;
+      return result.data.length;
     }
 
     const rs = {
@@ -241,16 +250,20 @@ async function getPersonsDataAPI(query) {
     console.log("query-data: ", JSON.stringify(rs));
 
     socket.emit("query-data", rs);
+
+    return 0;
   } catch (e) {
     const rs = {
       queryId: query.id,
-      error: `Ошибка! ${e}`,
+      error: `Ошибка! Сервис Qarau API не доступен.`,
       service: "Qarau API",
     };
 
     console.log("query-data: ", JSON.stringify(rs));
 
     socket.emit("query-data", rs);
+
+    return 0;
   }
 }
 
@@ -281,7 +294,7 @@ async function getUsersBoxAPI(query) {
 
         socket.emit("query-data", rs);
       });
-      return;
+      return result.data.items.length;
     }
 
     const rs = {
@@ -293,15 +306,19 @@ async function getUsersBoxAPI(query) {
     console.log("query-data: ", rs);
 
     socket.emit("query-data", rs);
+
+    return 0;
   } catch (e) {
     const rs = {
       queryId: query.id,
-      error: `Ошибка! ${e}`,
+      error: `Ошибка! Сервис UsersBox API не доступен.`,
       service: "UsersBox API",
     };
 
     console.log("query-data: ", rs);
 
     socket.emit("query-data", rs);
+
+    return 0;
   }
 }
