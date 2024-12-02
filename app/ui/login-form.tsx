@@ -3,8 +3,9 @@
 import { Button } from '@material-tailwind/react';
 import { FormEvent, useState } from 'react';
 import { HiArrowSmRight, HiCash, HiExclamationCircle, HiKey } from 'react-icons/hi';
-import { login, LoginState } from '@/app/lib/actions';
+import { login } from '@/app/lib/actions';
 import { useRouter } from 'next/navigation';
+import { LoginState } from '../lib/definitions';
 
 export default function LoginForm() {
   const [state, setState] = useState<LoginState>({});
