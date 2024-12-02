@@ -5,6 +5,17 @@ import { z } from "zod";
 export const EXPIRED_PASSWORD_DAYS = 30;
 export const ITEMS_PER_PAGE = 8;
 
+export const searchSchema = z.object({
+  body: z.string().min(4, {
+    message: 'Для поиска необходимо хотя бы 4 символа'
+  }),
+  photo: z.string(),
+});
+
+export const search = searchSchema.omit({
+  photo: true
+});
+
 export type LoginState = {
   user?: User;
   errors?: {
@@ -45,10 +56,7 @@ export const CreateUserSchema = z.object({
     message: "Поле не заполнено",
   }),
   middleName: z.string(),
-  expiredPwd: z.date(),
-  subsId: z.string().refine((data) => data.trim() !== "", {
-    message: "Поле не заполнено",
-  }),
+  balance: z.number().positive(),
 });
 
 export const UpdateUserSchema = z.object({
@@ -68,10 +76,7 @@ export const UpdateUserSchema = z.object({
     message: "Поле не заполнено",
   }),
   middleName: z.string(),
-  expiredPwd: z.date(),
-  subsId: z.string().refine((data) => data.trim() !== "", {
-    message: "Поле не заполнено",
-  }),
+  balance: z.number().positive(),
 });
 
 export const SubscriptionFormSchema = z.object({
@@ -92,6 +97,7 @@ export type State = {
     lastName?: string[];
     firstName?: string[];
     middleName?: string[];
+    balance?: string[];
   };
   message?: string | null;
 };

@@ -193,7 +193,11 @@ async function processQuery(data) {
 
     socket.emit("query-started", { queryId: query.id });
 
-    const result = await Promise.all([getPersonsDataAPI(query), getUsersBoxAPI(query)]);
+    const result = await Promise.all([
+      getPersonsDataAPI(query),
+      getUsersBoxAPI(query),
+      //getChatGPTAPI(query),
+    ]);
 
     await prisma.query.update({
       where: {
@@ -255,7 +259,7 @@ async function getPersonsDataAPI(query) {
   } catch (e) {
     const rs = {
       queryId: query.id,
-      error: `Ошибка! Сервис Qarau API не доступен.`,
+      error: `Ошибка! Сервис не доступен.`,
       service: "Qarau API",
     };
 
@@ -311,7 +315,7 @@ async function getUsersBoxAPI(query) {
   } catch (e) {
     const rs = {
       queryId: query.id,
-      error: `Ошибка! Сервис UsersBox API не доступен.`,
+      error: `Ошибка! Сервис не доступен.`,
       service: "UsersBox API",
     };
 
@@ -321,4 +325,41 @@ async function getUsersBoxAPI(query) {
 
     return 0;
   }
+}
+
+async function getChatGPTAPI(query) {
+  const apiKey = process.env.OPENAI_API_TOKEN;
+
+  const url = process.env.OPENAI_API_URL;
+
+  const body = JSON.stringify({
+    model: process.env.OPENAI_API_MODEL,
+    messages: [
+      { role: 'system', content: 'You are an assistant helping to find information about people.' },
+      { role: 'user', content: query.body }
+    ],
+    temperature: 0.2
+  });
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body,
+    });
+
+    const data = await response.json();
+
+    console.log(data);
+
+    return 0;
+  } catch (e) {
+
+    console.log(e);
+
+    return 0;
+  };
 }

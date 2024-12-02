@@ -186,6 +186,32 @@ export default function UserForm({
             </div>
           </div>
         </div>
+        {/* balance */}
+        <div className="mb-4">
+          <label htmlFor="balance" className="pl-2 mb-2 block text-sm font-medium">
+            Баланс
+          </label>
+          <div className="relative mt-2 rounded-md">
+            <div className="relative">
+              <input
+                className="peer block w-full rounded-md border border-gray-200 py-2 pl-2 text-sm outline-2 placeholder:text-gray-500"
+                id="balance"
+                name="balance"
+                type="number"
+                defaultValue={user?.balance ? user.balance : 0}
+                aria-describedby="balance-error"
+              />
+            </div>
+            <div id="balance-error" aria-live="polite" aria-atomic="true">
+              {state.errors?.balance &&
+                state.errors.balance.map((error: string) => (
+                  <p className="mt-2 text-sm text-red-500" key={error}>
+                    {error}
+                  </p>
+                ))}
+            </div>
+          </div>
+        </div>
       </div>
       {user?.id && <ModalDeleteUser id={user.id} open={open} handleOpen={handleOpen} />}
     </form >

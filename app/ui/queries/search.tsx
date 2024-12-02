@@ -3,10 +3,12 @@
 import { HiOutlineCamera, HiOutlineSearch } from "react-icons/hi";
 import { useSearchParams } from 'next/navigation';
 import { Btn } from "@/app/ui/buttons";
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, FormEvent, useRef, useState } from "react";
+import { search } from "@/app/lib/definitions";
 
-export default function Search({ error }: { error: string }) {
+export default function Search() {
   const searchParams = useSearchParams();
+  const [error, setError] = useState<string | undefined>('');
   const [photo, setPhoto] = useState<File | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -19,9 +21,25 @@ export default function Search({ error }: { error: string }) {
         inputRef.current.value = file.name ? file.name : '';
       }
     }
+  };
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    const formData = new FormData(event.currentTarget);
+
+    const validatedFields = search.safeParse({
+      body: formData.get('body'),
+      photo: formData.get('photo'),
+    });
+
+    if (!validatedFields.success) {
+      setError(validatedFields.error.flatten().fieldErrors.body?.join(';'))
+      event.preventDefault();
+      return;
+    };
   }
+
   return (
-    <form>
+    <form onSubmit={handleSubmit}>
       <div className="flex flex-col md:flex-row md:items-center gap-3 flex-wrap mb-5">
         <div className="grow relative flex flex-1 flex-shrink-0">
           <input

@@ -25,6 +25,7 @@ export async function createUser(prevState: State, formData: FormData) {
     lastName: formData.get("lastName"),
     firstName: formData.get("firstName"),
     middleName: formData.get("middleName"),
+    balance: Number(formData.get("balance")),
   });
 
   if (!validatedFields.success) {
@@ -34,7 +35,7 @@ export async function createUser(prevState: State, formData: FormData) {
     };
   }
 
-  const { email, password, lastName, firstName, middleName } =
+  const { email, password, lastName, firstName, middleName, balance } =
     validatedFields.data;
 
   const isActive = !!formData.get("isActive");
@@ -48,6 +49,7 @@ export async function createUser(prevState: State, formData: FormData) {
         lastName: lastName,
         firstName: firstName,
         middleName: middleName,
+        balance: balance,
       },
     });
   } catch {
@@ -71,6 +73,7 @@ export async function updateUser(
     lastName: formData.get("lastName"),
     firstName: formData.get("firstName"),
     middleName: formData.get("middleName"),
+    balance: Number(formData.get("balance")),
   });
 
   if (!validatedFields.success) {
@@ -80,7 +83,7 @@ export async function updateUser(
     };
   }
 
-  const { email, password, lastName, firstName, middleName } =
+  const { email, password, lastName, firstName, middleName, balance } =
     validatedFields.data;
 
   const isActive = !!formData.get("isActive");
@@ -98,6 +101,7 @@ export async function updateUser(
           lastName: lastName,
           firstName: firstName,
           middleName: middleName,
+          balance: balance,
         },
       });
     } else {
@@ -111,6 +115,7 @@ export async function updateUser(
           lastName: lastName,
           firstName: firstName,
           middleName: middleName,
+          balance: balance,
         },
       });
     }
@@ -220,22 +225,21 @@ export async function deleteSubscription(id: string) {
 }
 
 export async function createQuery(userId: string, body: string) {
-  const query = await prisma.query.create({
+  return await prisma.query.create({
     data: {
       userId: userId,
       body: body,
     },
   });
+}
 
+export async function addJobQueriesProccess(queryId: string) {
   await queue.add(
     "process-queries",
     {
-      queryId: query.id,
+      queryId: queryId,
     },
-    { delay: 3000 }
   );
-
-  return query;
 }
 
 export async function loadData(persons: Person[]) {
