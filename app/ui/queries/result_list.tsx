@@ -73,7 +73,7 @@ export default function ResultList({ url, userId }: { url: string, userId: strin
 
     console.log(formattedBody);
 
-    let url = new URL('http://yandex.ru/yandsearch');
+    const url = new URL('http://yandex.ru/yandsearch');
     url.searchParams.append('text', body);
     url.searchParams.append('filter', 'people');
     url.searchParams.append('lr', '213');
