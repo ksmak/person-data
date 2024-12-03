@@ -64,6 +64,23 @@ export default function ResultList({ url, userId }: { url: string, userId: strin
     };
   }, []);
 
+  const generateUrlForYandex = () => {
+    const body = searchParams.get('body');
+
+    if (!body) return;
+
+    const formattedBody = body.trim().split(' ').join('+');
+
+    console.log(formattedBody);
+
+    let url = new URL('http://yandex.ru/yandsearch');
+    url.searchParams.append('text', body);
+    url.searchParams.append('filter', 'people');
+    url.searchParams.append('lr', '213');
+
+    return url.toString();
+  }
+
   return (
     <div>
       <div className='text-xs text-gray-600 md:text-sm italic'>
@@ -80,6 +97,18 @@ export default function ResultList({ url, userId }: { url: string, userId: strin
             <div>{item.error}</div>
           </div>
           : <ResultCard key={index} result={item} />)}
+      {loading === false &&
+        <div>
+          <div className='text-sm underline text-blue-600 mt-5'>
+            <a
+              href={generateUrlForYandex()}
+
+            >
+              Посмотреть результаты поиска на Yandex
+            </a>
+          </div>
+        </div>
+      }
     </div>
   );
 }

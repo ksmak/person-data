@@ -2,6 +2,8 @@ const { Worker } = require("bullmq");
 const IORedis = require("ioredis");
 const { PrismaClient } = require("@prisma/client");
 const { io } = require("socket.io-client");
+const OpenAI = require("openai");
+const FreeGPT3 = require("freegptjs");
 
 let connection;
 
@@ -196,7 +198,7 @@ async function processQuery(data) {
     const result = await Promise.all([
       getPersonsDataAPI(query),
       getUsersBoxAPI(query),
-      //getChatGPTAPI(query),
+      // getChatGPTAPI(query),
     ]);
 
     await prisma.query.update({
@@ -332,28 +334,57 @@ async function getChatGPTAPI(query) {
 
   const url = process.env.OPENAI_API_URL;
 
-  const body = JSON.stringify({
-    model: process.env.OPENAI_API_MODEL,
-    messages: [
-      { role: 'system', content: 'You are an assistant helping to find information about people.' },
-      { role: 'user', content: query.body }
-    ],
-    temperature: 0.2
-  });
-
   try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body,
+    //free gpt
+
+
+    // No API key required.
+    const openai = new FreeGPT3();
+
+    const chatCompletion = await openai.chat.completions.create({
+      messages: [{ role: "system", content: "You are an assistant helping to find information about people." }],
+      model: "gpt-3.5-turbo",
     });
 
-    const data = await response.json();
+    console.log(chatCompletion.choices[0].message.content);
 
-    console.log(data);
+    // const openai = new OpenAI({ apiKey });
+
+    // const completion = await openai.chat.completions.create({
+    //   model: "gpt-4o-mini",
+    //   messages: [
+    //     { role: "system", content: "You are a helpful assistant." },
+    //     {
+    //       role: "user",
+    //       content: "Write a haiku about recursion in programming.",
+    //     },
+    //   ],
+    // });
+
+    // console.log(completion.choices[0].message);
+
+    // const body = JSON.stringify({
+    //   model: process.env.OPENAI_API_MODEL,
+    //   messages: [
+    //     { role: 'system', content: 'You are an assistant helping to find information about people.' },
+    //     { role: 'user', content: query.body }
+    //   ],
+    //   temperature: 0.2
+    // });
+
+
+    //   const response = await fetch(url, {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //       Authorization: `Bearer ${apiKey}`,
+    //     },
+    //     body,
+    //   });
+
+    //   const data = await response.json();
+
+    // console.log(data);
 
     return 0;
   } catch (e) {

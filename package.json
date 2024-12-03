@@ -23,6 +23,7 @@
     "bullmq": "^5.26.2",
     "clsx": "^2.1.1",
     "docx": "^9.0.3",
+    "freegptjs": "^0.0.2",
     "install": "^0.13.0",
     "ioredis": "^5.4.1",
     "jest-mock-extended": "^4.0.0-beta1",
