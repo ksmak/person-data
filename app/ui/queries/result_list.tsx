@@ -8,6 +8,8 @@ import { Spinner } from '@material-tailwind/react';
 import { useSearchParams } from 'next/navigation';
 import { addJobQueriesProccess, createQuery } from '@/app/lib/actions';
 import { DefaultEventsMap } from '@socket.io/component-emitter';
+import { Btn, SecondaryBtn } from '../buttons';
+import { HiOutlinePrinter } from 'react-icons/hi';
 
 export default function ResultList({ url, userId }: { url: string, userId: string }) {
   const searchParams = useSearchParams();
@@ -81,6 +83,40 @@ export default function ResultList({ url, userId }: { url: string, userId: strin
     return url.toString();
   }
 
+  const handlePrint = async () => {
+    try {
+      const response = await fetch('/dashboard/queries/print', {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ results }),
+      });
+
+      if (!response.ok) {
+        throw Error(response.statusText);
+      }
+
+      const header = response.headers.get('Content-Disposition') || 'attachment; filename=results.docx';
+      const parts = header.split(';');
+      const filename = parts[1].split('=')[1].replaceAll("\"", "");
+
+      const blob = await response.blob();
+
+      if (blob != null) {
+        var url = window.URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   return (
     <div>
       <div className='text-xs text-gray-600 md:text-sm italic'>
@@ -89,6 +125,15 @@ export default function ResultList({ url, userId }: { url: string, userId: strin
           : loading
             ? <div>Идет поиск данных... <Spinner className="inline ml-2 h-4 w-4 text-primary/50" /></div>
             : <div>Поиск завершен. Найдено: {results.filter(item => !item.error).length}</div>}
+      </div>
+      <div className='w-full flex justify-end'>
+        <SecondaryBtn
+          className='bg-gray-50 flex items-center gap-2'
+          onClick={handlePrint}
+        >
+          <div className='hidden md:block'>Печать</div>
+          <HiOutlinePrinter className='h-5 w-5' />
+        </SecondaryBtn>
       </div>
       {results.map((item: Result, index: number) =>
         item.error
@@ -102,7 +147,7 @@ export default function ResultList({ url, userId }: { url: string, userId: strin
           <div className='text-sm underline text-blue-600 mt-5'>
             <a
               href={generateUrlForYandex()}
-
+              target='_blank'
             >
               Посмотреть результаты поиска на Yandex
             </a>

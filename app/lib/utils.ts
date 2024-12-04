@@ -1,5 +1,6 @@
-import { personFields } from "./definitions";
+import { personFields, PersonResult, Result, ResultField } from "./definitions";
 import bcrypt from "bcryptjs";
+import { fieldHelper } from "./fields";
 
 const salt = bcrypt.genSaltSync(10);
 
@@ -181,4 +182,66 @@ export function getCondition(key: string, val: string) {
   return {
     [`${key}`]: replaceVal,
   };
+}
+
+export function getResults(result: Result): ResultField[] {
+  let obj: ResultField[] = [];
+
+  switch (result.service) {
+    case 'Qarau API': {
+      try {
+        const data = result.data as PersonResult;
+        obj.push({ title: 'База данных', value: data.db_name || '' });
+        obj.push({ title: 'Ф.И.О', value: `${data.lastName} ${data.firstName} ${data.middleName}` });
+        obj.push({ title: 'ИИН', value: data.iin || '' });
+        obj.push({ title: 'Номер', value: data.phone || '' });
+        obj.push({ title: 'Адрес', value: '' });
+        obj.push({ title: 'Область/Регион', value: data.region || '' });
+        obj.push({ title: 'Район', value: data.district || '' });
+        obj.push({ title: 'Населенный пункт', value: data.locality || '' });
+        obj.push({ title: 'Улица/Микрорайон', value: data.street || '' });
+        obj.push({ title: 'Дом', value: data.building || '' });
+        obj.push({ title: 'Квартира', value: data.apartment || '' });
+        obj.push({ title: 'Дополнительная информация', value: '' });
+        if (!!data.extendedPersonData) {
+          Object.keys(data.extendedPersonData).map((key: string) => {
+            if (data.extendedPersonData && data.extendedPersonData[`${key}` as keyof typeof data.extendedPersonData]) {
+              obj.push({
+                title: key,
+                value: data.extendedPersonData[`${key}` as keyof typeof data.extendedPersonData]
+                  ? String(data.extendedPersonData[`${key}` as keyof typeof data.extendedPersonData]) : '',
+              })
+            }
+          });
+        };
+      } catch (e) {
+        console.log(e);
+      }
+      break;
+    }
+
+    case 'UsersBox API': {
+      try {
+        obj.push({ title: 'База данных', value: result.data?.source?.database });
+        obj.push({ title: 'Коллекция', value: result.data?.source?.collection });
+        if (result.data?.hits?.items) {
+          result.data.hits.items.map((item: any) => {
+            Object.keys(item).map((k: string) => {
+              if (fieldHelper[`${k}` as keyof typeof fieldHelper]) {
+                if (typeof item[`${k}`] === 'object') {
+                  obj.push({ title: fieldHelper[`${k}` as keyof typeof fieldHelper], value: JSON.stringify(item[`${k}`]) });
+                } else {
+                  obj.push({ title: fieldHelper[`${k}` as keyof typeof fieldHelper], value: item[`${k}`] || '' });
+                }
+              }
+            });
+          });
+        }
+      } catch (e) {
+        console.log(e);
+      }
+      break;
+    }
+  }
+  return obj;
 }

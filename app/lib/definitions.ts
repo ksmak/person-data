@@ -165,6 +165,7 @@ export const PERSONS_FULLTEXT_EXP = `
 `;
 
 export type PersonResult = {
+  db_name: string | null;
   lastName: string | null;
   firstName: string | null;
   middleName: string | null;
@@ -177,7 +178,6 @@ export type PersonResult = {
   building: string | null;
   apartment: string | null;
   extendedPersonData: string | null;
-  db_name: string | null;
 };
 
 export type Person = {
@@ -256,3 +256,8 @@ export type Result = {
   service: "Qarau API" | "UsersBox API";
   error?: string;
 };
+
+export type ResultField = {
+  title: string;
+  value: string;
+}
