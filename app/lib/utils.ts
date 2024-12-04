@@ -222,8 +222,8 @@ export function getResults(result: Result): ResultField[] {
 
     case 'UsersBox API': {
       try {
-        obj.push({ title: 'База данных', value: result.data?.source?.database });
-        obj.push({ title: 'Коллекция', value: result.data?.source?.collection });
+        obj.push({ title: 'База данных', value: result.data?.source?.database || '' });
+        obj.push({ title: 'Коллекция', value: result.data?.source?.collection || '' });
         if (result.data?.hits?.items) {
           result.data.hits.items.map((item: any) => {
             Object.keys(item).map((k: string) => {

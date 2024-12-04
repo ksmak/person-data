@@ -126,7 +126,7 @@ export default function ResultList({ url, userId }: { url: string, userId: strin
             ? <div>Идет поиск данных... <Spinner className="inline ml-2 h-4 w-4 text-primary/50" /></div>
             : <div>Поиск завершен. Найдено: {results.filter(item => !item.error).length}</div>}
       </div>
-      <div className='w-full flex justify-end'>
+      {typeof loading !== 'undefined' && loading === false ? <div className='w-full flex justify-end'>
         <SecondaryBtn
           className='bg-gray-50 flex items-center gap-2'
           onClick={handlePrint}
@@ -135,6 +135,7 @@ export default function ResultList({ url, userId }: { url: string, userId: strin
           <HiOutlinePrinter className='h-5 w-5' />
         </SecondaryBtn>
       </div>
+        : null}
       {results.map((item: Result, index: number) =>
         item.error
           ? <div key={index} className='bg-secondary rounded my-3 p-2 border border-borderlight text-sm text-red-600'>
@@ -142,7 +143,7 @@ export default function ResultList({ url, userId }: { url: string, userId: strin
             <div>{item.error}</div>
           </div>
           : <ResultCard key={index} result={item} />)}
-      {loading === false &&
+      {typeof loading !== 'undefined' && loading === false ?
         <div>
           <div className='text-sm underline text-blue-600 mt-5'>
             <a
@@ -153,6 +154,7 @@ export default function ResultList({ url, userId }: { url: string, userId: strin
             </a>
           </div>
         </div>
+        : null
       }
     </div>
   );

@@ -112,7 +112,8 @@ export async function POST(request: Request) {
             },
         });
     } catch (e) {
-        return new Response('Error printing!', {
+        console.log(e);
+        return new Response(`Error printing! ${e}`, {
             status: 500
         })
     }
