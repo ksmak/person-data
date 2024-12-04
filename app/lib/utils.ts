@@ -185,7 +185,7 @@ export function getCondition(key: string, val: string) {
 }
 
 export function getResults(result: Result): ResultField[] {
-  let obj: ResultField[] = [];
+  const obj: ResultField[] = [];
 
   switch (result.service) {
     case 'Qarau API': {

@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 
         const json = await request.json();
 
-        let items: any = [];
+        const items: any = [];
 
         json.results.map(async (result: Result) => {
             if (!result.error) {
