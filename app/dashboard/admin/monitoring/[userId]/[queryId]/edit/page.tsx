@@ -39,6 +39,9 @@ export default async function Page(props: {
                 breadcrumbs={
                     [
                         {
+                            label: 'Администрирование', href: '/dashboard/admin'
+                        },
+                        {
                             label: 'Мониторинг запросов', href: '/dashboard/admin/monitoring'
                         },
                         {

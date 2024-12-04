@@ -7,6 +7,7 @@ import { fetchUserByEmail, fetchUsersQueriesPages } from '@/app/lib/data';
 import { Metadata } from 'next';
 import { auth } from '@/auth';
 import { ErrorAccess } from '@/app/ui/error-access';
+import Breadcrumbs from '@/app/ui/breadcrumbs';
 
 export const metadata: Metadata = {
     title: 'Monitoring',
@@ -39,9 +40,17 @@ export default async function Page(props: {
 
     return (
         <div className="w-full">
-            <div className="flex w-full items-center justify-between">
-                <h1 className="text-2xl">Мониторинг запросов</h1>
-            </div>
+            <Breadcrumbs
+                breadcrumbs={
+                    [
+                        {
+                            label: 'Администрирование', href: '/dashboard/admin'
+                        },
+                        {
+                            label: 'Мониторинг запросов', href: "/dashboard/admin/monitoring", active: true
+                        },
+                    ]}
+            />
             <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
                 <Search placeholder="Поиск..." />
             </div>

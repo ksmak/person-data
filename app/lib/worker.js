@@ -2,8 +2,7 @@ const { Worker } = require("bullmq");
 const IORedis = require("ioredis");
 const { PrismaClient } = require("@prisma/client");
 const { io } = require("socket.io-client");
-const OpenAI = require("openai");
-const FreeGPT3 = require("freegptjs");
+// const OpenAI = require("openai");
 
 let connection;
 
@@ -337,12 +336,17 @@ async function getChatGPTAPI(query) {
   try {
     //free gpt
 
-
     // No API key required.
     const openai = new FreeGPT3();
 
     const chatCompletion = await openai.chat.completions.create({
-      messages: [{ role: "system", content: "You are an assistant helping to find information about people." }],
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are an assistant helping to find information about people.",
+        },
+      ],
       model: "gpt-3.5-turbo",
     });
 
@@ -372,7 +376,6 @@ async function getChatGPTAPI(query) {
     //   temperature: 0.2
     // });
 
-
     //   const response = await fetch(url, {
     //     method: 'POST',
     //     headers: {
@@ -388,9 +391,8 @@ async function getChatGPTAPI(query) {
 
     return 0;
   } catch (e) {
-
     console.log(e);
 
     return 0;
-  };
+  }
 }

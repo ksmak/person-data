@@ -2,12 +2,12 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { fetchUserByEmailAndPassword } from "@/app/lib/data";
 import prisma from "@/client";
-import { PrismaAdapter } from "@auth/prisma-adapter"
+import { PrismaAdapter } from "@auth/prisma-adapter";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
   session: {
-    strategy: 'jwt',
+    strategy: "jwt",
   },
   pages: {
     signIn: "/login",
@@ -15,11 +15,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       if (!!auth?.user) {
-        const isOnDashboard = nextUrl.pathname.startsWith("/dashboard/");
+        const isOnDashboard = nextUrl.pathname.startsWith("/dashboard");
         if (isOnDashboard) {
           return true;
         } else {
-          return Response.redirect(new URL("/dashboard/queries", nextUrl));
+          return Response.redirect(new URL("/dashboard", nextUrl));
         }
       }
 

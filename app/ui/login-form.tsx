@@ -16,7 +16,7 @@ export default function LoginForm() {
     const formData = new FormData(event.currentTarget);
     const state: LoginState = await login(formData) as LoginState;
     setState(state);
-    router.push("/dashboard/queries");
+    router.push("/dashboard");
   }
 
   return (

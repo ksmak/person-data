@@ -2,6 +2,7 @@ import { ImportForm } from "@/app/ui/admin/import/forms";
 import { fetchDb, fetchUserByEmail } from "@/app/lib/data";
 import { ErrorAccess } from "@/app/ui/error-access";
 import { auth } from "@/auth";
+import Breadcrumbs from "@/app/ui/breadcrumbs";
 
 export default async function Page() {
     const session = await auth();
@@ -18,7 +19,17 @@ export default async function Page() {
 
     return (
         <div className="w-full">
-            <h1 className="text-2xl text-center pb-5">Загрузка данных</h1>
+            <Breadcrumbs
+                breadcrumbs={
+                    [
+                        {
+                            label: 'Администрирование', href: '/dashboard/admin'
+                        },
+                        {
+                            label: 'Загрузка данных', href: "/dashboard/admin/import", active: true
+                        },
+                    ]}
+            />
             <ImportForm url={process.env.WS_URL || "http://localhost"} db={db} />
         </div>
     )

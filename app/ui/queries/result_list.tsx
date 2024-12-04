@@ -3,14 +3,14 @@
 import io, { Socket } from 'socket.io-client';
 import { Result } from "@/app/lib/definitions";
 import { useEffect, useState } from "react";
-import ResultCard from './result_card';
+import ResultCard from '@/app/ui/queries/result_card';
 import { Spinner } from '@material-tailwind/react';
 import { useSearchParams } from 'next/navigation';
 import { addJobQueriesProccess, createQuery } from '@/app/lib/actions';
 import { DefaultEventsMap } from '@socket.io/component-emitter';
-import { Btn, SecondaryBtn } from '../buttons';
+import { SecondaryBtn } from '@/app/ui/buttons';
 import { HiOutlinePrinter } from 'react-icons/hi';
-import LogoOutline from '../logo-outline';
+import LogoOutline from '@/app/ui/logo-outline';
 
 export default function ResultList({ url, userId }: { url: string, userId: string }) {
   const searchParams = useSearchParams();
@@ -86,7 +86,7 @@ export default function ResultList({ url, userId }: { url: string, userId: strin
 
   const handlePrint = async () => {
     try {
-      const response = await fetch('/dashboard/queries/print', {
+      const response = await fetch('/dashboard/print', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -120,7 +120,7 @@ export default function ResultList({ url, userId }: { url: string, userId: strin
 
   return (
     <div className='w-full flex flex-col items-center'>
-      <div className='text-xs text-gray-600 md:text-sm italic flex flex-col'>
+      <div className='text-sm text-gray-600 md:text-sm italic flex flex-col'>
         {typeof loading === 'undefined'
           ? <LogoOutline className="w-48 h-48 md:w-72 md:h-72 flex justify-center items-center" />
           : loading
@@ -139,7 +139,7 @@ export default function ResultList({ url, userId }: { url: string, userId: strin
         : null}
       {results.map((item: Result, index: number) =>
         item.error
-          ? <div key={index} className='w-full bg-secondary rounded my-3 border border-borderlight text-xs text-red-600 flex gap-1'>
+          ? <div key={index} className='w-full bg-secondary rounded my-3 border border-borderlight text-sm text-red-600 flex gap-1'>
             <div>Сервис: {item.service},</div>
             <div>{item.error}</div>
           </div>

@@ -14,8 +14,8 @@ import { User } from "@prisma/client";
 
 const links = [
   {
-    title: 'Поиск информации',
-    href: '/dashboard/queries',
+    title: 'Поиск',
+    href: '/dashboard',
     icon: HiOutlineSearch,
     forAdmin: false,
     subMenu: false,
