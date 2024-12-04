@@ -19,7 +19,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (isOnDashboard) {
           return true;
         } else {
-          return Response.redirect(new URL("/dashboard", nextUrl));
+          return Response.redirect(new URL("/dashboard/queries", nextUrl));
         }
       }
 

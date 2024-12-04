@@ -1,9 +1,14 @@
-export default function Logo() {
+import Image from "next/image";
+
+export default function Logo({ className }: { className: string }) {
   return (
-    <div
-      className="w-full leading-none text-white flex justify-center"
-    >
-      <p className="text-[25px] md:text-[25px] font-serif uppercase antialiased font-medium tracking-wider">Qarau</p>
+    <div className={className}>
+      <Image
+        src="/qarau-logo.png"
+        height={125}
+        width={125}
+        alt="logo"
+      />
     </div>
   );
 }

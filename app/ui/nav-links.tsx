@@ -3,7 +3,6 @@
 import {
   HiOutlineSearch,
   HiOutlineDatabase,
-  HiOutlineUserCircle,
   HiOutlineUser,
   HiOutlineShieldCheck,
   HiOutlineChartBar

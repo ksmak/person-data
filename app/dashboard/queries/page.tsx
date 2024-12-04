@@ -24,11 +24,13 @@ export default async function Page(props: {
     if (!user) return <ErrorAccess />;
 
     return (
-        <div className="w-full flex flex-col">
-            <div className="text-xl md:text-4xl text-gray-900 font-bold text-center md:text-start">Добро пожаловать</div>
-            <div className="text-xs md:text-lg text-gray-600 mt-2 mb-10">Вы можете начать поиск по ФИО, фотографии, ИИН/БИН, email, номеру телефона, адресу и т.д.</div>
-            <Search />
-            <div className="mt-3">
+        <div className="w-full h-screen flex flex-col items-center">
+            <div className="text-xl md:text-4xl text-gray-900 font-semibold tracking-wide ">Добро пожаловать</div>
+            <div className="text-xs md:text-lg text-gray-600 mt-2 mb-10 leading-5 text-wrap indent-1">Вы можете начать поиск по ФИО, фотографии, ИИН/БИН, email, номеру телефона, адресу и т.д.</div>
+            <div className="w-full">
+                <Search />
+            </div>
+            <div className="w-full mt-3">
                 <ResultList url={process.env.WS_URL || "http://localhost:3001"} userId={user.id} />
             </div>
         </div >

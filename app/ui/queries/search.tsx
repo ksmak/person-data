@@ -40,7 +40,7 @@ export default function Search() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="flex flex-col md:flex-row md:items-center gap-3 flex-wrap mb-5">
+      <div className="flex flex-col md:flex-row md:items-center gap-3 flex-wrap mb-5 md:px-52">
         <div className="grow relative flex flex-1 flex-shrink-0">
           <input
             ref={inputRef}
@@ -64,7 +64,7 @@ export default function Search() {
               onChange={handleUploadPhoto}
             />
           </label>
-          <div className="absolute left-0 top-12 text-xs text-red-600">{error}</div>
+          <div className="absolute left-0 top-12 text-xs text-gray-600">{error}</div>
         </div>
         <Btn type="submit" className="h-10 w-32 self-center flex justify-center">начать поиск</Btn>
       </div>

@@ -16,21 +16,12 @@ export default function LoginForm() {
     const formData = new FormData(event.currentTarget);
     const state: LoginState = await login(formData) as LoginState;
     setState(state);
-    if (state.user) {
-      if (state.user.isAdmin) {
-        router.push("/dashboard");
-      } else {
-        router.push("/dashboard/queries")
-      }
-    }
+    router.push("/dashboard/queries");
   }
 
   return (
     <form className="space-y-3" onSubmit={handleSubmit}>
-      <div className="flex-1 rounded-lg bg-secondary border border-borderlight px-6 pb-4 pt-8">
-        <h1 className={`mb-3 text-sm text-center italic`}>
-          Для продолжения введите свой логин и пароль.
-        </h1>
+      <div className="flex-1 rounded-lg px-4 pb-4 pt-4">
         <div className="w-full">
           <div>
             <label
@@ -73,8 +64,8 @@ export default function LoginForm() {
             <p className="text-xs text-red-500">{state?.errors?.password}</p>
           </div>
         </div>
-        <Button className="mt-4 w-full flex items-center gap-4 bg-primary" type='submit'>
-          Вход <HiArrowSmRight className="ml-auto h-5 w-5 text-gray-50" />
+        <Button className="mt-10 w-full flex justify-center items-center gap-4 bg-primary" type='submit'>
+          <div>Войти</div>
         </Button>
         <div
           className="flex h-8 items-end space-x-1"

@@ -15,7 +15,7 @@ export default function ResultCard({ result }: { result: Result }) {
                 setVisible(true);
                 setTimeout(() => {
                     setVisible(false);
-                }, 2000)
+                }, 1000)
             })
             .catch(err => {
                 console.log('Something went wrong', err);
@@ -23,12 +23,12 @@ export default function ResultCard({ result }: { result: Result }) {
     }
 
     return (
-        <div className="mt-5 text-sm antialiased tracking-wider ">
+        <div className="mt-5 text-sm antialiased tracking-wide bg-white p-4 rounded-md w-full">
             {result_fields.map((item: ResultField, index: number) => (
                 <div key={index}>
                     <span className="font-thin text-gray-800">{item.title}{': '}</span>
                     <span
-                        className="mono select-all hover:cursor-pointer hover:italic"
+                        className="mono select-all hover:cursor-pointer"
                         onClick={handleSelectText}
                         ref={refText}
                     >
@@ -36,7 +36,7 @@ export default function ResultCard({ result }: { result: Result }) {
                     </span>
                 </div>
             ))}
-            {visible && <div className="absolute bottom-10 end-20">скопировано в буфер обмена!</div>}
+            {visible && <div className="absolute bottom-10">скопировано в буфер обмена!</div>}
         </div>
     );
 }

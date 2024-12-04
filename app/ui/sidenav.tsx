@@ -56,11 +56,11 @@ export default function SideNav({ user }: { user: User | null }) {
             </Drawer>
             <Link
                 className="mb-2 flex h-20 items-center justify-start rounded-md bg-primary p-4 md:h-52"
-                href="/dashboard"
+                href="/dashboard/queries"
             >
-                <div className="w-full text-white md:w-52 flex justify-between items-center">
-                    <Logo />
-                    <Button className='md:hidden bg-primary shadow-none' onClick={openDrawer}>
+                <div className="w-full text-white md:w-52 flex justify-between md:justify-center items-center">
+                    <Logo className='h-16 w-16 md:w-52 md:h-52 flex justify-center items-center' />
+                    <Button className='block md:hidden bg-primary' onClick={openDrawer}>
                         <HiOutlineMenu className='h-7 w-7' />
                     </Button>
                 </div>

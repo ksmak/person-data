@@ -192,7 +192,7 @@ export function getResults(result: Result): ResultField[] {
       try {
         const data = result.data as PersonResult;
         obj.push({ title: 'База данных', value: data.db_name || '' });
-        obj.push({ title: 'Ф.И.О', value: `${data.lastName} ${data.firstName} ${data.middleName}` });
+        obj.push({ title: 'Ф.И.О', value: `${data.lastName || ''} ${data.firstName || ''} ${data.middleName || ''}` });
         obj.push({ title: 'ИИН', value: data.iin || '' });
         obj.push({ title: 'Номер', value: data.phone || '' });
         obj.push({ title: 'Адрес', value: '' });
