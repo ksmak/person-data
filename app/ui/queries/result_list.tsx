@@ -104,8 +104,8 @@ export default function ResultList({ url, userId }: { url: string, userId: strin
       const blob = await response.blob();
 
       if (blob != null) {
-        let url = window.URL.createObjectURL(blob);
-        let a = document.createElement('a');
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
         a.href = url;
         a.download = filename;
         document.body.appendChild(a);
