@@ -24,7 +24,7 @@ export async function POST(request: Request) {
 
         const user = await fetchUserByEmail(email);
 
-        if (!user?.isAdmin) throw new Error('User not found.');
+        if (!user) throw new Error('User not found.');
 
         const json = await request.json();
 
