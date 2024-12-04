@@ -9,8 +9,8 @@ module.exports = withMT({
       colors: {
         primary: "#6f96c3",
         secondary: "#edf2f7",
-        select: "#dbe5f0",
-        primarytxt: "#022c22",
+        select: "#b7cbe1",
+        primarytxt: "#263e5a",
         emerald600: "#3c6390",
         emerald500: "#4470a2",
         emerald400: "#4b7cb4",

@@ -40,7 +40,7 @@ export default function Search() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="flex flex-col md:flex-row md:items-center gap-3 flex-wrap mb-5 md:px-52">
+      <div className="flex flex-col md:flex-row md:items-center gap-3 flex-wrap mb-5 md:w-1/2 ml-auto mr-auto">
         <div className="grow relative flex flex-1 flex-shrink-0">
           <input
             ref={inputRef}
