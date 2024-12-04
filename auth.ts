@@ -15,7 +15,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       if (!!auth?.user) {
-        const isOnDashboard = nextUrl.pathname.startsWith("/dashboard");
+        const isOnDashboard = nextUrl.pathname.startsWith("/dashboard/");
         if (isOnDashboard) {
           return true;
         } else {
