@@ -57,15 +57,15 @@ export async function POST(request: Request) {
         });
 
         const doc = new Document({
-            title: "Person Data: results",
-            description: "Person Data: results",
+            title: "Qarau: results",
+            description: "Qarau: results",
             sections: [
                 {
                     headers: {
                         default: new Header({
                             children: [
                                 new Paragraph({
-                                    text: "PERSON DATA",
+                                    text: "QARAU",
                                     heading: HeadingLevel.HEADING_6,
                                     alignment: AlignmentType.RIGHT,
                                 }),
