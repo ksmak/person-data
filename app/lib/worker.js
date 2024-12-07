@@ -3,7 +3,6 @@ const IORedis = require("ioredis");
 const { PrismaClient } = require("@prisma/client");
 const { io } = require("socket.io-client");
 const fs = require("fs");
-const path = require("path");
 // const OpenAI = require("openai");
 
 let connection;
@@ -198,7 +197,7 @@ async function processQuery(data) {
 
     let result = [0];
 
-    if (query.body.startsWith("#photo:")) {
+    if (query.body.startsWith("https://")) {
       result.push(await getSearch4Faces(query));
     } else {
       result = await Promise.all([
@@ -429,14 +428,34 @@ async function getSearch4Faces(query) {
   }
 
   // Проверка наличия аргумента в строке body
-  let fileName;
+  const fileName = query.body;
+
+  let fileBuffer;
 
   try {
-    fileName = query.body.split(":")[1];
-  } catch {
+    const response = await fetch(fileName);
+
+    if (!response.ok) {
+      const rs = {
+        queryId: query.id,
+        error: `Ошибка доступа к файлу.`,
+        service: "Search4Faces API",
+      };
+
+      console.log("query-data: ", rs);
+
+      socket.emit("query-data", rs);
+
+      return 0;
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+
+    fileBuffer = Buffer.from(arrayBuffer);
+  } catch (error) {
     const rs = {
       queryId: query.id,
-      error: `Ошибка! Не указан файл.`,
+      error: `Ошибка! ${error}`,
       service: "Search4Faces API",
     };
 
@@ -446,26 +465,6 @@ async function getSearch4Faces(query) {
 
     return 0;
   }
-
-  const imagePath = `/public/uploads/${fileName}`;
-
-  // Проверка файла на существование и формат
-  if (!fs.existsSync(imagePath)) {
-    const rs = {
-      queryId: query.id,
-      error: `Ошибка! Файл не существует.`,
-      service: "Search4Faces API",
-    };
-
-    console.log("query-data: ", rs);
-
-    socket.emit("query-data", rs);
-
-    return 0;
-  }
-
-  const fileBuffer = fs.readFileSync(imagePath);
-  const fileExtension = path.extname(imagePath).toLowerCase();
 
   const isJpeg = fileBuffer
     .subarray(0, 3)
@@ -474,7 +473,7 @@ async function getSearch4Faces(query) {
     .subarray(0, 8)
     .equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
 
-  if (![".jpeg", ".jpg", ".png"].includes(fileExtension) && !isJpeg && !isPng) {
+  if (!isJpeg && !isPng) {
     const rs = {
       queryId: query.id,
       error: `Ошибка! Файл не является допустимым .jpeg или .png изображением.`,
@@ -489,10 +488,7 @@ async function getSearch4Faces(query) {
   }
 
   // Кодирование изображения в Base64
-  const imageBase64old = fileBuffer.toString("base64");
-  const imageBase64 = fs.readFileSync(imagePath, "base64");
-
-  console.log(imageBase64 === imageBase64old);
+  const imageBase64 = fileBuffer.toString("base64");
 
   try {
     // Детектирование лиц
@@ -519,8 +515,6 @@ async function getSearch4Faces(query) {
 
         // Поиск лиц
         const searchFace = await request("searchFace", searchParams);
-
-        console.log(JSON.stringify(searchFace));
 
         if (!searchFace.profiles) {
           return 0;

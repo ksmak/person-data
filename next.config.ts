@@ -16,6 +16,9 @@ const nextConfig: NextConfig = {
     return config;
   },
   output: "standalone",
+  images: {
+    domains: ["qaraubucket.s3.eu-north-1.amazonaws.com"],
+  },
 };
 
 export default nextConfig;

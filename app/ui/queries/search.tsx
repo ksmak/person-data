@@ -154,7 +154,7 @@ export default function Search({ url, userId }: { url: string, userId: string })
       <div className="my-3 self-center">
         {file && <Image
           alt={file}
-          src={`/uploads/${file}`}
+          src={file}
           width={100}
           height={100}
         />}
@@ -166,7 +166,7 @@ export default function Search({ url, userId }: { url: string, userId: string })
             className="peer block w-full rounded-md border border-gray-500 py-[9px] pl-10 pr-8 md:pr-36 text-md outline-none placeholder:text-gray-500"
             name="body"
             placeholder="Поиск..."
-            defaultValue={!file ? '' : `#photo:${file}`}
+            defaultValue={file}
           />
           <HiOutlineSearch className="absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
           <label htmlFor="uploadFile1"

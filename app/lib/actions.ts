@@ -296,9 +296,30 @@ export async function logout() {
 
 export async function uploadFile(file: File) {
   const arrayBuffer = await file.arrayBuffer();
-  const buffer = new Uint8Array(arrayBuffer);
-  const fileName = uuidv4();
-  const extension = file.name.split(".").at(-1);
-  await fs.writeFile(`/public/uploads/${fileName}.${extension}`, buffer);
-  return `${fileName}.${extension}`;
+  const buffer = Buffer.from(arrayBuffer);
+
+  const AWS = require("aws-sdk");
+
+  const s3 = new AWS.S3({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region: process.env.AWS_REGION,
+  });
+
+  const params = {
+    Bucket: "qaraubucket",
+    Key: file.name,
+    Body: buffer,
+    ContentType: file.type,
+  };
+
+  await s3.upload(params).promise();
+
+  const paramsPresignedUrl = {
+    Bucket: "qaraubucket",
+    Key: file.name,
+    Expires: 60 * 60,
+  };
+
+  return s3.getSignedUrlPromise("getObject", paramsPresignedUrl);
 }
