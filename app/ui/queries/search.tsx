@@ -154,7 +154,7 @@ export default function Search({ url, userId }: { url: string, userId: string })
       <div className="my-3 self-center">
         {file && <Image
           alt={file}
-          src={`/public/uploads/${file}`}
+          src={`/uploads/${file}`}
           width={100}
           height={100}
         />}
