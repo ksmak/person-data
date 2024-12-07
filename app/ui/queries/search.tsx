@@ -90,7 +90,7 @@ export default function Search({ url, userId }: { url: string, userId: string })
           setFile(result);
         })
         .catch(() => {
-          setMessage('Ошибка при загрузке файла!')
+          setMessage('Ошибка при загрузке файла!');
         })
         .finally(() => {
           setLoadingFile(false);
@@ -154,7 +154,7 @@ export default function Search({ url, userId }: { url: string, userId: string })
       <div className="my-3 self-center">
         {file && <Image
           alt={file}
-          src={`/uploads/${file}`}
+          src={`/public/uploads/${file}`}
           width={100}
           height={100}
         />}

@@ -447,7 +447,7 @@ async function getSearch4Faces(query) {
     return 0;
   }
 
-  const imagePath = `./public/uploads/${fileName}`;
+  const imagePath = `/public/uploads/${fileName}`;
 
   // Проверка файла на существование и формат
   if (!fs.existsSync(imagePath)) {
