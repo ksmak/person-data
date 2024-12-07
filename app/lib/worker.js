@@ -538,7 +538,7 @@ async function getSearch4Faces(query) {
   } catch (error) {
     const rs = {
       queryId: query.id,
-      error: `Ошибка! ${error}`,
+      error: `Ошибка API! ${error}`,
       service: "Search4Faces API",
     };
 
