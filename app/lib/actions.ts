@@ -10,12 +10,14 @@ import {
   Person,
   State,
   UpdateSubscription,
-  UpdateUser
+  UpdateUser,
 } from "@/app/lib/definitions";
 import queue from "./queue";
 import { saltAndHashPassword } from "./utils";
 import { signIn, signOut } from "@/auth";
 import { AuthError } from "next-auth";
+import fs from "node:fs/promises";
+import { v4 as uuidv4 } from "uuid";
 
 export async function createUser(prevState: State, formData: FormData) {
   const validatedFields = CreateUser.safeParse({
@@ -234,12 +236,9 @@ export async function createQuery(userId: string, body: string) {
 }
 
 export async function addJobQueriesProccess(queryId: string) {
-  await queue.add(
-    "process-queries",
-    {
-      queryId: queryId,
-    },
-  );
+  await queue.add("process-queries", {
+    queryId: queryId,
+  });
 }
 
 export async function loadData(persons: Person[]) {
@@ -293,4 +292,13 @@ export async function login(formData: FormData) {
 export async function logout() {
   await signOut();
   redirect("/dashboard");
+}
+
+export async function uploadFile(file: File) {
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = new Uint8Array(arrayBuffer);
+  const fileName = uuidv4();
+  const extension = file.name.split(".").at(-1);
+  await fs.writeFile(`./public/uploads/${fileName}.${extension}`, buffer);
+  return `${fileName}.${extension}`;
 }

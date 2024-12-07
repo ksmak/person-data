@@ -54,7 +54,9 @@ export default function SideNav({ user }: { user: User | null }) {
                 </div>
             </Drawer>
             <div className="w-full h-24 flex justify-between items-center bg-primary text-white">
-                <Logo className='h-20 w-20 flex justify-center items-center ml-5 md:ml-8' />
+                <Link href="/">
+                    <Logo className='h-20 w-20 flex justify-center items-center ml-5 md:ml-8' />
+                </Link>
                 <Button className='md:mr-8 mr-5 bg-primary shadow-none hover:shadow-none' onClick={openDrawer}>
                     <HiOutlineMenu className='h-7 w-7' />
                 </Button>

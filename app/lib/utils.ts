@@ -188,50 +188,79 @@ export function getResults(result: Result): ResultField[] {
   const obj: ResultField[] = [];
 
   switch (result.service) {
-    case 'Qarau API': {
+    case "Qarau API": {
       try {
         const data = result.data as PersonResult;
-        obj.push({ title: 'База данных', value: data.db_name || '' });
-        obj.push({ title: 'Ф.И.О', value: `${data.lastName || ''} ${data.firstName || ''} ${data.middleName || ''}` });
-        obj.push({ title: 'ИИН', value: data.iin || '' });
-        obj.push({ title: 'Номер', value: data.phone || '' });
-        obj.push({ title: 'Адрес', value: '' });
-        obj.push({ title: 'Область/Регион', value: data.region || '' });
-        obj.push({ title: 'Район', value: data.district || '' });
-        obj.push({ title: 'Населенный пункт', value: data.locality || '' });
-        obj.push({ title: 'Улица/Микрорайон', value: data.street || '' });
-        obj.push({ title: 'Дом', value: data.building || '' });
-        obj.push({ title: 'Квартира', value: data.apartment || '' });
-        obj.push({ title: 'Дополнительная информация', value: '' });
+        obj.push({ title: "База данных", value: data.db_name || "" });
+        obj.push({
+          title: "Ф.И.О",
+          value: `${data.lastName || ""} ${data.firstName || ""} ${
+            data.middleName || ""
+          }`,
+        });
+        obj.push({ title: "ИИН", value: data.iin || "" });
+        obj.push({ title: "Номер", value: data.phone || "" });
+        obj.push({ title: "Адрес", value: "" });
+        obj.push({ title: "Область/Регион", value: data.region || "" });
+        obj.push({ title: "Район", value: data.district || "" });
+        obj.push({ title: "Населенный пункт", value: data.locality || "" });
+        obj.push({ title: "Улица/Микрорайон", value: data.street || "" });
+        obj.push({ title: "Дом", value: data.building || "" });
+        obj.push({ title: "Квартира", value: data.apartment || "" });
+        obj.push({ title: "Дополнительная информация", value: "" });
         if (!!data.extendedPersonData) {
           Object.keys(data.extendedPersonData).map((key: string) => {
-            if (data.extendedPersonData && data.extendedPersonData[`${key}` as keyof typeof data.extendedPersonData]) {
+            if (
+              data.extendedPersonData &&
+              data.extendedPersonData[
+                `${key}` as keyof typeof data.extendedPersonData
+              ]
+            ) {
               obj.push({
                 title: key,
-                value: data.extendedPersonData[`${key}` as keyof typeof data.extendedPersonData]
-                  ? String(data.extendedPersonData[`${key}` as keyof typeof data.extendedPersonData]) : '',
-              })
+                value: data.extendedPersonData[
+                  `${key}` as keyof typeof data.extendedPersonData
+                ]
+                  ? String(
+                      data.extendedPersonData[
+                        `${key}` as keyof typeof data.extendedPersonData
+                      ]
+                    )
+                  : "",
+              });
             }
           });
-        };
+        }
       } catch (e) {
         console.log(e);
       }
       break;
     }
 
-    case 'UsersBox API': {
+    case "UsersBox API": {
       try {
-        obj.push({ title: 'База данных', value: result.data?.source?.database || '' });
-        obj.push({ title: 'Коллекция', value: result.data?.source?.collection || '' });
+        obj.push({
+          title: "База данных",
+          value: result.data?.source?.database || "",
+        });
+        obj.push({
+          title: "Коллекция",
+          value: result.data?.source?.collection || "",
+        });
         if (result.data?.hits?.items) {
           result.data.hits.items.map((item: any) => {
             Object.keys(item).map((k: string) => {
               if (fieldHelper[`${k}` as keyof typeof fieldHelper]) {
-                if (typeof item[`${k}`] === 'object') {
-                  obj.push({ title: fieldHelper[`${k}` as keyof typeof fieldHelper], value: JSON.stringify(item[`${k}`]) });
+                if (typeof item[`${k}`] === "object") {
+                  obj.push({
+                    title: fieldHelper[`${k}` as keyof typeof fieldHelper],
+                    value: JSON.stringify(item[`${k}`]),
+                  });
                 } else {
-                  obj.push({ title: fieldHelper[`${k}` as keyof typeof fieldHelper], value: item[`${k}`] || '' });
+                  obj.push({
+                    title: fieldHelper[`${k}` as keyof typeof fieldHelper],
+                    value: item[`${k}`] || "",
+                  });
                 }
               }
             });
@@ -240,6 +269,48 @@ export function getResults(result: Result): ResultField[] {
       } catch (e) {
         console.log(e);
       }
+      break;
+    }
+
+    case "Search4Faces API": {
+      obj.push({
+        title: "Фамилия",
+        value: result.data?.last_name || "",
+      });
+      obj.push({
+        title: "Имя",
+        value: result.data?.first_name || "",
+      });
+      obj.push({
+        title: "Отчество",
+        value: result.data?.maiden_name || "",
+      });
+      obj.push({
+        title: "Дата рождения",
+        value: result.data?.born || "",
+      });
+      obj.push({
+        title: "Возраст",
+        value: result.data?.age || "",
+      });
+      obj.push({
+        title: "Страна",
+        value: result.data?.country || "",
+      });
+      obj.push({
+        title: "Город",
+        value: result.data?.city || "",
+      });
+      obj.push({
+        title: "адрес профиля пользователя",
+        value: result.data?.profile || "",
+        href: result.data?.profile || "",
+      });
+      obj.push({
+        title: "адрес страницы с изображением из профиля",
+        value: result.data?.photo || "",
+        href: result.data?.photo || "",
+      });
       break;
     }
   }

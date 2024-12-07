@@ -7,13 +7,13 @@ export const ITEMS_PER_PAGE = 8;
 
 export const searchSchema = z.object({
   body: z.string().min(4, {
-    message: 'Для поиска необходимо хотя бы 4 символа'
+    message: "Для поиска необходимо хотя бы 4 символа",
   }),
   photo: z.string(),
 });
 
 export const search = searchSchema.omit({
-  photo: true
+  photo: true,
 });
 
 export type LoginState = {
@@ -135,7 +135,6 @@ export const UpdateSubscription = SubscriptionFormSchema.omit({
   id: true,
 });
 
-
 export const PERSONS_FIELDS_LIST = `
     "Person"."iin",
     "Person"."phone",
@@ -227,14 +226,14 @@ export type TableHead = {
   title: string;
   name: string;
   fieldType:
-  | "string"
-  | "boolean"
-  | "date"
-  | "datetime"
-  | "active"
-  | "nested"
-  | "queryBody"
-  | "queryState";
+    | "string"
+    | "boolean"
+    | "date"
+    | "datetime"
+    | "active"
+    | "nested"
+    | "queryBody"
+    | "queryState";
   nestedName?: string;
 };
 
@@ -253,11 +252,12 @@ export type MessageChat = {
 
 export type Result = {
   data: any;
-  service: "Qarau API" | "UsersBox API";
+  service: "Qarau API" | "UsersBox API" | "Search4Faces API";
   error?: string;
 };
 
 export type ResultField = {
   title: string;
   value: string;
-}
+  href?: string;
+};

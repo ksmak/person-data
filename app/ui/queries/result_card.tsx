@@ -27,13 +27,15 @@ export default function ResultCard({ result }: { result: Result }) {
             {result_fields.map((item: ResultField, index: number) => (
                 <div key={index}>
                     <span className="font-thin text-gray-800">{item.title}{': '}</span>
-                    <span
-                        className="mono select-all hover:cursor-pointer"
-                        onClick={handleSelectText}
-                        ref={refText}
-                    >
-                        {item.value}
-                    </span>
+                    {item.href
+                        ? <a href={item.href} target="_blank" className="text-blue-600 underline">{item.href}</a>
+                        : <span
+                            className="mono select-all hover:cursor-pointer"
+                            onClick={handleSelectText}
+                            ref={refText}
+                        >
+                            {item.value}
+                        </span>}
                 </div>
             ))}
             {visible && <div className="absolute bottom-10">скопировано в буфер обмена!</div>}

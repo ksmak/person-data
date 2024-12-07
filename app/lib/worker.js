@@ -2,6 +2,8 @@ const { Worker } = require("bullmq");
 const IORedis = require("ioredis");
 const { PrismaClient } = require("@prisma/client");
 const { io } = require("socket.io-client");
+const fs = require("fs");
+const path = require("path");
 // const OpenAI = require("openai");
 
 let connection;
@@ -194,11 +196,17 @@ async function processQuery(data) {
 
     socket.emit("query-started", { queryId: query.id });
 
-    const result = await Promise.all([
-      getPersonsDataAPI(query),
-      getUsersBoxAPI(query),
-      // getChatGPTAPI(query),
-    ]);
+    let result = [0];
+
+    if (query.body.startsWith("#photo:")) {
+      result.push(await getSearch4Faces(query));
+    } else {
+      result = await Promise.all([
+        getPersonsDataAPI(query),
+        getUsersBoxAPI(query),
+        getChatGPTAPI(query),
+      ]);
+    }
 
     await prisma.query.update({
       where: {
@@ -329,29 +337,10 @@ async function getUsersBoxAPI(query) {
 }
 
 async function getChatGPTAPI(query) {
+  const url = process.env.OPENAI_API_URL;
   const apiKey = process.env.OPENAI_API_TOKEN;
 
-  const url = process.env.OPENAI_API_URL;
-
   try {
-    //free gpt
-
-    // No API key required.
-    const openai = new FreeGPT3();
-
-    const chatCompletion = await openai.chat.completions.create({
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are an assistant helping to find information about people.",
-        },
-      ],
-      model: "gpt-3.5-turbo",
-    });
-
-    console.log(chatCompletion.choices[0].message.content);
-
     // const openai = new OpenAI({ apiKey });
 
     // const completion = await openai.chat.completions.create({
@@ -391,7 +380,177 @@ async function getChatGPTAPI(query) {
 
     return 0;
   } catch (e) {
-    console.log(e);
+    const rs = {
+      queryId: query.id,
+      error: `Ошибка! Сервис не доступен.`,
+      service: "ChatGPT API",
+    };
+
+    console.log("query-data: ", rs);
+
+    socket.emit("query-data", rs);
+
+    return 0;
+  }
+}
+
+async function getSearch4Faces(query) {
+  // Настройки API
+  const apiUrl = process.env.SEARCH4FACES_URL;
+  const apiKey = process.env.SEARCH4FACES_API_KEY;
+
+  // Функция для выполнения запроса
+  async function request(method, params) {
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json-rpc",
+        "x-authorization-token": apiKey,
+      },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        method: method,
+        params: params,
+        id: 1,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Ошибка HTTP: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.error) {
+      throw new Error(`Ошибка API: ${JSON.stringify(data.error)}`);
+    }
+
+    return data.result;
+  }
+
+  // Проверка наличия аргумента в строке body
+  let fileName;
+
+  try {
+    fileName = query.body.split(":")[1];
+  } catch {
+    const rs = {
+      queryId: query.id,
+      error: `Ошибка! Не указан файл.`,
+      service: "Search4Faces API",
+    };
+
+    console.log("query-data: ", rs);
+
+    socket.emit("query-data", rs);
+
+    return 0;
+  }
+
+  const imagePath = `./public/uploads/${fileName}`;
+
+  // Проверка файла на существование и формат
+  if (!fs.existsSync(imagePath)) {
+    const rs = {
+      queryId: query.id,
+      error: `Ошибка! Файл не существует.`,
+      service: "Search4Faces API",
+    };
+
+    console.log("query-data: ", rs);
+
+    socket.emit("query-data", rs);
+
+    return 0;
+  }
+
+  const fileBuffer = fs.readFileSync(imagePath);
+  const fileExtension = path.extname(imagePath).toLowerCase();
+
+  const isJpeg = fileBuffer
+    .subarray(0, 3)
+    .equals(Buffer.from([0xff, 0xd8, 0xff]));
+  const isPng = fileBuffer
+    .subarray(0, 8)
+    .equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
+
+  if (![".jpeg", ".jpg", ".png"].includes(fileExtension) && !isJpeg && !isPng) {
+    const rs = {
+      queryId: query.id,
+      error: `Ошибка! Файл не является допустимым .jpeg или .png изображением.`,
+      service: "Search4Faces API",
+    };
+
+    console.log("query-data: ", rs);
+
+    socket.emit("query-data", rs);
+
+    return 0;
+  }
+
+  // Кодирование изображения в Base64
+  const imageBase64old = fileBuffer.toString("base64");
+  const imageBase64 = fs.readFileSync(imagePath, "base64");
+
+  console.log(imageBase64 === imageBase64old);
+
+  try {
+    // Детектирование лиц
+    const detectFaces = await request("detectFaces", { image: imageBase64 });
+    const faces = detectFaces.faces;
+    const sources = [
+      "vkok_avatar",
+      "vk_wall",
+      "tt_avatar",
+      "ch_avatar",
+      "vkokn_avatar",
+      "sb_photo",
+    ];
+
+    for (let i = 0; i < faces.length; i++) {
+      for (let j = 0; j < sources.length; j++) {
+        const searchParams = {
+          image: detectFaces.image,
+          face: faces[i],
+          source: sources[j],
+          results: 3,
+          hidden: true,
+        };
+
+        // Поиск лиц
+        const searchFace = await request("searchFace", searchParams);
+
+        console.log(JSON.stringify(searchFace));
+
+        if (!searchFace.profiles) {
+          return 0;
+        }
+
+        searchFace.profiles.map((item) => {
+          const rs = {
+            queryId: query.id,
+            data: item,
+            service: "Search4Faces API",
+          };
+
+          console.log("query-data: ", rs);
+
+          socket.emit("query-data", rs);
+        });
+
+        return searchFace.profiles.length;
+      }
+    }
+  } catch (error) {
+    const rs = {
+      queryId: query.id,
+      error: `Ошибка! ${error}`,
+      service: "Search4Faces API",
+    };
+
+    console.log("query-data: ", rs);
+
+    socket.emit("query-data", rs);
 
     return 0;
   }
