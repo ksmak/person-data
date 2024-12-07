@@ -299,6 +299,6 @@ export async function uploadFile(file: File) {
   const buffer = new Uint8Array(arrayBuffer);
   const fileName = uuidv4();
   const extension = file.name.split(".").at(-1);
-  await fs.writeFile(`./public/uploads/${fileName}.${extension}`, buffer);
+  await fs.writeFile(`/public/uploads/${fileName}.${extension}`, buffer);
   return `${fileName}.${extension}`;
 }
