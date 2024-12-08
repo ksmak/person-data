@@ -32,12 +32,6 @@ export default async function UserQueriesPanel({
 
         },
         {
-            title: "Запрос",
-            name: "body",
-            fieldType: "string",
-
-        },
-        {
             title: "Статус",
             name: "state",
             fieldType: "queryState",
@@ -46,6 +40,18 @@ export default async function UserQueriesPanel({
         {
             title: "Количество совпадений",
             name: "count",
+            fieldType: "string",
+
+        },
+        {
+            title: "Фото",
+            name: " image",
+            fieldType: "string",
+
+        },
+        {
+            title: "Запрос",
+            name: "body",
             fieldType: "string",
 
         },

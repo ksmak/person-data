@@ -6,6 +6,7 @@ import { auth } from "@/auth";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HiOutlineX } from "react-icons/hi";
+import moment from "moment";
 
 export default async function Page(props: {
     params: Promise<{
@@ -69,6 +70,12 @@ export default async function Page(props: {
                             </Link>
                         </SecondaryBtn>
                     </div>
+                </div>
+                <div className="mt-2 p-4 bg-secondary rounded-lg border border-gray-100">
+                    создан: {moment(query.createdAt).format('DD.MM.YYYY HH:mm')}
+                </div>
+                <div className="mt-2 p-4 bg-secondary rounded-lg border border-gray-100">
+                    фото: {query.image}
                 </div>
                 <div className="mt-2 p-4 bg-secondary rounded-lg border border-gray-100">
                     {query.body}
