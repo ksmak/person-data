@@ -197,7 +197,7 @@ async function processQuery(data) {
 
     let result = [0];
 
-    if (query.body.startsWith("https://")) {
+    if (query.image) {
       result.push(await getSearch4Faces(query));
     } else {
       result = await Promise.all([

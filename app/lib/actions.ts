@@ -16,8 +16,6 @@ import queue from "./queue";
 import { saltAndHashPassword } from "./utils";
 import { signIn, signOut } from "@/auth";
 import { AuthError } from "next-auth";
-import fs from "node:fs/promises";
-import { v4 as uuidv4 } from "uuid";
 
 export async function createUser(prevState: State, formData: FormData) {
   const validatedFields = CreateUser.safeParse({
@@ -226,11 +224,27 @@ export async function deleteSubscription(id: string) {
   redirect("/dashboard/admin/subscriptions");
 }
 
-export async function createQuery(userId: string, body: string) {
+export async function createQuery(
+  userId: string,
+  body: string,
+  image: File | null
+) {
+  let _body = "";
+  let _image = null;
+
+  if (image) {
+    _body = await uploadFile(image);
+    _image = image.name;
+  } else {
+    _body = body;
+    _image = null;
+  }
+
   return await prisma.query.create({
     data: {
       userId: userId,
-      body: body,
+      body: _body,
+      image: _image,
     },
   });
 }
