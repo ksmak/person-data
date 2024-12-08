@@ -509,7 +509,7 @@ async function getSearch4Faces(query) {
           image: detectFaces.image,
           face: faces[i],
           source: sources[j],
-          results: 3,
+          results: Number(process.env.SEARCH4FACES_RESULTS_COUNT) || 2,
           hidden: true,
         };
 

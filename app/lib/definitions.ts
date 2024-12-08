@@ -260,4 +260,5 @@ export type ResultField = {
   title: string;
   value: string;
   href?: string;
+  image?: string;
 };

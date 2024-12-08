@@ -164,11 +164,11 @@ export default function Search({ url, userId }: { url: string, userId: string })
   return (
     <div className="w-full flex flex-col justify-center">
       {file &&
-        <div className="my-3 self-center w-24 flex flex-col gap-3">
+        <div className="my-3 self-center w-32 flex flex-col gap-3">
           <Image alt={file.name || ''}
             src={URL.createObjectURL(file)}
-            width={100}
-            height={100}
+            width={200}
+            height={200}
           />
           <SecondaryBtn className="justify-center" onClick={handleDelete}>Удалить</SecondaryBtn>
         </div>}

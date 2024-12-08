@@ -274,6 +274,15 @@ export function getResults(result: Result): ResultField[] {
 
     case "Search4Faces API": {
       obj.push({
+        title: "face",
+        value: result.data?.face || "",
+        image: result.data?.face || "",
+      });
+      obj.push({
+        title: "Процент схожести",
+        value: result.data?.score || "",
+      });
+      obj.push({
         title: "Фамилия",
         value: result.data?.last_name || "",
       });
@@ -310,6 +319,11 @@ export function getResults(result: Result): ResultField[] {
         title: "адрес страницы с изображением из профиля",
         value: result.data?.photo || "",
         href: result.data?.photo || "",
+      });
+      obj.push({
+        title: "адрес исходного изображения из профиля",
+        value: result.data?.source || "",
+        href: result.data?.source || "",
       });
       break;
     }
