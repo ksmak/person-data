@@ -15,7 +15,7 @@ export default async function Page() {
     return (
         <div className="w-full flex flex-col items-center px-4">
             <div className="mt-10 text-2xl md:text-4xl font-semibold text-primarytxt">Добро пожаловать</div>
-            <div className="text-md md:text-lg text-gray-600 mt-2 mb-10 leading-5 text-wrap indent-1">Вы можете начать поиск по ФИО, фотографии, ИИН/БИН, email, номеру телефона, адресу и т.д.</div>
+            <div className="text-md md:text-lg text-gray-600 mt-2 mb-10 leading-5 text-wrap indent-1">Вы можете начать поиск по ФИО, фотографии, email, номеру телефона, адресу и т.д.</div>
             <Search
                 url={process.env.WS_URL || 'http://localhost:3001'}
                 userId={user.id}
