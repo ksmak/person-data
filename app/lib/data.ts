@@ -85,13 +85,11 @@ export async function fetchUsersPages(query: string) {
 }
 
 export async function fetchUserById(id: string) {
-  const user = prisma.user.findUnique({
+  return await prisma.user.findUnique({
     where: {
       id: id,
     },
   });
-
-  return user;
 }
 
 export async function fetchFilteredSubscriptions(

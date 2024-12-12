@@ -207,15 +207,33 @@ async function processQuery(data) {
       ]);
     }
 
+    const count = result.reduce((acc, v) => acc + v, 0);
+
     await prisma.query.update({
       where: {
         id: query.id,
       },
       data: {
         state: "COMPLETED",
-        count: result.reduce((acc, v) => acc + v, 0),
+        count: count,
       },
     });
+
+    if (count > 0) {
+      const user = await prisma.user.findUnique({
+        where: {
+          id: query.userId,
+        }
+      })
+      await prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          balance: user.balance - 1,
+        }
+      })
+    }
 
     socket.emit("query-completed", { queryId: query.id });
   } catch (e) {

@@ -18,9 +18,9 @@ export function SubscriptionCard({
                 <div className="font-normal text-sm">
                     &#9745; Цена: <strong>{sub.price} тг.</strong>
                 </div>
-                <Btn className="">
+                {/* <Btn className="">
                     Покупка
-                </Btn>
+                </Btn> */}
             </div>
         </div>
     )

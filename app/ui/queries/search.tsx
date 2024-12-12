@@ -6,13 +6,16 @@ import { ChangeEvent, FormEvent, useRef, useState } from "react";
 import { Result, search } from "@/app/lib/definitions";
 import ResultList from "./result_list";
 import { io, } from "socket.io-client";
-import { addJobQueriesProccess, createQuery, uploadFile } from "@/app/lib/actions";
+import { addJobQueriesProccess, createQuery } from "@/app/lib/actions";
 import LogoOutline from "../logo-outline";
-import { Spinner } from "@material-tailwind/react";
 import Image from "next/image";
 import clsx from "clsx";
+import { Dialog, DialogBody, DialogFooter, DialogHeader, Spinner } from "@material-tailwind/react";
+import { fetchUserById } from "@/app/lib/data";
+import Link from "next/link";
+import { User } from "@prisma/client";
 
-export default function Search({ url, userId }: { url: string, userId: string }) {
+export default function Search({ url, user }: { url: string, user: User }) {
   const socket = io(url);
   const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState<boolean>();
@@ -20,6 +23,7 @@ export default function Search({ url, userId }: { url: string, userId: string })
   const [message, setMessage] = useState<string>('');
   const [file, setFile] = useState<File | null>(null);
   const [body, setBody] = useState<string>();
+  const [modal, setModal] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -101,9 +105,13 @@ export default function Search({ url, userId }: { url: string, userId: string })
   }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    setLoading(true);
-
     event.preventDefault();
+        
+    if (!user?.balance || user.balance <= 0) {
+      return;
+    }
+    
+    setLoading(true);
 
     const formData = new FormData(event.currentTarget);
 
@@ -126,7 +134,7 @@ export default function Search({ url, userId }: { url: string, userId: string })
     }
 
     try {
-      const query = await createQuery(userId, body, file);
+      const query = await createQuery(user.id, body, file);
 
       socket.on('connect', () => {
         // console.log('connect socket');
@@ -163,6 +171,27 @@ export default function Search({ url, userId }: { url: string, userId: string })
 
   return (
     <div className="w-full flex flex-col justify-center">
+    <Dialog open={modal} handler={() => setModal(false)}>
+        <DialogHeader>Уважаемый подписчик!</DialogHeader>
+        <DialogBody className='text-md text-black'>
+          К сожалению, ваш баланс на данный момент исчерпан. Для пополнения
+          перейдите по следующей ссылке{': '}
+          <Link
+            className='text-primary underline italic'
+            href='/dashboard/subscriptions'
+          >
+            Подписки
+          </Link>
+        </DialogBody>
+        <DialogFooter>
+          <button
+            className='flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200'
+            onClick={() => setModal(false)}
+          >
+            <span>Закрыть</span>
+          </button>
+        </DialogFooter>
+      </Dialog>
       {file &&
         <div className="my-3 self-center w-32 flex flex-col gap-3">
           <Image alt={file.name || ''}
