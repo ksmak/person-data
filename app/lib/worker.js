@@ -203,7 +203,7 @@ async function processQuery(data) {
       result = await Promise.all([
         getPersonsDataAPI(query),
         getUsersBoxAPI(query),
-        getChatGPTAPI(query),
+        // getChatGPTAPI(query),
       ]);
     }
 
@@ -223,16 +223,16 @@ async function processQuery(data) {
       const user = await prisma.user.findUnique({
         where: {
           id: query.userId,
-        }
-      })
+        },
+      });
       await prisma.user.update({
         where: {
           id: user.id,
         },
         data: {
           balance: user.balance - 1,
-        }
-      })
+        },
+      });
     }
 
     socket.emit("query-completed", { queryId: query.id });
