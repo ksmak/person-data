@@ -1,4 +1,4 @@
-import { fetchUserById } from "@/app/lib/data";
+import { fetchUserByEmail } from "@/app/lib/data";
 import { SecondaryBtn } from "@/app/ui/buttons";
 import { ErrorAccess } from "@/app/ui/error-access";
 import UserQueriesPanel from "@/app/ui/admin/monitoring/panels";
@@ -17,13 +17,18 @@ export default async function Page(props: {
     sort?: string;
   }>;
 }) {
-  const params = await props.params;
-  const userId = params.userId;
+  const session = await auth();
 
-  const user = await fetchUserById(userId);
+  const email = session?.user?.email;
+
+  if (!email) return <ErrorAccess />;
+
+  const user = await fetchUserByEmail(email);
 
   if (!user?.isAdmin) return <ErrorAccess />;
 
+  const params = await props.params;
+  const userId = params.userId;
   const searchParams = await props.searchParams;
   const currentPage = Number(searchParams?.page) || 1;
   const orderBy = searchParams?.orderBy || "createdAt";
